@@ -77,5 +77,9 @@ func CreateAppGood(
 		CreatedAt:             info.CreatedAt,
 	}
 
+	// TODO: expand recommender
+	// TODO: expand coin type
+	// TODO: expand support coin types
+
 	return info1, nil
 }
