@@ -24,7 +24,7 @@ spec:
           - path: /api/good-gateway
             backend:
               serviceName: good-gateway
-              servicePort: 50330
+              servicePort: 50550
     - host: api.procyon.vip
       http: *http_rules
     - host: api.xpool.top

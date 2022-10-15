@@ -1,4 +1,4 @@
-# Npool ledger manager
+# Npool good gateway
 
 [![Test](https://github.com/NpoolPlatform/good-gateway/actions/workflows/main.yml/badge.svg?branch=master)](https://github.com/NpoolPlatform/good-gateway/actions/workflows/main.yml)
 
@@ -12,27 +12,7 @@
 -----------
 ### 功能
 ### 功能
-- [x] 创建service template
-- [x] 封装日志库
-- [x] 统一service cli框架
-- [x] 集成cli框架(https://github.com/urfave/cli)
-- [x] 集成http server框架(https://github.com/go-chi/chi.git 不需要封装)
-- [x] 集成http client框架(https://github.com/go-resty/resty 不需要封装)
-- [x] 集成consul注册与发现
-- [x] 全局主机环境参数解析
-- [x] 集成apollo配置中心(https://github.com/philchia/agollo.git)
-- [x] 集成redis访问
-- [x] 集成mysql访问框架(https://github.com/ent/ent)
-* [x] 集成版本信息
-* [x] 集成rabbitmq访问
-* [x] 完善rabbitmq API
-* [x] 生成docker镜像
-* [x] 发布docker镜像
-* [x] 将服务部署到k8s集群
-* [x] 将服务api通过traefik-internet ingress代理，供外部应用调用(视服务功能决定是否需要)
-* [ ] ingress中服务相关api的traefik规则定义
-* [x] 集成GRPC
-* [x] 添加GRPC proto编译支持
+- [x] 支持商品网关
 
 ### 命令
 * make init ```初始化仓库，创建go.mod```
@@ -43,24 +23,6 @@
 * make good-gateway ```单独编译服务```
 * make good-gateway-image ```单独生成服务镜像```
 * make deploy-to-k8s-cluster ```部署到k8s集群```
-
-### 步骤
-* 在github上将模板仓库https://github.com/NpoolPlatform/good-gateway.git import为https://github.com/NpoolPlatform/my-service-name.git
-* git clone https://github.com/NpoolPlatform/my-service-name.git
-* cd my-service-name
-* mv cmd/good-gateway cmd/my-service
-* 修改cmd/my-service/main.go中的serviceName为My Service
-* mv cmd/my-service/ServiceTemplate.viper.yaml cmd/my-service/MyService.viper.yaml
-* 将cmd/my-service/MyService.viper.yaml中的内容修改为当前服务对应内容
-* 修改Dockerfile和k8s部署文档为当前服务对应内容
-  * grep -rb "service template" ./*
-  * grep -rb "ServiceTemplate" ./*
-  * grep -rb "Service Template" ./*
-  * grep -rb "service_template" ./*
-  * grep -rb "good-gateway" ./*
-  * grep -rb "servicetmpl" ./*
-  * 修改cmd/my-service/k8s中的三个yaml文件，包含端口，服务名字
-  * grep -rb "serviceid"，并使用uuid生成新值替换
 
 ### 最佳实践
 * 每个服务只提供单一可执行文件，有利于docker镜像打包与k8s部署管理

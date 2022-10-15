@@ -5,8 +5,9 @@ go 1.17
 require (
 	github.com/NpoolPlatform/api-manager v0.0.0-20220826022307-d72866fe3ec0
 	github.com/NpoolPlatform/go-service-framework v0.0.0-20220927113434-7c153f087a8c
+	github.com/NpoolPlatform/good-manager v0.0.0-20221012151115-34d937e04eab
 	github.com/NpoolPlatform/good-middleware v0.0.0-20221013090447-ea312cbed0b9
-	github.com/NpoolPlatform/message v0.0.0-20221013102022-a5056f862bff
+	github.com/NpoolPlatform/message v0.0.0-20221015100707-7c0e3f131579
 	github.com/NpoolPlatform/sphinx-coininfo v0.0.0-20220930040119-1eb8b2e73e3f
 	github.com/go-resty/resty/v2 v2.7.0
 	github.com/google/uuid v1.3.0
@@ -23,7 +24,6 @@ require (
 require (
 	ariga.io/atlas v0.7.2-0.20220927111110-867ee0cca56a // indirect
 	entgo.io/ent v0.11.3 // indirect
-	github.com/NpoolPlatform/good-manager v0.0.0-20221012151115-34d937e04eab // indirect
 	github.com/NpoolPlatform/libent-cruder v0.0.0-20220821121920-9559f5776d15 // indirect
 	github.com/Shonminh/apollo-client v0.4.0 // indirect
 	github.com/agext/levenshtein v1.2.1 // indirect

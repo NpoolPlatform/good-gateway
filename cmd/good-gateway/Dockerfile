@@ -6,6 +6,6 @@ COPY good-gateway /app
 
 ENTRYPOINT ["/app/good-gateway"]
 
-EXPOSE 50330 50331 50332 50333
+EXPOSE 50550 50551 50552 50553
 
 CMD ["run"]

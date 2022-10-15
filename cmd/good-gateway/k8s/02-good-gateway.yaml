@@ -21,7 +21,7 @@ spec:
           imagePullPolicy: Always
           volumeMounts:
             - name: service-config
-              mountPath: /etc/ServiceTemplate
+              mountPath: /etc/GoodGateway
           env:
             - name: ENV_ENVIRONMENT_TARGET
               valueFrom:
@@ -48,7 +48,7 @@ spec:
             name: good-gateway-config
             items:
               - key: service-conf
-                path: ServiceTemplate.viper.yaml
+                path: GoodGateway.viper.yaml
 ---
 apiVersion: v1
 kind: Service
@@ -58,16 +58,16 @@ metadata:
 spec:
   ports:
     - name: http
-      port: 50330
-      targetPort: 50330
+      port: 50550
+      targetPort: 50550
     - name: grpc
-      port: 50331
-      targetPort: 50331
+      port: 50551
+      targetPort: 50551
     - name: healthz
-      port: 50332
-      targetPort: 50332
+      port: 50552
+      targetPort: 50552
     - name: prometheus
-      port: 50333
-      targetPort: 50333
+      port: 50553
+      targetPort: 50553
   selector:
     app: good-gateway
