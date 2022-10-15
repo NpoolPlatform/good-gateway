@@ -4,9 +4,9 @@ go 1.17
 
 require (
 	github.com/NpoolPlatform/api-manager v0.0.0-20220826022307-d72866fe3ec0
-	github.com/NpoolPlatform/go-service-framework v0.0.0-20220927113434-7c153f087a8c
-	github.com/NpoolPlatform/good-manager v0.0.0-20221012151115-34d937e04eab
-	github.com/NpoolPlatform/good-middleware v0.0.0-20221013090447-ea312cbed0b9
+	github.com/NpoolPlatform/go-service-framework v0.0.0-20221015040432-cd676d323379
+	github.com/NpoolPlatform/good-manager v0.0.0-20221015040644-d3cf57e2a99b
+	github.com/NpoolPlatform/good-middleware v0.0.0-20221015095050-7303a81bf098
 	github.com/NpoolPlatform/message v0.0.0-20221015100707-7c0e3f131579
 	github.com/NpoolPlatform/sphinx-coininfo v0.0.0-20220930040119-1eb8b2e73e3f
 	github.com/go-resty/resty/v2 v2.7.0

@@ -89,7 +89,7 @@ func (s *Server) CreateAppGood(ctx context.Context, in *npool.CreateAppGoodReque
 		in.GetOnline(),
 		in.GetVisible(),
 		in.GetGoodName(),
-		price,
+		in.GetPrice(),
 		in.GetDisplayIndex(),
 		in.GetPurchaseLimit(),
 		in.GetCommissionPercent(),
