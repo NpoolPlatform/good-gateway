@@ -8,7 +8,6 @@ require (
 	github.com/NpoolPlatform/good-manager v0.0.0-20221015040644-d3cf57e2a99b
 	github.com/NpoolPlatform/good-middleware v0.0.0-20221015095050-7303a81bf098
 	github.com/NpoolPlatform/message v0.0.0-20221015100707-7c0e3f131579
-	github.com/NpoolPlatform/sphinx-coininfo v0.0.0-20220930040119-1eb8b2e73e3f
 	github.com/go-resty/resty/v2 v2.7.0
 	github.com/google/uuid v1.3.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.10.0
