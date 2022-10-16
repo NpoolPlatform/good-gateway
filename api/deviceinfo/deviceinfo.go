@@ -3,6 +3,7 @@ package deviceinfo
 
 import (
 	"context"
+
 	constant "github.com/NpoolPlatform/good-middleware/pkg/message/const"
 	commontracer "github.com/NpoolPlatform/good-middleware/pkg/tracer"
 
