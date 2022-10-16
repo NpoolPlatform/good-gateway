@@ -105,7 +105,7 @@ func (s *Server) CreateAppGood(ctx context.Context, in *npool.CreateAppGoodReque
 }
 
 /*
-func (s *Server) GetGood(ctx context.Context, in *npool.GetGoodRequest) (*npool.GetGoodResponse, error) {
+func (s *Server) GetAppGood(ctx context.Context, in *npool.GetAppGoodsRequest) (*npool.GetAppGoodResponse, error) {
 	var err error
 
 	_, span := otel.Tracer(constant.ServiceName).Start(ctx, "GetGood")
