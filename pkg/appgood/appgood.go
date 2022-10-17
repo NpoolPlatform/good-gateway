@@ -1,9 +1,10 @@
+//nolint
 package appgood
 
 import (
 	"context"
+	"fmt"
 
-	appusermwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/user"
 	goodmgrcli "github.com/NpoolPlatform/good-manager/pkg/client/subgood"
 	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 	npoolpb "github.com/NpoolPlatform/message/npool"
@@ -17,6 +18,11 @@ import (
 	appgoodmgrpb "github.com/NpoolPlatform/message/npool/good/mgr/v1/appgood"
 
 	appgoodmwcli "github.com/NpoolPlatform/good-middleware/pkg/client/appgood"
+
+	coininfopb "github.com/NpoolPlatform/message/npool/coininfo"
+
+	appusermwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/user"
+	appusermwpb "github.com/NpoolPlatform/message/npool/appuser/mw/v1/user"
 )
 
 func CreateAppGood(
@@ -40,12 +46,10 @@ func CreateAppGood(
 		return nil, err
 	}
 
-	return scan(ctx, info, nil)
+	return scan(ctx, info)
 }
 
 func GetAppGoods(ctx context.Context, appID string, offset, limit int32) ([]*npool.Good, uint32, error) {
-	infos := []*npool.Good{}
-
 	goods, total, err := appgoodmwcli.GetGoods(ctx, &appgoodmgrpb.Conds{
 		AppID: &npoolpb.StringVal{
 			Op:    cruder.EQ,
@@ -55,14 +59,9 @@ func GetAppGoods(ctx context.Context, appID string, offset, limit int32) ([]*npo
 	if err != nil {
 		return nil, 0, err
 	}
-
-	for _, val := range goods {
-		goodInfos, err := scan(ctx, val, nil)
-		if err != nil {
-			return nil, 0, err
-		}
-
-		infos = append(infos, goodInfos)
+	infos, err := scans(ctx, goods, appID)
+	if err != nil {
+		return nil, 0, err
 	}
 
 	return infos, total, err
@@ -82,55 +81,89 @@ func UpdateAppGood(ctx context.Context, in *npool.UpdateAppGoodRequest) (*npool.
 		return nil, err
 	}
 
-	return scan(ctx, info, nil)
+	return scan(ctx, info)
 }
 
-//nolint
-func scan(ctx context.Context, info *goodmwpb.Good, key *int) (*npool.Good, error) {
-	coinType, err := coininfocli.GetCoinInfo(ctx, info.CoinTypeID)
+func scan(ctx context.Context, info *goodmwpb.Good) (*npool.Good, error) {
+	infos := []*goodmwpb.Good{}
+	infos = append(infos, info)
+	goods, err := scans(ctx, infos, info.AppID)
+	if err != nil {
+		return nil, err
+	}
+	if len(goods) == 0 {
+		return nil, fmt.Errorf("goods invalid")
+	}
+	return goods[0], nil
+}
+
+func scans(ctx context.Context, infos []*goodmwpb.Good, appID string) ([]*npool.Good, error) {
+	coinTypes, err := coininfocli.GetCoinInfos(ctx, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	supportCoins := []*npool.Good_CoinInfo{}
-	for _, val := range info.SupportCoinTypeIDs {
-		coinTypeInfo, err := coininfocli.GetCoinInfo(ctx, val)
-		if err != nil {
-			return nil, err
-		}
-		supportCoins = append(supportCoins, &npool.Good_CoinInfo{
-			CoinTypeID:  info.CoinTypeID,
-			CoinLogo:    coinTypeInfo.Logo,
-			CoinName:    coinTypeInfo.Name,
-			CoinUnit:    coinTypeInfo.Unit,
-			CoinPreSale: coinTypeInfo.PreSale,
-		})
+	ctMap := map[string]*coininfopb.CoinInfo{}
+	for _, coinType := range coinTypes {
+		ctMap[coinType.ID] = coinType
 	}
 
-	var recommenderEmailAddress *string
-	var recommenderPhoneNO *string
-	var recommenderUsername *string
-	var recommenderFirstName *string
-	var recommenderLastName *string
-
-	if info.RecommenderID != nil {
-		recommender, err := appusermwcli.GetUser(ctx, info.AppID, info.GetRecommenderID())
-		if err != nil {
-			return nil, err
+	userIDs := []string{}
+	goodIDs := []string{}
+	for _, val := range infos {
+		if val.RecommenderID != nil {
+			userIDs = append(userIDs, *val.RecommenderID)
 		}
-		recommenderEmailAddress = &recommender.EmailAddress
-		recommenderPhoneNO = &recommender.PhoneNO
-		recommenderUsername = &recommender.Username
-		recommenderFirstName = &recommender.FirstName
-		recommenderLastName = &recommender.LastName
+		goodIDs = append(goodIDs, val.ID)
 	}
 
+	userInfos, _, err := appusermwcli.GetManyUsers(ctx, userIDs)
+	if err != nil {
+		return nil, err
+	}
+
+	userMap := map[string]*appusermwpb.User{}
+	for _, userInfo := range userInfos {
+		userMap[userInfo.ID] = userInfo
+	}
+
+	subGoodMap, err := getSubGoods(ctx, ctMap, userMap, goodIDs, appID)
+	if err != nil {
+		return nil, err
+	}
+
+	goods := getGoodInfos(ctMap, userMap, infos)
+
+	for key := range goods {
+		subGood, ok := subGoodMap[goods[key].ID]
+		if ok {
+			goods[key].SubGoods = subGood
+		}
+	}
+	return goods, nil
+}
+
+func getSubGoods(
+	ctx context.Context,
+	ctMap map[string]*coininfopb.CoinInfo,
+	userMap map[string]*appusermwpb.User,
+	goodIDs []string,
+	appID string,
+) (map[string][]*npool.Good, error) {
 	subGoods, _, err := goodmgrcli.GetSubGoods(ctx, &subgoodmgrpb.Conds{
-		MainGoodID: &npoolpb.StringVal{
+		AppID: &npoolpb.StringVal{
 			Op:    cruder.EQ,
-			Value: info.GoodID,
+			Value: appID,
 		},
-	}, 0, 0)
+		MainGoodIDs: &npoolpb.StringSliceVal{
+			Op:    cruder.EQ,
+			Value: goodIDs,
+		},
+	}, 0, int32(len(goodIDs)))
+
+	if err != nil {
+		return nil, err
+	}
 
 	subGoodIDs := []string{}
 	for _, val := range subGoods {
@@ -142,7 +175,7 @@ func scan(ctx context.Context, info *goodmwpb.Good, key *int) (*npool.Good, erro
 		subAppGoods, _, err = appgoodmwcli.GetGoods(ctx, &appgoodmgrpb.Conds{
 			AppID: &npoolpb.StringVal{
 				Op:    cruder.EQ,
-				Value: info.AppID,
+				Value: "",
 			},
 			GoodIDs: &npoolpb.StringSliceVal{
 				Op:    cruder.EQ,
@@ -154,79 +187,144 @@ func scan(ctx context.Context, info *goodmwpb.Good, key *int) (*npool.Good, erro
 		}
 	}
 
-	subAppGoodsInfo := []*npool.Good{}
-	for index, val := range subAppGoods {
-		info1, err := scan(ctx, val, &index)
-		if err != nil {
-			return nil, err
+	goods := getGoodInfos(ctMap, userMap, subAppGoods)
+
+	subGoodMap := map[string][]*npool.Good{}
+
+	for _, subGood := range subGoods {
+		subGoodInfos := []*npool.Good{}
+		for _, subGood1 := range subGoods {
+			for _, good := range goods {
+				if subGood.MainGoodID == subGood1.MainGoodID && subGood1.SubGoodID == good.ID {
+					good.Commission = subGood1.Commission
+					good.Must = subGood1.Must
+					subGoodInfos = append(subGoodInfos, good)
+				}
+			}
 		}
-		subAppGoodsInfo = append(subAppGoodsInfo, info1)
+		subGoodMap[subGood.MainGoodID] = subGoodInfos
 	}
 
-	must := true
-	commission := true
-	if key != nil {
-		must = subAppGoodsInfo[*key].Must
-		commission = subAppGoodsInfo[*key].Commission
-	}
+	return subGoodMap, nil
+}
 
-	info1 := &npool.Good{
-		ID:                      info.ID,
-		AppID:                   info.AppID,
-		GoodID:                  info.GoodID,
-		Online:                  info.Online,
-		Visible:                 info.Visible,
-		Price:                   info.Price,
-		DisplayIndex:            info.DisplayIndex,
-		PurchaseLimit:           info.PurchaseLimit,
-		CommissionPercent:       info.CommissionPercent,
-		PromotionStartAt:        info.PromotionStartAt,
-		PromotionEndAt:          info.PromotionEndAt,
-		PromotionMessage:        info.PromotionMessage,
-		PromotionPrice:          info.PromotionPrice,
-		PromotionPosters:        info.PromotionPosters,
-		RecommenderID:           info.RecommenderID,
-		RecommenderEmailAddress: recommenderEmailAddress,
-		RecommenderPhoneNO:      recommenderPhoneNO,
-		RecommenderUsername:     recommenderUsername,
-		RecommenderFirstName:    recommenderFirstName,
-		RecommenderLastName:     recommenderLastName,
-		RecommendMessage:        info.RecommendMessage,
-		RecommendIndex:          info.RecommendIndex,
-		RecommendAt:             info.RecommendAt,
-		DeviceType:              info.DeviceType,
-		DeviceManufacturer:      info.DeviceManufacturer,
-		DevicePowerComsuption:   info.DevicePowerComsuption,
-		DeviceShipmentAt:        info.DeviceShipmentAt,
-		DevicePosters:           info.DevicePosters,
-		DurationDays:            info.DurationDays,
-		VendorLocationCountry:   info.VendorLocationCountry,
-		CoinTypeID:              info.CoinTypeID,
-		CoinLogo:                coinType.Logo,
-		CoinName:                coinType.Name,
-		CoinUnit:                coinType.Unit,
-		CoinPreSale:             coinType.PreSale,
-		GoodType:                info.GoodType,
-		BenefitType:             info.BenefitType,
-		GoodName:                info.GoodName,
-		Unit:                    info.Unit,
-		UnitAmount:              info.UnitAmount,
-		TestOnly:                info.TestOnly,
-		Posters:                 info.Posters,
-		Labels:                  info.Labels,
-		VoteCount:               info.VoteCount,
-		Rating:                  info.Rating,
-		SupportCoins:            supportCoins,
-		GoodTotal:               info.GoodTotal,
-		GoodLocked:              info.GoodLocked,
-		GoodInService:           info.GoodInService,
-		GoodSold:                info.GoodSold,
-		SubGoods:                subAppGoodsInfo,
-		Must:                    must,
-		Commission:              commission,
-		StartAt:                 info.StartAt,
-		CreatedAt:               info.CreatedAt,
-	}
+func getGoodInfos(
+	ctMap map[string]*coininfopb.CoinInfo,
+	userMap map[string]*appusermwpb.User,
+	infos []*goodmwpb.Good,
+) []*npool.Good {
 
-	return info1, nil
+	goods := []*npool.Good{}
+
+	for _, info := range infos {
+		var coinType *coininfopb.CoinInfo
+		_, ok := ctMap[info.CoinTypeID]
+		if ok {
+			coinType = ctMap[info.CoinTypeID]
+		}
+
+		supportCoins := []*npool.Good_CoinInfo{}
+
+		for _, supportCoinTypeID := range info.SupportCoinTypeIDs {
+			coinTypeInfo, ok := ctMap[supportCoinTypeID]
+			if ok {
+				supportCoins = append(supportCoins, &npool.Good_CoinInfo{
+					CoinTypeID:  info.CoinTypeID,
+					CoinLogo:    coinTypeInfo.Logo,
+					CoinName:    coinTypeInfo.Name,
+					CoinUnit:    coinTypeInfo.Unit,
+					CoinPreSale: coinTypeInfo.PreSale,
+				})
+			}
+		}
+
+		var recommenderEmailAddress *string
+		var recommenderPhoneNO *string
+		var recommenderUsername *string
+		var recommenderFirstName *string
+		var recommenderLastName *string
+
+		if info.RecommenderID != nil {
+			userInfo, ok := userMap[*info.RecommenderID]
+			if ok {
+				recommenderEmailAddress = &userInfo.EmailAddress
+				recommenderPhoneNO = &userInfo.PhoneNO
+				recommenderUsername = &userInfo.Username
+				recommenderFirstName = &userInfo.FirstName
+				recommenderLastName = &userInfo.LastName
+			}
+		}
+
+		coinTypeLogo := ""
+		coinTypeName := ""
+		coinTypeUnit := ""
+		coinTypePreSale := true
+		if coinType != nil {
+			coinTypeLogo = coinType.Logo
+			coinTypeName = coinType.Name
+			coinTypeUnit = coinType.Unit
+			coinTypePreSale = coinType.PreSale
+		}
+
+		info1 := &npool.Good{
+			ID:                      info.ID,
+			AppID:                   info.AppID,
+			GoodID:                  info.GoodID,
+			Online:                  info.Online,
+			Visible:                 info.Visible,
+			Price:                   info.Price,
+			DisplayIndex:            info.DisplayIndex,
+			PurchaseLimit:           info.PurchaseLimit,
+			CommissionPercent:       info.CommissionPercent,
+			PromotionStartAt:        info.PromotionStartAt,
+			PromotionEndAt:          info.PromotionEndAt,
+			PromotionMessage:        info.PromotionMessage,
+			PromotionPrice:          info.PromotionPrice,
+			PromotionPosters:        info.PromotionPosters,
+			RecommenderID:           info.RecommenderID,
+			RecommenderEmailAddress: recommenderEmailAddress,
+			RecommenderPhoneNO:      recommenderPhoneNO,
+			RecommenderUsername:     recommenderUsername,
+			RecommenderFirstName:    recommenderFirstName,
+			RecommenderLastName:     recommenderLastName,
+			RecommendMessage:        info.RecommendMessage,
+			RecommendIndex:          info.RecommendIndex,
+			RecommendAt:             info.RecommendAt,
+			DeviceType:              info.DeviceType,
+			DeviceManufacturer:      info.DeviceManufacturer,
+			DevicePowerComsuption:   info.DevicePowerComsuption,
+			DeviceShipmentAt:        info.DeviceShipmentAt,
+			DevicePosters:           info.DevicePosters,
+			DurationDays:            info.DurationDays,
+			VendorLocationCountry:   info.VendorLocationCountry,
+			CoinTypeID:              info.CoinTypeID,
+			CoinLogo:                coinTypeLogo,
+			CoinName:                coinTypeName,
+			CoinUnit:                coinTypeUnit,
+			CoinPreSale:             coinTypePreSale,
+			GoodType:                info.GoodType,
+			BenefitType:             info.BenefitType,
+			GoodName:                info.GoodName,
+			Unit:                    info.Unit,
+			UnitAmount:              info.UnitAmount,
+			TestOnly:                info.TestOnly,
+			Posters:                 info.Posters,
+			Labels:                  info.Labels,
+			VoteCount:               info.VoteCount,
+			Rating:                  info.Rating,
+			SupportCoins:            supportCoins,
+			GoodTotal:               info.GoodTotal,
+			GoodLocked:              info.GoodLocked,
+			GoodInService:           info.GoodInService,
+			GoodSold:                info.GoodSold,
+			SubGoods:                nil,
+			Must:                    true,
+			Commission:              true,
+			StartAt:                 info.StartAt,
+			CreatedAt:               info.CreatedAt,
+		}
+
+		goods = append(goods, info1)
+	}
+	return goods
 }
