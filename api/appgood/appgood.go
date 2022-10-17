@@ -23,6 +23,8 @@ import (
 	appgood1 "github.com/NpoolPlatform/good-gateway/pkg/appgood"
 
 	"github.com/google/uuid"
+
+	appgoodmgrcli "github.com/NpoolPlatform/good-manager/pkg/client/appgood"
 )
 
 // nolint
@@ -185,6 +187,22 @@ func (s *Server) UpdateAppGood(ctx context.Context, in *npool.UpdateAppGoodReque
 	if _, err := uuid.Parse(in.GetID()); err != nil {
 		logger.Sugar().Errorw("UpdateGood", "ID", in.GetID(), "error", err)
 		return &npool.UpdateAppGoodResponse{}, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	if _, err := uuid.Parse(in.GetAppID()); err != nil {
+		logger.Sugar().Errorw("UpdateGood", "AppID", in.GetAppID(), "error", err)
+		return &npool.UpdateAppGoodResponse{}, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	good, err := appgoodmgrcli.GetAppGood(ctx, in.GetID())
+	if err != nil {
+		logger.Sugar().Errorw("UpdateGood", "error", err)
+		return &npool.UpdateAppGoodResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
+	if good.AppID != in.GetAppID() {
+		logger.Sugar().Errorw("UpdateGood", "AppID", in.GetAppID(), "error", err)
+		return &npool.UpdateAppGoodResponse{}, status.Error(codes.InvalidArgument, "AppID is invalid")
 	}
 
 	if in.Price != nil {

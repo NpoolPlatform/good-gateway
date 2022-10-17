@@ -5,8 +5,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
-
+	mgrcli "github.com/NpoolPlatform/good-manager/pkg/client/subgood"
 	constant "github.com/NpoolPlatform/good-middleware/pkg/message/const"
 	commontracer "github.com/NpoolPlatform/good-middleware/pkg/tracer"
 
@@ -21,10 +20,7 @@ import (
 
 	"github.com/google/uuid"
 
-	mgrcli "github.com/NpoolPlatform/good-manager/pkg/client/subgood"
-	mgrpb "github.com/NpoolPlatform/message/npool/good/mgr/v1/subgood"
-
-	npoolpb "github.com/NpoolPlatform/message/npool"
+	subgoodm "github.com/NpoolPlatform/good-gateway/pkg/subgood"
 )
 
 // nolint
@@ -58,13 +54,7 @@ func (s *Server) CreateSubGood(ctx context.Context, in *npool.CreateSubGoodReque
 
 	span = commontracer.TraceInvoker(span, "SubGood", "mw", "CreateSubGood")
 
-	info, err := mgrcli.CreateSubGood(ctx, &mgrpb.SubGoodReq{
-		AppID:      &in.AppID,
-		MainGoodID: &in.MainGoodID,
-		SubGoodID:  &in.SubGoodID,
-		Must:       &in.Must,
-		Commission: &in.Commission,
-	})
+	info, err := subgoodm.CreateSubGood(ctx, in)
 	if err != nil {
 		logger.Sugar().Errorw("CreateSubGood", "error", err)
 		return &npool.CreateSubGoodResponse{}, status.Error(codes.Internal, err.Error())
@@ -106,12 +96,12 @@ func (s *Server) CreateAppSubGood(ctx context.Context, in *npool.CreateAppSubGoo
 
 	span = commontracer.TraceInvoker(span, "SubGood", "mw", "CreateSubGood")
 
-	info, err := mgrcli.CreateSubGood(ctx, &mgrpb.SubGoodReq{
-		AppID:      &in.TargetAppID,
-		MainGoodID: &in.MainGoodID,
-		SubGoodID:  &in.SubGoodID,
-		Must:       &in.Must,
-		Commission: &in.Commission,
+	info, err := subgoodm.CreateSubGood(ctx, &npool.CreateSubGoodRequest{
+		AppID:      in.TargetAppID,
+		MainGoodID: in.MainGoodID,
+		SubGoodID:  in.SubGoodID,
+		Must:       in.Must,
+		Commission: in.Commission,
 	})
 	if err != nil {
 		logger.Sugar().Errorw("CreateSubGood", "error", err)
@@ -143,12 +133,7 @@ func (s *Server) GetSubGoods(ctx context.Context, in *npool.GetSubGoodsRequest) 
 
 	span = commontracer.TraceInvoker(span, "SubGood", "mgr", "GetSubGoods")
 
-	infos, total, err := mgrcli.GetSubGoods(ctx, &mgrpb.Conds{
-		AppID: &npoolpb.StringVal{
-			Op:    cruder.EQ,
-			Value: in.GetAppID(),
-		},
-	}, in.GetOffset(), in.GetLimit())
+	infos, total, err := subgoodm.GetSubGoods(ctx, in.GetAppID(), in.GetOffset(), in.GetLimit())
 	if err != nil {
 		logger.Sugar().Errorw("GetSubGood", "error", err)
 		return &npool.GetSubGoodsResponse{}, status.Error(codes.Internal, err.Error())
@@ -179,6 +164,17 @@ func (s *Server) UpdateSubGood(ctx context.Context, in *npool.UpdateSubGoodReque
 		return &npool.UpdateSubGoodResponse{}, status.Error(codes.InvalidArgument, err.Error())
 	}
 
+	subGood, err := mgrcli.GetSubGood(ctx, in.GetID())
+	if err != nil {
+		logger.Sugar().Errorw("UpdateSubGood", "ID", in.GetID(), "error", err)
+		return &npool.UpdateSubGoodResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
+	if subGood.GetAppID() != in.AppID {
+		logger.Sugar().Errorw("validate", "AppID", in.GetAppID(), "error", err)
+		return &npool.UpdateSubGoodResponse{}, status.Error(codes.InvalidArgument, fmt.Sprintf("AppID is invalid: %v", err))
+	}
+
 	if in.SubGoodID != nil {
 		if _, err := uuid.Parse(in.GetSubGoodID()); err != nil {
 			logger.Sugar().Errorw("validate", "SubGoodID", in.GetSubGoodID(), "error", err)
@@ -186,12 +182,7 @@ func (s *Server) UpdateSubGood(ctx context.Context, in *npool.UpdateSubGoodReque
 		}
 	}
 
-	info, err := mgrcli.UpdateSubGood(ctx, &mgrpb.SubGoodReq{
-		ID:         &in.ID,
-		SubGoodID:  in.SubGoodID,
-		Must:       in.Must,
-		Commission: in.Commission,
-	})
+	info, err := subgoodm.UpdateSubGood(ctx, in)
 	if err != nil {
 		logger.Sugar().Errorw("UpdateSubGood", "error", err)
 		return &npool.UpdateSubGoodResponse{}, status.Error(codes.Internal, err.Error())
@@ -227,8 +218,8 @@ func (s *Server) UpdateAppSubGood(ctx context.Context, in *npool.UpdateAppSubGoo
 		}
 	}
 
-	info, err := mgrcli.UpdateSubGood(ctx, &mgrpb.SubGoodReq{
-		ID:         &in.ID,
+	info, err := subgoodm.UpdateSubGood(ctx, &npool.UpdateSubGoodRequest{
+		ID:         in.ID,
 		SubGoodID:  in.SubGoodID,
 		Must:       in.Must,
 		Commission: in.Commission,
