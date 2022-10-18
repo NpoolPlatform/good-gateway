@@ -2,8 +2,11 @@ package api
 
 import (
 	"context"
-
-	good "github.com/NpoolPlatform/message/npool/good/gw/v1"
+	"github.com/NpoolPlatform/good-gateway/api/deviceinfo"
+	"github.com/NpoolPlatform/good-gateway/api/good"
+	"github.com/NpoolPlatform/good-gateway/api/subgood"
+	"github.com/NpoolPlatform/good-gateway/api/vendorlocation"
+	"github.com/NpoolPlatform/message/npool/good/gw/v1"
 
 	appgood "github.com/NpoolPlatform/good-gateway/api/appgood"
 
@@ -12,19 +15,35 @@ import (
 )
 
 type Server struct {
-	good.UnimplementedGatewayServer
+	v1.UnimplementedGatewayServer
 }
 
 func Register(server grpc.ServiceRegistrar) {
-	good.RegisterGatewayServer(server, &Server{})
+	v1.RegisterGatewayServer(server, &Server{})
 	appgood.Register(server)
+	deviceinfo.Register(server)
+	good.Register(server)
+	subgood.Register(server)
+	vendorlocation.Register(server)
 }
 
 func RegisterGateway(mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) error {
-	if err := good.RegisterGatewayHandlerFromEndpoint(context.Background(), mux, endpoint, opts); err != nil {
+	if err := v1.RegisterGatewayHandlerFromEndpoint(context.Background(), mux, endpoint, opts); err != nil {
 		return err
 	}
 	if err := appgood.RegisterGateway(mux, endpoint, opts); err != nil {
+		return err
+	}
+	if err := deviceinfo.RegisterGateway(mux, endpoint, opts); err != nil {
+		return err
+	}
+	if err := good.RegisterGateway(mux, endpoint, opts); err != nil {
+		return err
+	}
+	if err := subgood.RegisterGateway(mux, endpoint, opts); err != nil {
+		return err
+	}
+	if err := vendorlocation.RegisterGateway(mux, endpoint, opts); err != nil {
 		return err
 	}
 	return nil
