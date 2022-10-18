@@ -21,7 +21,11 @@ spec:
     - host: api.npool.top
       http: &http_rules
         paths:
-          - path: /api/good-gateway
+          - path: /api/good/v1/version
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/get/appgoods
             backend:
               serviceName: good-gateway
               servicePort: 50550
@@ -31,3 +35,153 @@ spec:
       http: *http_rules
     - host: api.ohhash.com
       http: *http_rules
+
+---
+
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: good-gateway-traefik-app-user-ingress
+  namespace: kube-system
+  annotations:
+    k8s.kuboard.cn/displayName: good-gateway-traefik-app-user
+    k8s.kuboard.cn/workload: good-gateway-traefik-app-user
+    kubernetes.io/ingress.class: "traefik-internet"
+    traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
+    traefik.ingress.kubernetes.io/router.middlewares:
+      kube-system-strip-good-gateway-prefix@kubernetescrd,
+      kube-system-common-headers@kubernetescrd,
+      kube-system-headers-appid-to-body@kubernetescrd,
+      kube-system-headers-userid-to-body@kubernetescrd,
+      kube-system-headers-app-login-token-to-body@kubernetescrd,
+      kube-system-app-user-role-rbac-auth@kubernetescrd
+
+spec:
+  rules:
+    - host: api.npool.top
+      http: &http_rules
+        paths:
+          - path: /api/good/v1/create/n/appgood
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/get/n/appgoods
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/update/appgood
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/update/n/appgood
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+
+
+          - path: /api/good/v1/create/deviceinfo
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/update/deviceinfo
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/get/deviceinfo
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/get/deviceinfos
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+
+
+          - path: /api/good/v1/create/good
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/get/good
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/update/good
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/get/goods
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+
+
+          - path: /api/good/v1/create/subgood
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/create/app/subgood
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/update/subgood
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/update/app/subgood
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/get/subgoods
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/get/app/subgoods
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+
+
+          - path: /api/good/v1/create/vendorlocation
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/update/vendorlocation
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/get/vendorlocation
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/get/vendorlocations
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+
+    - host: api.procyon.vip
+      http: *http_rules
+    - host: api.xpool.top
+      http: *http_rules
+    - host: api.ohhash.com
+      http: *http_rules
+    - host: api.procyon.xpool.top
+      http: *http_rules
+    - host: api.jh-testing.npool.top
+      http: *http_rules
+    - host: api.japan-procyon-production.npool.top
+      http: *http_rules
+    - host: api.lpsecretbase.com
+      http: *http_rules
+
+
+
+
+
+
+
+
+
+
+
+
+
