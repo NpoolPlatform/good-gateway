@@ -73,6 +73,10 @@ spec:
             backend:
               serviceName: good-gateway
               servicePort: 50550
+          - path: /api/good/v1/get/appgoods
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
           - path: /api/good/v1/get/n/appgoods
             backend:
               serviceName: good-gateway
