@@ -7,7 +7,7 @@ import (
 	"github.com/NpoolPlatform/good-gateway/api/good"
 	"github.com/NpoolPlatform/good-gateway/api/subgood"
 	"github.com/NpoolPlatform/good-gateway/api/vendorlocation"
-	"github.com/NpoolPlatform/message/npool/good/gw/v1"
+	v1 "github.com/NpoolPlatform/message/npool/good/gw/v1"
 
 	appgood "github.com/NpoolPlatform/good-gateway/api/appgood"
 
