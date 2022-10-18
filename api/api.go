@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+
 	"github.com/NpoolPlatform/good-gateway/api/deviceinfo"
 	"github.com/NpoolPlatform/good-gateway/api/good"
 	"github.com/NpoolPlatform/good-gateway/api/subgood"
