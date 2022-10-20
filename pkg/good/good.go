@@ -71,6 +71,7 @@ func CreateGood(ctx context.Context, req *npool.CreateGoodRequest) (*npool.Good,
 
 func UpdateGood(ctx context.Context, req *npool.UpdateGoodRequest) (*npool.Good, error) {
 	info, err := goodmwcli.UpdateGood(ctx, &goodmwpb.GoodReq{
+		ID:                 &req.ID,
 		DeviceInfoID:       req.DeviceInfoID,
 		DurationDays:       req.DurationDays,
 		CoinTypeID:         req.CoinTypeID,

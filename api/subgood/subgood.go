@@ -53,6 +53,10 @@ func (s *Server) CreateSubGood(ctx context.Context, in *npool.CreateSubGoodReque
 	}
 
 	span = commontracer.TraceInvoker(span, "SubGood", "mw", "CreateSubGood")
+	if err != nil {
+		logger.Sugar().Errorw("validate", "SubGoodID", in.GetSubGoodID(), "error", err)
+		return &npool.CreateSubGoodResponse{}, status.Error(codes.Internal, err.Error())
+	}
 
 	info, err := subgoodm.CreateSubGood(ctx, in)
 	if err != nil {

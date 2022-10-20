@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/NpoolPlatform/good-gateway/api"
 	"github.com/NpoolPlatform/good-gateway/pkg/migrator"
+	"github.com/NpoolPlatform/good-manager/pkg/db"
 
 	grpc2 "github.com/NpoolPlatform/go-service-framework/pkg/grpc"
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
@@ -23,6 +24,10 @@ var runCmd = &cli.Command{
 	Aliases: []string{"s"},
 	Usage:   "Run the daemon",
 	Action: func(c *cli.Context) error {
+		if err := db.Init(); err != nil {
+			return err
+		}
+
 		if err := migrator.Migrate(c.Context); err != nil {
 			return err
 		}

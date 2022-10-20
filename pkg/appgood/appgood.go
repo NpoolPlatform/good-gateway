@@ -69,6 +69,7 @@ func GetAppGoods(ctx context.Context, appID string, offset, limit int32) ([]*npo
 
 func UpdateAppGood(ctx context.Context, in *npool.UpdateAppGoodRequest) (*npool.Good, error) {
 	info, err := appgoodmwcli.UpdateGood(ctx, &appgoodmgrpb.AppGoodReq{
+		ID:                &in.ID,
 		Online:            in.Online,
 		Visible:           in.Visible,
 		GoodName:          in.GoodName,
@@ -114,12 +115,16 @@ func scans(ctx context.Context, infos []*goodmwpb.Good, appID string) ([]*npool.
 		if val.RecommenderID != nil {
 			userIDs = append(userIDs, *val.RecommenderID)
 		}
-		goodIDs = append(goodIDs, val.ID)
+		goodIDs = append(goodIDs, val.GoodID)
 	}
 
-	userInfos, _, err := appusermwcli.GetManyUsers(ctx, userIDs)
-	if err != nil {
-		return nil, err
+	userInfos := []*appusermwpb.User{}
+
+	if len(userIDs) > 0 {
+		userInfos, _, err = appusermwcli.GetManyUsers(ctx, userIDs)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	userMap := map[string]*appusermwpb.User{}
@@ -127,15 +132,18 @@ func scans(ctx context.Context, infos []*goodmwpb.Good, appID string) ([]*npool.
 		userMap[userInfo.ID] = userInfo
 	}
 
-	subGoodMap, err := getSubGoods(ctx, ctMap, userMap, goodIDs, appID)
-	if err != nil {
-		return nil, err
+	subGoodMap := map[string][]*npool.Good{}
+	if len(goodIDs) > 0 {
+		subGoodMap, err = getSubGoods(ctx, ctMap, userMap, goodIDs, appID)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	goods := getGoodInfos(ctMap, userMap, infos)
 
 	for key := range goods {
-		subGood, ok := subGoodMap[goods[key].ID]
+		subGood, ok := subGoodMap[goods[key].GoodID]
 		if ok {
 			goods[key].SubGoods = subGood
 		}
@@ -156,7 +164,7 @@ func getSubGoods(
 			Value: appID,
 		},
 		MainGoodIDs: &npoolpb.StringSliceVal{
-			Op:    cruder.EQ,
+			Op:    cruder.IN,
 			Value: goodIDs,
 		},
 	}, 0, int32(len(goodIDs)))
@@ -175,10 +183,10 @@ func getSubGoods(
 		subAppGoods, _, err = appgoodmwcli.GetGoods(ctx, &appgoodmgrpb.Conds{
 			AppID: &npoolpb.StringVal{
 				Op:    cruder.EQ,
-				Value: "",
+				Value: appID,
 			},
 			GoodIDs: &npoolpb.StringSliceVal{
-				Op:    cruder.EQ,
+				Op:    cruder.IN,
 				Value: subGoodIDs,
 			},
 		}, 0, int32(len(subGoodIDs)))
@@ -188,14 +196,12 @@ func getSubGoods(
 	}
 
 	goods := getGoodInfos(ctMap, userMap, subAppGoods)
-
 	subGoodMap := map[string][]*npool.Good{}
-
 	for _, subGood := range subGoods {
 		subGoodInfos := []*npool.Good{}
 		for _, subGood1 := range subGoods {
 			for _, good := range goods {
-				if subGood.MainGoodID == subGood1.MainGoodID && subGood1.SubGoodID == good.ID {
+				if subGood.MainGoodID == subGood1.MainGoodID && subGood1.SubGoodID == good.GoodID {
 					good.Commission = subGood1.Commission
 					good.Must = subGood1.Must
 					subGoodInfos = append(subGoodInfos, good)
@@ -204,7 +210,6 @@ func getSubGoods(
 		}
 		subGoodMap[subGood.MainGoodID] = subGoodInfos
 	}
-
 	return subGoodMap, nil
 }
 

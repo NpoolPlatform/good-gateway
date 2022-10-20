@@ -53,7 +53,7 @@ func GetSubGood(ctx context.Context, id string) (*npool.SubGood, error) {
 	goodIDs := []string{info.MainGoodID, info.SubGoodID}
 	goods, _, err := goodmgrcli.GetGoods(ctx, &goodmgrpb.Conds{
 		IDs: &npoolpb.StringSliceVal{
-			Op:    cruder.EQ,
+			Op:    cruder.IN,
 			Value: goodIDs,
 		},
 	}, 0, int32(len(goodIDs)))

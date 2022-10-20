@@ -169,6 +169,7 @@ func (s *Server) UpdateDeviceInfo(ctx context.Context, in *npool.UpdateDeviceInf
 	}
 
 	info, err := mgrcli.UpdateDeviceInfo(ctx, &mgrpb.DeviceInfoReq{
+		ID:              &in.ID,
 		Type:            in.Type,
 		Manufacturer:    in.Manufacturer,
 		PowerComsuption: in.PowerComsuption,
