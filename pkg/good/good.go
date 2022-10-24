@@ -3,6 +3,8 @@ package good
 import (
 	"context"
 
+	coininfopb "github.com/NpoolPlatform/message/npool/coininfo"
+
 	goodmwcli "github.com/NpoolPlatform/good-middleware/pkg/client/good"
 	goodmwpb "github.com/NpoolPlatform/message/npool/good/mw/v1/good"
 
@@ -16,7 +18,12 @@ func GetGood(ctx context.Context, id string) (*npool.Good, error) {
 	if err != nil {
 		return nil, err
 	}
-	return ScanCoinType(ctx, info)
+
+	coinMap, err := getCoinType(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return ScanCoinType(info, coinMap)
 }
 
 func GetGoods(ctx context.Context, offset, limit int32) ([]*npool.Good, uint32, error) {
@@ -25,15 +32,21 @@ func GetGoods(ctx context.Context, offset, limit int32) ([]*npool.Good, uint32, 
 		return nil, 0, err
 	}
 
+	coinMap, err := getCoinType(ctx)
+	if err != nil {
+		return nil, 0, err
+	}
+
 	goods := []*npool.Good{}
 	for _, val := range infos {
-		good, err := ScanCoinType(ctx, val)
+		good, err := ScanCoinType(val, coinMap)
 		if err != nil {
 			return nil, 0, err
 		}
 
 		goods = append(goods, good)
 	}
+
 	return goods, total, nil
 }
 
@@ -66,7 +79,13 @@ func CreateGood(ctx context.Context, req *npool.CreateGoodRequest) (*npool.Good,
 	if err != nil {
 		return nil, err
 	}
-	return ScanCoinType(ctx, info)
+
+	coinMap, err := getCoinType(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return ScanCoinType(info, coinMap)
 }
 
 func UpdateGood(ctx context.Context, req *npool.UpdateGoodRequest) (*npool.Good, error) {
@@ -93,27 +112,60 @@ func UpdateGood(ctx context.Context, req *npool.UpdateGoodRequest) (*npool.Good,
 	if err != nil {
 		return nil, err
 	}
-	return ScanCoinType(ctx, info)
-}
 
-func ScanCoinType(ctx context.Context, info *goodmwpb.Good) (*npool.Good, error) {
-	coinType, err := coininfocli.GetCoinInfo(ctx, info.CoinTypeID)
+	coinMap, err := getCoinType(ctx)
 	if err != nil {
 		return nil, err
 	}
 
+	return ScanCoinType(info, coinMap)
+}
+
+func getCoinType(ctx context.Context) (map[string]*coininfopb.CoinInfo, error) {
+	coinTypes, err := coininfocli.GetCoinInfos(ctx, nil)
+	if err != nil {
+		return nil, err
+	}
+	coinMap := map[string]*coininfopb.CoinInfo{}
+	for _, val := range coinTypes {
+		coinMap[val.ID] = val
+	}
+
+	return coinMap, nil
+}
+
+func ScanCoinType(info *goodmwpb.Good, coinMap map[string]*coininfopb.CoinInfo) (*npool.Good, error) {
+	coinTypeLogo := ""
+	coinTypeName := ""
+	coinTypeUnit := ""
+	coinTypePreSale := false
+	coinTypeM, ok := coinMap[info.CoinTypeID]
+	if ok {
+		coinTypeLogo = coinTypeM.Logo
+		coinTypeName = coinTypeM.Name
+		coinTypeUnit = coinTypeM.Unit
+		coinTypePreSale = coinTypeM.PreSale
+	}
+
 	supportCoins := []*npool.Good_CoinInfo{}
 	for _, val := range info.SupportCoinTypeIDs {
-		coinTypeInfo, err := coininfocli.GetCoinInfo(ctx, val)
-		if err != nil {
-			return nil, err
+		subCoinTypeLogo := ""
+		subCoinTypeName := ""
+		subCoinTypeUnit := ""
+		subCoinTypePreSale := false
+		subCoinTypeM, ok := coinMap[val]
+		if ok {
+			subCoinTypeLogo = subCoinTypeM.Logo
+			subCoinTypeName = subCoinTypeM.Name
+			subCoinTypeUnit = subCoinTypeM.Unit
+			subCoinTypePreSale = subCoinTypeM.PreSale
 		}
 		supportCoins = append(supportCoins, &npool.Good_CoinInfo{
 			CoinTypeID:  info.CoinTypeID,
-			CoinLogo:    coinTypeInfo.Logo,
-			CoinName:    coinTypeInfo.Name,
-			CoinUnit:    coinTypeInfo.Unit,
-			CoinPreSale: coinTypeInfo.PreSale,
+			CoinLogo:    subCoinTypeLogo,
+			CoinName:    subCoinTypeName,
+			CoinUnit:    subCoinTypeUnit,
+			CoinPreSale: subCoinTypePreSale,
 		})
 	}
 
@@ -127,10 +179,10 @@ func ScanCoinType(ctx context.Context, info *goodmwpb.Good) (*npool.Good, error)
 		DevicePosters:              info.DevicePosters,
 		DurationDays:               info.DurationDays,
 		CoinTypeID:                 info.CoinTypeID,
-		CoinLogo:                   coinType.Logo,
-		CoinName:                   coinType.Name,
-		CoinUnit:                   coinType.Unit,
-		CoinPreSale:                coinType.PreSale,
+		CoinLogo:                   coinTypeLogo,
+		CoinName:                   coinTypeName,
+		CoinUnit:                   coinTypeUnit,
+		CoinPreSale:                coinTypePreSale,
 		InheritFromGoodID:          info.InheritFromGoodID,
 		InheritFromGoodName:        info.InheritFromGoodName,
 		InheritFromGoodType:        info.InheritFromGoodType,
