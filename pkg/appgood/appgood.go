@@ -46,7 +46,7 @@ func CreateAppGood(
 		return nil, err
 	}
 
-	return scan(ctx, info)
+	return Scan(ctx, info)
 }
 
 func GetAppGoods(ctx context.Context, appID string, offset, limit int32) ([]*npool.Good, uint32, error) {
@@ -59,7 +59,7 @@ func GetAppGoods(ctx context.Context, appID string, offset, limit int32) ([]*npo
 	if err != nil {
 		return nil, 0, err
 	}
-	infos, err := scans(ctx, goods, appID)
+	infos, err := Scans(ctx, goods, appID)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -82,13 +82,13 @@ func UpdateAppGood(ctx context.Context, in *npool.UpdateAppGoodRequest) (*npool.
 		return nil, err
 	}
 
-	return scan(ctx, info)
+	return Scan(ctx, info)
 }
 
-func scan(ctx context.Context, info *goodmwpb.Good) (*npool.Good, error) {
+func Scan(ctx context.Context, info *goodmwpb.Good) (*npool.Good, error) {
 	infos := []*goodmwpb.Good{}
 	infos = append(infos, info)
-	goods, err := scans(ctx, infos, info.AppID)
+	goods, err := Scans(ctx, infos, info.AppID)
 	if err != nil {
 		return nil, err
 	}
@@ -98,7 +98,7 @@ func scan(ctx context.Context, info *goodmwpb.Good) (*npool.Good, error) {
 	return goods[0], nil
 }
 
-func scans(ctx context.Context, infos []*goodmwpb.Good, appID string) ([]*npool.Good, error) {
+func Scans(ctx context.Context, infos []*goodmwpb.Good, appID string) ([]*npool.Good, error) {
 	coinTypes, err := coininfocli.GetCoinInfos(ctx, nil)
 	if err != nil {
 		return nil, err

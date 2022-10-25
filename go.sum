@@ -83,8 +83,8 @@ github.com/NpoolPlatform/libent-cruder v0.0.0-20220821121920-9559f5776d15 h1:iBK
 github.com/NpoolPlatform/libent-cruder v0.0.0-20220821121920-9559f5776d15/go.mod h1:zvvqlRwbOdTUauPQ9dFDhDuxa91ILV0CQfVdPBZj+eA=
 github.com/NpoolPlatform/message v0.0.0-20220501030927-34f296682c0c/go.mod h1:i/F/sQWjQk44RGvfgEB0zH0oAK/0qLvgJ1AsJDZQDkk=
 github.com/NpoolPlatform/message v0.0.0-20220819134247-1dc75c85fe43/go.mod h1:8YXp4MghMHLZ9bBdQQyfjcRtLI2RbEHAQoNCejT2nZU=
-github.com/NpoolPlatform/message v0.0.0-20221025032721-b009ae58e6fa h1:XhsuGxBZiIQ1VuJxr6/+78m+wcw+Qi6RyPs666cshUA=
-github.com/NpoolPlatform/message v0.0.0-20221025032721-b009ae58e6fa/go.mod h1:PPu6xSY6EEmKktC6azkYreJVM4gaGkmxuusqHok2IEA=
+github.com/NpoolPlatform/message v0.0.0-20221025081317-6fec102fb3b3 h1:E+3OtcF7VxR2HgGAfdsCXlMocPVkg6aZbQO+bAS7ffU=
+github.com/NpoolPlatform/message v0.0.0-20221025081317-6fec102fb3b3/go.mod h1:PPu6xSY6EEmKktC6azkYreJVM4gaGkmxuusqHok2IEA=
 github.com/NpoolPlatform/sphinx-coininfo v0.0.0-20220930040119-1eb8b2e73e3f h1:tFiY+yRZbUr5m/UzkMD8xAO35qkbQPsL0e7zjJT8YJM=
 github.com/NpoolPlatform/sphinx-coininfo v0.0.0-20220930040119-1eb8b2e73e3f/go.mod h1:DlZVXy/eIXjojDWYeB2A/3C/875Ru1Nob+mS9ZSwG3I=
 github.com/NpoolPlatform/stock-manager v0.0.0-20220930040146-676de0bdaf4c h1:wudgnrLwm+MVr6Nnhfyur/DrgbJsCrAk2mvSur21CL4=

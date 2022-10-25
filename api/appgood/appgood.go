@@ -316,7 +316,7 @@ func (s *Server) UpdateNAppGood(ctx context.Context, in *npool.UpdateNAppGoodReq
 		GoodName:          in.GoodName,
 		Price:             in.Price,
 		DisplayIndex:      in.DisplayIndex,
-		PurchaseLimit:     in.CommissionPercent,
+		PurchaseLimit:     in.PurchaseLimit,
 		CommissionPercent: in.CommissionPercent,
 	})
 	if err != nil {
