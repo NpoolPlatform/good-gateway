@@ -11,7 +11,7 @@ require (
 	github.com/NpoolPlatform/good-manager v0.0.0-20221020034141-bda321f755c8
 	github.com/NpoolPlatform/good-middleware v0.0.0-20221018100429-fb5a429423c3
 	github.com/NpoolPlatform/libent-cruder v0.0.0-20220821121920-9559f5776d15
-	github.com/NpoolPlatform/message v0.0.0-20221025081317-6fec102fb3b3
+	github.com/NpoolPlatform/message v0.0.0-20221025103048-0e3b527e8d78
 	github.com/NpoolPlatform/sphinx-coininfo v0.0.0-20220930040119-1eb8b2e73e3f
 	github.com/NpoolPlatform/stock-manager v0.0.0-20220930040146-676de0bdaf4c
 	github.com/go-resty/resty/v2 v2.7.0
