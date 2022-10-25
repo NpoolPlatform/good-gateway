@@ -135,41 +135,21 @@ func getCoinType(ctx context.Context) (map[string]*coininfopb.CoinInfo, error) {
 }
 
 func ScanCoinType(info *goodmwpb.Good, coinMap map[string]*coininfopb.CoinInfo) (*npool.Good, error) {
-	coinTypeLogo := ""
-	coinTypeName := ""
-	coinTypeUnit := ""
-	coinTypePreSale := false
-	coinTypeM, ok := coinMap[info.CoinTypeID]
-	if ok {
-		coinTypeLogo = coinTypeM.Logo
-		coinTypeName = coinTypeM.Name
-		coinTypeUnit = coinTypeM.Unit
-		coinTypePreSale = coinTypeM.PreSale
-	}
-
 	supportCoins := []*npool.Good_CoinInfo{}
 	for _, val := range info.SupportCoinTypeIDs {
-		subCoinTypeLogo := ""
-		subCoinTypeName := ""
-		subCoinTypeUnit := ""
-		subCoinTypePreSale := false
 		subCoinTypeM, ok := coinMap[val]
 		if ok {
-			subCoinTypeLogo = subCoinTypeM.Logo
-			subCoinTypeName = subCoinTypeM.Name
-			subCoinTypeUnit = subCoinTypeM.Unit
-			subCoinTypePreSale = subCoinTypeM.PreSale
+			supportCoins = append(supportCoins, &npool.Good_CoinInfo{
+				CoinTypeID:  info.CoinTypeID,
+				CoinLogo:    subCoinTypeM.Logo,
+				CoinName:    subCoinTypeM.Name,
+				CoinUnit:    subCoinTypeM.Unit,
+				CoinPreSale: subCoinTypeM.PreSale,
+			})
 		}
-		supportCoins = append(supportCoins, &npool.Good_CoinInfo{
-			CoinTypeID:  info.CoinTypeID,
-			CoinLogo:    subCoinTypeLogo,
-			CoinName:    subCoinTypeName,
-			CoinUnit:    subCoinTypeUnit,
-			CoinPreSale: subCoinTypePreSale,
-		})
 	}
 
-	return &npool.Good{
+	good := &npool.Good{
 		ID:                         info.ID,
 		DeviceInfoID:               info.DeviceInfoID,
 		DeviceType:                 info.DeviceType,
@@ -179,10 +159,6 @@ func ScanCoinType(info *goodmwpb.Good, coinMap map[string]*coininfopb.CoinInfo) 
 		DevicePosters:              info.DevicePosters,
 		DurationDays:               info.DurationDays,
 		CoinTypeID:                 info.CoinTypeID,
-		CoinLogo:                   coinTypeLogo,
-		CoinName:                   coinTypeName,
-		CoinUnit:                   coinTypeUnit,
-		CoinPreSale:                coinTypePreSale,
 		InheritFromGoodID:          info.InheritFromGoodID,
 		InheritFromGoodName:        info.InheritFromGoodName,
 		InheritFromGoodType:        info.InheritFromGoodType,
@@ -204,14 +180,24 @@ func ScanCoinType(info *goodmwpb.Good, coinMap map[string]*coininfopb.CoinInfo) 
 		VoteCount:                  info.VoteCount,
 		Rating:                     info.Rating,
 		SupportCoins:               supportCoins,
-		GoodStockID:                info.GoodStockID,
-		GoodTotal:                  info.GoodTotal,
-		GoodLocked:                 info.GoodLocked,
-		GoodInService:              info.GoodInService,
-		GoodSold:                   info.GoodSold,
+		StockID:                    info.GoodStockID,
+		Total:                      info.GoodTotal,
+		Locked:                     info.GoodLocked,
+		InService:                  info.GoodInService,
+		Sold:                       info.GoodSold,
 		DeliveryAt:                 info.DeliveryAt,
 		StartAt:                    info.StartAt,
 		CreatedAt:                  info.CreatedAt,
 		UpdatedAt:                  info.UpdatedAt,
-	}, nil
+	}
+
+	coinTypeM, ok := coinMap[info.CoinTypeID]
+	if ok {
+		good.CoinLogo = coinTypeM.Logo
+		good.CoinName = coinTypeM.Name
+		good.Unit = coinTypeM.Unit
+		good.CoinPreSale = coinTypeM.PreSale
+	}
+
+	return good, nil
 }

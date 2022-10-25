@@ -11,7 +11,7 @@ require (
 	github.com/NpoolPlatform/good-manager v0.0.0-20221020034141-bda321f755c8
 	github.com/NpoolPlatform/good-middleware v0.0.0-20221018100429-fb5a429423c3
 	github.com/NpoolPlatform/libent-cruder v0.0.0-20220821121920-9559f5776d15
-	github.com/NpoolPlatform/message v0.0.0-20221017094946-44504414bde4
+	github.com/NpoolPlatform/message v0.0.0-20221025032721-b009ae58e6fa
 	github.com/NpoolPlatform/sphinx-coininfo v0.0.0-20220930040119-1eb8b2e73e3f
 	github.com/NpoolPlatform/stock-manager v0.0.0-20220930040146-676de0bdaf4c
 	github.com/go-resty/resty/v2 v2.7.0
@@ -22,7 +22,7 @@ require (
 	github.com/urfave/cli/v2 v2.5.0
 	go.opentelemetry.io/otel v1.8.0
 	go.opentelemetry.io/otel/trace v1.8.0
-	google.golang.org/grpc v1.50.0
+	google.golang.org/grpc v1.50.1
 	google.golang.org/protobuf v1.28.0
 )
 

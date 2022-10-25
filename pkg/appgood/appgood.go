@@ -222,14 +222,7 @@ func getGoodInfos(
 	goods := []*npool.Good{}
 
 	for _, info := range infos {
-		var coinType *coininfopb.CoinInfo
-		_, ok := ctMap[info.CoinTypeID]
-		if ok {
-			coinType = ctMap[info.CoinTypeID]
-		}
-
 		supportCoins := []*npool.Good_CoinInfo{}
-
 		for _, supportCoinTypeID := range info.SupportCoinTypeIDs {
 			coinTypeInfo, ok := ctMap[supportCoinTypeID]
 			if ok {
@@ -258,17 +251,6 @@ func getGoodInfos(
 				recommenderFirstName = &userInfo.FirstName
 				recommenderLastName = &userInfo.LastName
 			}
-		}
-
-		coinTypeLogo := ""
-		coinTypeName := ""
-		coinTypeUnit := ""
-		coinTypePreSale := true
-		if coinType != nil {
-			coinTypeLogo = coinType.Logo
-			coinTypeName = coinType.Name
-			coinTypeUnit = coinType.Unit
-			coinTypePreSale = coinType.PreSale
 		}
 
 		info1 := &npool.Good{
@@ -303,10 +285,6 @@ func getGoodInfos(
 			DurationDays:            info.DurationDays,
 			VendorLocationCountry:   info.VendorLocationCountry,
 			CoinTypeID:              info.CoinTypeID,
-			CoinLogo:                coinTypeLogo,
-			CoinName:                coinTypeName,
-			CoinUnit:                coinTypeUnit,
-			CoinPreSale:             coinTypePreSale,
 			GoodType:                info.GoodType,
 			BenefitType:             info.BenefitType,
 			GoodName:                info.GoodName,
@@ -327,6 +305,14 @@ func getGoodInfos(
 			Commission:              true,
 			StartAt:                 info.StartAt,
 			CreatedAt:               info.CreatedAt,
+		}
+
+		coinType, ok := ctMap[info.CoinTypeID]
+		if ok {
+			info1.CoinLogo = coinType.Logo
+			info1.CoinName = coinType.Name
+			info1.CoinUnit = coinType.Unit
+			info1.CoinPreSale = coinType.PreSale
 		}
 
 		goods = append(goods, info1)
