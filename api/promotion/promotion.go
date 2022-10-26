@@ -227,6 +227,38 @@ func (s *Server) GetPromotions(ctx context.Context, in *npool.GetPromotionsReque
 	}, nil
 }
 
+func (s *Server) GetAppPromotions(ctx context.Context, in *npool.GetAppPromotionsRequest) (*npool.GetAppPromotionsResponse, error) {
+	var err error
+
+	_, span := otel.Tracer(constant.ServiceName).Start(ctx, "GetPromotions")
+	defer span.End()
+
+	defer func() {
+		if err != nil {
+			span.SetStatus(scodes.Error, err.Error())
+			span.RecordError(err)
+		}
+	}()
+
+	if _, err := uuid.Parse(in.GetTargetAppID()); err != nil {
+		logger.Sugar().Errorw("validate", "TargetAppID", in.GetTargetAppID(), "error", err)
+		return &npool.GetAppPromotionsResponse{}, status.Error(codes.InvalidArgument, fmt.Sprintf("AppID is invalid: %v", err))
+	}
+
+	span = commontracer.TraceInvoker(span, "Promotion", "mgr", "GetPromotions")
+
+	infos, total, err := promotionm.GetPromotions(ctx, in.GetTargetAppID(), in.GetOffset(), in.GetLimit())
+	if err != nil {
+		logger.Sugar().Errorw("GetPromotion", "error", err)
+		return &npool.GetAppPromotionsResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
+	return &npool.GetAppPromotionsResponse{
+		Infos: infos,
+		Total: total,
+	}, nil
+}
+
 // nolint
 func (s *Server) UpdatePromotion(ctx context.Context, in *npool.UpdatePromotionRequest) (*npool.UpdatePromotionResponse, error) {
 	var err error

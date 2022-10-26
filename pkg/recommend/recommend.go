@@ -66,7 +66,7 @@ func GetRecommends(ctx context.Context, appID string, offset, limit int32) ([]*n
 
 	goods, _, err := goodmgrcli.GetGoods(ctx, &goodmgrpb.Conds{
 		IDs: &npoolpb.StringSliceVal{
-			Op:    cruder.EQ,
+			Op:    cruder.IN,
 			Value: goodIDs,
 		},
 	}, 0, int32(len(goodIDs)))
