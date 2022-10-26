@@ -170,6 +170,56 @@ spec:
               serviceName: good-gateway
               servicePort: 50550
 
+
+          - path: /api/good/v1/create/promotion
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/create/app/promotion
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/update/promotion
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/update/app/promotion
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/get/promotions
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/get/app/promotions
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+
+          - path: /api/good/v1/create/recommend
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/create/app/recommend
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/update/recommend
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/update/app/recommend
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/get/recommends
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/get/app/recommends
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
     - host: api.procyon.vip
       http: *http_rules
     - host: api.xpool.top
