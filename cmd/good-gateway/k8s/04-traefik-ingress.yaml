@@ -196,6 +196,7 @@ spec:
               serviceName: good-gateway
               servicePort: 50550
 
+
           - path: /api/good/v1/create/recommend
             backend:
               serviceName: good-gateway
