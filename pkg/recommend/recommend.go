@@ -57,6 +57,9 @@ func GetRecommends(ctx context.Context, appID string, offset, limit int32) ([]*n
 		return nil, 0, err
 	}
 
+	if len(infos) == 0 {
+		return nil, 0, err
+	}
 	goodIDs := []string{}
 	userIDs := []string{}
 	for _, val := range infos {
@@ -92,19 +95,14 @@ func GetRecommends(ctx context.Context, appID string, offset, limit int32) ([]*n
 	recommends := []*npool.Recommend{}
 	for _, info := range infos {
 		recommend := &npool.Recommend{
-			ID:                      info.ID,
-			AppID:                   info.AppID,
-			GoodID:                  info.GoodID,
-			RecommenderID:           info.RecommenderID,
-			RecommenderUsername:     "",
-			RecommenderFirstName:    "",
-			RecommenderLastName:     "",
-			RecommenderEmailAddress: "",
-			RecommenderPhoneNo:      "",
-			Message:                 "",
-			RecommendIndex:          0,
-			CreatedAt:               info.CreatedAt,
-			UpdatedAt:               info.UpdatedAt,
+			ID:             info.ID,
+			AppID:          info.AppID,
+			GoodID:         info.GoodID,
+			RecommenderID:  info.RecommenderID,
+			Message:        info.Message,
+			RecommendIndex: info.RecommendIndex,
+			CreatedAt:      info.CreatedAt,
+			UpdatedAt:      info.UpdatedAt,
 		}
 
 		good, ok := goodMap[info.GoodID]

@@ -59,6 +59,10 @@ func GetPromotions(ctx context.Context, appID string, offset, limit int32) ([]*n
 		return nil, 0, err
 	}
 
+	if len(infos) == 0 {
+		return nil, 0, err
+	}
+
 	goodIDs := []string{}
 	for _, val := range infos {
 		goodIDs = append(goodIDs, val.GoodID)
