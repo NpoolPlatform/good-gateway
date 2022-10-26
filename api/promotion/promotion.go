@@ -273,6 +273,11 @@ func (s *Server) UpdatePromotion(ctx context.Context, in *npool.UpdatePromotionR
 		}
 	}()
 
+	if _, err := uuid.Parse(in.GetID()); err != nil {
+		logger.Sugar().Errorw("validate", "ID", in.GetID(), "error", err)
+		return &npool.UpdatePromotionResponse{}, status.Error(codes.InvalidArgument, fmt.Sprintf("ID is invalid: %v", err))
+	}
+
 	if _, err := uuid.Parse(in.GetAppID()); err != nil {
 		logger.Sugar().Errorw("validate", "AppID", in.GetAppID(), "error", err)
 		return &npool.UpdatePromotionResponse{}, status.Error(codes.InvalidArgument, fmt.Sprintf("GetAppID is invalid: %v", err))
