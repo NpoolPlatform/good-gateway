@@ -224,6 +224,38 @@ func (s *Server) GetRecommends(ctx context.Context, in *npool.GetRecommendsReque
 	}, nil
 }
 
+func (s *Server) GetAppRecommends(ctx context.Context, in *npool.GetAppRecommendsRequest) (*npool.GetAppRecommendsResponse, error) {
+	var err error
+
+	_, span := otel.Tracer(constant.ServiceName).Start(ctx, "GetAppRecommends")
+	defer span.End()
+
+	defer func() {
+		if err != nil {
+			span.SetStatus(scodes.Error, err.Error())
+			span.RecordError(err)
+		}
+	}()
+
+	if _, err := uuid.Parse(in.GetTargetAppID()); err != nil {
+		logger.Sugar().Errorw("validate", "AppID", in.GetTargetAppID(), "error", err)
+		return &npool.GetAppRecommendsResponse{}, status.Error(codes.InvalidArgument, fmt.Sprintf("AppID is invalid: %v", err))
+	}
+
+	span = commontracer.TraceInvoker(span, "Recommend", "mgr", "GetAppRecommends")
+
+	infos, total, err := recommendm.GetRecommends(ctx, in.GetTargetAppID(), in.GetOffset(), in.GetLimit())
+	if err != nil {
+		logger.Sugar().Errorw("GetRecommend", "error", err)
+		return &npool.GetAppRecommendsResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
+	return &npool.GetAppRecommendsResponse{
+		Infos: infos,
+		Total: total,
+	}, nil
+}
+
 // nolint
 func (s *Server) UpdateRecommend(ctx context.Context, in *npool.UpdateRecommendRequest) (*npool.UpdateRecommendResponse, error) {
 	var err error

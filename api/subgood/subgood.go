@@ -149,6 +149,38 @@ func (s *Server) GetSubGoods(ctx context.Context, in *npool.GetSubGoodsRequest) 
 	}, nil
 }
 
+func (s *Server) GetAppSubGoods(ctx context.Context, in *npool.GetAppSubGoodsRequest) (*npool.GetAppSubGoodsResponse, error) {
+	var err error
+
+	_, span := otel.Tracer(constant.ServiceName).Start(ctx, "GetSubGoods")
+	defer span.End()
+
+	defer func() {
+		if err != nil {
+			span.SetStatus(scodes.Error, err.Error())
+			span.RecordError(err)
+		}
+	}()
+
+	if _, err := uuid.Parse(in.GetTargetAppID()); err != nil {
+		logger.Sugar().Errorw("validate", "AppID", in.GetTargetAppID(), "error", err)
+		return &npool.GetAppSubGoodsResponse{}, status.Error(codes.InvalidArgument, fmt.Sprintf("AppID is invalid: %v", err))
+	}
+
+	span = commontracer.TraceInvoker(span, "SubGood", "mgr", "GetSubGoods")
+
+	infos, total, err := subgoodm.GetSubGoods(ctx, in.GetTargetAppID(), in.GetOffset(), in.GetLimit())
+	if err != nil {
+		logger.Sugar().Errorw("GetSubGood", "error", err)
+		return &npool.GetAppSubGoodsResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
+	return &npool.GetAppSubGoodsResponse{
+		Infos: infos,
+		Total: total,
+	}, nil
+}
+
 // nolint
 func (s *Server) UpdateSubGood(ctx context.Context, in *npool.UpdateSubGoodRequest) (*npool.UpdateSubGoodResponse, error) {
 	var err error
