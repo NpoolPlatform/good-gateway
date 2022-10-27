@@ -29,6 +29,10 @@ spec:
             backend:
               serviceName: good-gateway
               servicePort: 50550
+          - path: /api/good/v1/get/appgood
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
           - path: /api/good/v1/get/promotions
             backend:
               serviceName: good-gateway

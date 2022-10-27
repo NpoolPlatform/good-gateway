@@ -138,6 +138,42 @@ func (s *Server) GetAppGoods(ctx context.Context, in *npool.GetAppGoodsRequest) 
 	}, nil
 }
 
+func (s *Server) GetAppGood(ctx context.Context, in *npool.GetAppGoodRequest) (*npool.GetAppGoodResponse, error) {
+	var err error
+
+	_, span := otel.Tracer(constant.ServiceName).Start(ctx, "GetAppGoods")
+	defer span.End()
+
+	defer func() {
+		if err != nil {
+			span.SetStatus(scodes.Error, err.Error())
+			span.RecordError(err)
+		}
+	}()
+
+	if _, err := uuid.Parse(in.GetAppID()); err != nil {
+		logger.Sugar().Errorw("GetAppGoods", "AppID", in.GetAppID(), "error", err)
+		return &npool.GetAppGoodResponse{}, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	if _, err := uuid.Parse(in.GetGoodID()); err != nil {
+		logger.Sugar().Errorw("GetAppGoods", "GoodID", in.GetGoodID(), "error", err)
+		return &npool.GetAppGoodResponse{}, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	span = commontracer.TraceInvoker(span, "AppGood", "pgk", "GetAppGood")
+
+	info, err := appgood1.GetAppGood(ctx, in.GetAppID(), in.GetGoodID())
+	if err != nil {
+		logger.Sugar().Errorw("GetAppGoods", "error", err)
+		return &npool.GetAppGoodResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
+	return &npool.GetAppGoodResponse{
+		Info: info,
+	}, nil
+}
+
 func (s *Server) GetNAppGoods(ctx context.Context, in *npool.GetNAppGoodsRequest) (*npool.GetNAppGoodsResponse, error) {
 	var err error
 

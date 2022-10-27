@@ -67,6 +67,33 @@ func GetAppGoods(ctx context.Context, appID string, offset, limit int32) ([]*npo
 	return infos, total, err
 }
 
+func GetAppGood(ctx context.Context, appID, goodID string) (*npool.Good, error) {
+	goods, _, err := appgoodmwcli.GetGoods(ctx, &appgoodmgrpb.Conds{
+		AppID: &npoolpb.StringVal{
+			Op:    cruder.EQ,
+			Value: appID,
+		},
+		GoodID: &npoolpb.StringVal{
+			Op:    cruder.EQ,
+			Value: goodID,
+		},
+	}, 0, 1)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(goods) == 0 {
+		return nil, fmt.Errorf("app good is invalid")
+	}
+
+	info, err := Scan(ctx, goods[0])
+	if err != nil {
+		return nil, err
+	}
+
+	return info, err
+}
+
 func UpdateAppGood(ctx context.Context, in *npool.UpdateAppGoodRequest) (*npool.Good, error) {
 	info, err := appgoodmwcli.UpdateGood(ctx, &appgoodmgrpb.AppGoodReq{
 		ID:                &in.ID,
