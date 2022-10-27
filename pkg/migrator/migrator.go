@@ -40,12 +40,13 @@ func Migrate(ctx context.Context) error {
 }
 
 const (
-	keyUsername = "username"
-	keyPassword = "password"
-	keyDBName   = "database_name"
-	maxOpen     = 10
-	maxIdle     = 10
-	MaxLife     = 3
+	keyUsername  = "username"
+	keyPassword  = "password"
+	keyDBName    = "database_name"
+	maxOpen      = 10
+	maxIdle      = 10
+	MaxLife      = 3
+	priceScale12 = 1000000000000
 )
 
 func dsn(hostname string) (string, error) {
@@ -149,6 +150,7 @@ func migrationCloudGoods(ctx context.Context) (err error) {
 			if ok {
 				goodName = good.Title
 			}
+
 			bulk[i] = tx.AppGood.
 				Create().
 				SetID(info.ID).
@@ -160,7 +162,7 @@ func migrationCloudGoods(ctx context.Context) (err error) {
 				SetOnline(info.Online).
 				SetVisible(info.Visible).
 				SetGoodName(goodName).
-				SetPrice(decimal.NewFromInt(int64(info.Price))).
+				SetPrice(decimal.NewFromInt(int64(info.Price)).Div(decimal.NewFromInt(priceScale12))).
 				SetDisplayIndex(int32(info.DisplayIndex)).
 				SetPurchaseLimit(info.PurchaseLimit).
 				SetCommissionPercent(int32(info.CommissionPercent))
@@ -288,7 +290,7 @@ func migrationCloudGoods(ctx context.Context) (err error) {
 				SetCoinTypeID(info.CoinInfoID).
 				SetInheritFromGoodID(info.InheritFromGoodID).
 				SetVendorLocationID(info.VendorLocationID).
-				SetPrice(decimal.NewFromInt(int64(info.Price))).
+				SetPrice(decimal.NewFromInt(int64(info.Price)).Div(decimal.NewFromInt(priceScale12))).
 				SetBenefitType(getBenefitType(info.BenefitType.String())).
 				SetGoodType(goodType).
 				SetTitle(info.Title).
@@ -330,7 +332,7 @@ func migrationCloudGoods(ctx context.Context) (err error) {
 				SetMessage(info.Message).
 				SetStartAt(info.Start).
 				SetEndAt(info.End).
-				SetPrice(decimal.NewFromInt(int64(info.Price)))
+				SetPrice(decimal.NewFromInt(int64(info.Price)).Div(decimal.NewFromInt(priceScale12)))
 		}
 		_, err = tx.Promotion.CreateBulk(bulk...).Save(_ctx)
 		return err
