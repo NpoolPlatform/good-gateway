@@ -152,12 +152,12 @@ func (s *Server) GetAppGood(ctx context.Context, in *npool.GetAppGoodRequest) (*
 	}()
 
 	if _, err := uuid.Parse(in.GetAppID()); err != nil {
-		logger.Sugar().Errorw("GetAppGoods", "AppID", in.GetAppID(), "error", err)
+		logger.Sugar().Errorw("GetAppGood", "AppID", in.GetAppID(), "error", err)
 		return &npool.GetAppGoodResponse{}, status.Error(codes.InvalidArgument, err.Error())
 	}
 
 	if _, err := uuid.Parse(in.GetGoodID()); err != nil {
-		logger.Sugar().Errorw("GetAppGoods", "GoodID", in.GetGoodID(), "error", err)
+		logger.Sugar().Errorw("GetAppGood", "GoodID", in.GetGoodID(), "error", err)
 		return &npool.GetAppGoodResponse{}, status.Error(codes.InvalidArgument, err.Error())
 	}
 
@@ -165,7 +165,7 @@ func (s *Server) GetAppGood(ctx context.Context, in *npool.GetAppGoodRequest) (*
 
 	info, err := appgood1.GetAppGood(ctx, in.GetAppID(), in.GetGoodID())
 	if err != nil {
-		logger.Sugar().Errorw("GetAppGoods", "error", err)
+		logger.Sugar().Errorw("GetAppGood", "error", err)
 		return &npool.GetAppGoodResponse{}, status.Error(codes.Internal, err.Error())
 	}
 
