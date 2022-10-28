@@ -2,6 +2,7 @@ package good
 
 import (
 	"context"
+	"fmt"
 
 	coininfopb "github.com/NpoolPlatform/message/npool/coininfo"
 
@@ -17,6 +18,10 @@ func GetGood(ctx context.Context, id string) (*npool.Good, error) {
 	info, err := goodmwcli.GetGood(ctx, id)
 	if err != nil {
 		return nil, err
+	}
+
+	if info == nil {
+		return nil, fmt.Errorf("GoodID not found")
 	}
 
 	coinMap, err := getCoinType(ctx)
