@@ -205,10 +205,9 @@ func (s *Server) UpdateSubGood(ctx context.Context, in *npool.UpdateSubGoodReque
 		logger.Sugar().Errorw("UpdateSubGood", "ID", in.GetID(), "error", err)
 		return &npool.UpdateSubGoodResponse{}, status.Error(codes.Internal, err.Error())
 	}
-
 	if subGood.GetAppID() != in.AppID {
-		logger.Sugar().Errorw("validate", "AppID", in.GetAppID(), "error", err)
-		return &npool.UpdateSubGoodResponse{}, status.Error(codes.InvalidArgument, fmt.Sprintf("AppID is invalid: %v", err))
+		logger.Sugar().Errorw("validate", "AppID", in.GetAppID(), "error", "subgood appid != appid")
+		return &npool.UpdateSubGoodResponse{}, status.Error(codes.InvalidArgument, fmt.Sprintf("AppID is invalid"))
 	}
 
 	if in.SubGoodID != nil {
