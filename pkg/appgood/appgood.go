@@ -254,11 +254,14 @@ func getGoodInfos(
 			coinTypeInfo, ok := ctMap[supportCoinTypeID]
 			if ok {
 				supportCoins = append(supportCoins, &npool.Good_CoinInfo{
-					CoinTypeID:  info.CoinTypeID,
-					CoinLogo:    coinTypeInfo.Logo,
-					CoinName:    coinTypeInfo.Name,
-					CoinUnit:    coinTypeInfo.Unit,
-					CoinPreSale: coinTypeInfo.PreSale,
+					CoinTypeID:   info.CoinTypeID,
+					CoinLogo:     coinTypeInfo.Logo,
+					CoinName:     coinTypeInfo.Name,
+					CoinUnit:     coinTypeInfo.Unit,
+					CoinPreSale:  coinTypeInfo.PreSale,
+					CoinEnv:      coinTypeInfo.ENV,
+					CoinHomePage: coinTypeInfo.HomePage,
+					CoinSpecs:    coinTypeInfo.Specs,
 				})
 			}
 		}
@@ -340,6 +343,9 @@ func getGoodInfos(
 			info1.CoinName = coinType.Name
 			info1.CoinUnit = coinType.Unit
 			info1.CoinPreSale = coinType.PreSale
+			info1.CoinEnv = coinType.ENV
+			info1.CoinHomePage = coinType.HomePage
+			info1.CoinSpecs = coinType.Specs
 		}
 
 		goods = append(goods, info1)
