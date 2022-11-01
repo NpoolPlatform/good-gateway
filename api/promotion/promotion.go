@@ -6,6 +6,9 @@ import (
 	"fmt"
 	"time"
 
+	appgoodmgrcli "github.com/NpoolPlatform/good-manager/pkg/client/appgood"
+	appgoodmgrpb "github.com/NpoolPlatform/message/npool/good/mgr/v1/appgood"
+
 	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 	"github.com/shopspring/decimal"
 
@@ -29,6 +32,8 @@ import (
 	"github.com/google/uuid"
 
 	promotionm "github.com/NpoolPlatform/good-gateway/pkg/promotion"
+
+	appmgrcli "github.com/NpoolPlatform/appuser-manager/pkg/client/app"
 )
 
 // nolint
@@ -163,6 +168,10 @@ func (s *Server) CreateAppPromotion(ctx context.Context, in *npool.CreateAppProm
 			Op:    cruder.EQ,
 			Value: in.GetGoodID(),
 		},
+		EndAt: &npoolpb.Uint32Val{
+			Op:    cruder.GT,
+			Value: in.GetStartAt(),
+		},
 	})
 	if err != nil {
 		logger.Sugar().Errorw("CreateGood", "error", err)
@@ -172,6 +181,37 @@ func (s *Server) CreateAppPromotion(ctx context.Context, in *npool.CreateAppProm
 	if exist {
 		logger.Sugar().Errorw("CreateGood", "error", err)
 		return &npool.CreateAppPromotionResponse{}, status.Error(codes.InvalidArgument, "Promotion already exists")
+	}
+
+	exist, err = appgoodmgrcli.ExistAppGoodConds(ctx, &appgoodmgrpb.Conds{
+		AppID: &npoolpb.StringVal{
+			Op:    cruder.EQ,
+			Value: in.GetTargetAppID(),
+		},
+		GoodID: &npoolpb.StringVal{
+			Op:    cruder.EQ,
+			Value: in.GetGoodID(),
+		},
+	})
+	if err != nil {
+		logger.Sugar().Errorw("validate", "error", err)
+		return &npool.CreateAppPromotionResponse{}, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	if !exist {
+		logger.Sugar().Errorw("validate", "GoodID", in.GetGoodID(), "error", err)
+		return &npool.CreateAppPromotionResponse{}, status.Error(codes.InvalidArgument, "App Good not exist")
+	}
+
+	app, err := appmgrcli.GetApp(ctx, in.GetTargetAppID())
+	if err != nil {
+		logger.Sugar().Errorw("validate", "error", err)
+		return &npool.CreateAppPromotionResponse{}, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	if app == nil {
+		logger.Sugar().Errorw("validate", "error", err)
+		return &npool.CreateAppPromotionResponse{}, status.Error(codes.InvalidArgument, "App is not exist")
 	}
 
 	span = commontracer.TraceInvoker(span, "Promotion", "mw", "CreatePromotion")
@@ -347,7 +387,7 @@ func (s *Server) UpdateAppPromotion(ctx context.Context, in *npool.UpdateAppProm
 
 	if _, err := uuid.Parse(in.GetTargetAppID()); err != nil {
 		logger.Sugar().Errorw("validate", "AppID", in.GetTargetAppID(), "error", err)
-		return &npool.UpdateAppPromotionResponse{}, status.Error(codes.InvalidArgument, fmt.Sprintf("GetAppID is invalid: %v", err))
+		return &npool.UpdateAppPromotionResponse{}, status.Error(codes.InvalidArgument, fmt.Sprintf("AppID is invalid: %v", err))
 	}
 
 	if in.Message != nil {
@@ -375,6 +415,17 @@ func (s *Server) UpdateAppPromotion(ctx context.Context, in *npool.UpdateAppProm
 			logger.Sugar().Errorw("CreateGood", "Price", in.GetPrice(), "error", err)
 			return &npool.UpdateAppPromotionResponse{}, status.Error(codes.InvalidArgument, "Price is invalid")
 		}
+	}
+
+	app, err := appmgrcli.GetApp(ctx, in.GetTargetAppID())
+	if err != nil {
+		logger.Sugar().Errorw("validate", "error", err)
+		return &npool.UpdateAppPromotionResponse{}, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	if app == nil {
+		logger.Sugar().Errorw("validate", "error", err)
+		return &npool.UpdateAppPromotionResponse{}, status.Error(codes.InvalidArgument, "App is not exist")
 	}
 
 	info, err := promotionm.UpdatePromotion(ctx, &npool.UpdatePromotionRequest{

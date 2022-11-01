@@ -56,8 +56,6 @@ func GetGoods(ctx context.Context, offset, limit int32) ([]*npool.Good, uint32, 
 }
 
 func CreateGood(ctx context.Context, req *npool.CreateGoodRequest) (*npool.Good, error) {
-	locked := int32(req.Locked)
-	inService := int32(req.InService)
 	info, err := goodmwcli.CreateGood(ctx, &goodmwpb.GoodReq{
 		DeviceInfoID:       &req.DeviceInfoID,
 		DurationDays:       &req.DurationDays,
@@ -75,9 +73,6 @@ func CreateGood(ctx context.Context, req *npool.CreateGoodRequest) (*npool.Good,
 		StartAt:            &req.StartAt,
 		TestOnly:           &req.TestOnly,
 		Total:              &req.Total,
-		Locked:             &locked,
-		InService:          &inService,
-		Sold:               &req.Sold,
 		Posters:            req.Posters,
 		Labels:             req.Labels,
 	})
@@ -110,7 +105,6 @@ func UpdateGood(ctx context.Context, req *npool.UpdateGoodRequest) (*npool.Good,
 		StartAt:            req.StartAt,
 		TestOnly:           req.TestOnly,
 		Total:              req.Total,
-		Sold:               req.Sold,
 		Posters:            req.Posters,
 		Labels:             req.Labels,
 	})

@@ -4,6 +4,11 @@ package appgood
 import (
 	"context"
 
+	appmgrcli "github.com/NpoolPlatform/appuser-manager/pkg/client/app"
+	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
+	npoolpb "github.com/NpoolPlatform/message/npool"
+	appgoodmgrpb "github.com/NpoolPlatform/message/npool/good/mgr/v1/appgood"
+
 	"github.com/shopspring/decimal"
 
 	constant "github.com/NpoolPlatform/good-middleware/pkg/message/const"
@@ -72,14 +77,43 @@ func (s *Server) CreateNAppGood(ctx context.Context, in *npool.CreateNAppGoodReq
 		return &npool.CreateNAppGoodResponse{}, status.Error(codes.InvalidArgument, "CommissionPercent is invalid")
 	}
 
-	exist, err := goodmgrcli.ExistGood(ctx, in.GetGoodID())
+	good, err := goodmgrcli.GetGood(ctx, in.GetGoodID())
 	if err != nil {
 		logger.Sugar().Errorw("CreateNAppGood", "GoodID", in.GetGoodID(), "error", err)
 		return &npool.CreateNAppGoodResponse{}, status.Error(codes.InvalidArgument, err.Error())
 	}
-	if !exist {
-		logger.Sugar().Errorw("CreateNAppGood", "GoodID", in.GetGoodID(), "exist", exist)
+	if good == nil {
+		logger.Sugar().Errorw("CreateNAppGood", "GoodID", in.GetGoodID())
 		return &npool.CreateNAppGoodResponse{}, status.Error(codes.InvalidArgument, "GoodID not exist")
+	}
+
+	if in.GetPrice() < good.GetPrice() {
+		logger.Sugar().Errorw("CreateNAppGood", "GoodID", in.GetGoodID())
+		return &npool.CreateNAppGoodResponse{}, status.Error(codes.InvalidArgument, "price greater than platform price")
+	}
+
+	exist, err := appgoodmgrcli.ExistAppGoodConds(ctx, &appgoodmgrpb.Conds{
+		AppID: &npoolpb.StringVal{
+			Op:    cruder.EQ,
+			Value: in.GetTargetAppID(),
+		},
+		GoodID: &npoolpb.StringVal{
+			Op:    cruder.EQ,
+			Value: in.GetGoodID(),
+		},
+	})
+	if err != nil {
+		logger.Sugar().Errorw("CreateNAppGood", "GoodID", in.GetGoodID(), "error", err)
+		return &npool.CreateNAppGoodResponse{}, status.Error(codes.InvalidArgument, err.Error())
+	}
+	if exist {
+		logger.Sugar().Errorw("CreateNAppGood", "GoodID", in.GetGoodID())
+		return &npool.CreateNAppGoodResponse{}, status.Error(codes.InvalidArgument, "Good is already exist")
+	}
+
+	if in.GetPrice() < good.GetPrice() {
+		logger.Sugar().Errorw("CreateNAppGood", "GoodID", in.GetGoodID())
+		return &npool.CreateNAppGoodResponse{}, status.Error(codes.InvalidArgument, "price greater than platform price")
 	}
 
 	span = commontracer.TraceInvoker(span, "Good", "mw", "CreateNAppGood")
@@ -306,6 +340,22 @@ func (s *Server) UpdateNAppGood(ctx context.Context, in *npool.UpdateNAppGoodReq
 	if _, err := uuid.Parse(in.GetID()); err != nil {
 		logger.Sugar().Errorw("UpdateGood", "ID", in.GetID(), "error", err)
 		return &npool.UpdateNAppGoodResponse{}, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	if _, err := uuid.Parse(in.GetTargetAppID()); err != nil {
+		logger.Sugar().Errorw("UpdateGood", "TargetAppID", in.GetTargetAppID(), "error", err)
+		return &npool.UpdateNAppGoodResponse{}, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	app, err := appmgrcli.GetApp(ctx, in.GetTargetAppID())
+	if err != nil {
+		logger.Sugar().Errorw("validate", "error", err)
+		return &npool.UpdateNAppGoodResponse{}, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	if app == nil {
+		logger.Sugar().Errorw("validate", "error", err)
+		return &npool.UpdateNAppGoodResponse{}, status.Error(codes.InvalidArgument, "App is not exist")
 	}
 
 	if in.Price != nil {

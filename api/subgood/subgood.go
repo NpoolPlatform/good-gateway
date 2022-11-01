@@ -5,7 +5,14 @@ import (
 	"context"
 	"fmt"
 
-	mgrcli "github.com/NpoolPlatform/good-manager/pkg/client/subgood"
+	appgoodmgrcli "github.com/NpoolPlatform/good-manager/pkg/client/appgood"
+	appgoodmgrpb "github.com/NpoolPlatform/message/npool/good/mgr/v1/appgood"
+
+	submgrcli "github.com/NpoolPlatform/good-manager/pkg/client/subgood"
+	submgrpb "github.com/NpoolPlatform/message/npool/good/mgr/v1/subgood"
+
+	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
+
 	constant "github.com/NpoolPlatform/good-middleware/pkg/message/const"
 	commontracer "github.com/NpoolPlatform/good-middleware/pkg/tracer"
 
@@ -21,6 +28,8 @@ import (
 	"github.com/google/uuid"
 
 	subgoodm "github.com/NpoolPlatform/good-gateway/pkg/subgood"
+
+	npoolpb "github.com/NpoolPlatform/message/npool"
 )
 
 // nolint
@@ -52,11 +61,73 @@ func (s *Server) CreateSubGood(ctx context.Context, in *npool.CreateSubGoodReque
 		return &npool.CreateSubGoodResponse{}, status.Error(codes.InvalidArgument, fmt.Sprintf("SubGoodID is invalid: %v", err))
 	}
 
-	span = commontracer.TraceInvoker(span, "SubGood", "mw", "CreateSubGood")
+	exist, err := appgoodmgrcli.ExistAppGoodConds(ctx, &appgoodmgrpb.Conds{
+		AppID: &npoolpb.StringVal{
+			Op:    cruder.EQ,
+			Value: in.GetAppID(),
+		},
+		GoodID: &npoolpb.StringVal{
+			Op:    cruder.EQ,
+			Value: in.GetMainGoodID(),
+		},
+	})
+	if err != nil {
+		logger.Sugar().Errorw("validate", "MainGoodID", in.GetMainGoodID(), "error", err)
+		return &npool.CreateSubGoodResponse{}, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	if !exist {
+		logger.Sugar().Errorw("validate", "MainGoodID", in.GetMainGoodID(), "error", err)
+		return &npool.CreateSubGoodResponse{}, status.Error(codes.InvalidArgument, "App Good not exist")
+	}
+
+	exist, err = appgoodmgrcli.ExistAppGoodConds(ctx, &appgoodmgrpb.Conds{
+		AppID: &npoolpb.StringVal{
+			Op:    cruder.EQ,
+			Value: in.GetAppID(),
+		},
+		GoodID: &npoolpb.StringVal{
+			Op:    cruder.EQ,
+			Value: in.GetSubGoodID(),
+		},
+		GoodIDs: nil,
+	})
+
 	if err != nil {
 		logger.Sugar().Errorw("validate", "SubGoodID", in.GetSubGoodID(), "error", err)
-		return &npool.CreateSubGoodResponse{}, status.Error(codes.Internal, err.Error())
+		return &npool.CreateSubGoodResponse{}, status.Error(codes.InvalidArgument, err.Error())
 	}
+
+	if !exist {
+		logger.Sugar().Errorw("validate", "SubGoodID", in.GetSubGoodID(), "error", err)
+		return &npool.CreateSubGoodResponse{}, status.Error(codes.InvalidArgument, "App Good not exist")
+	}
+
+	exist, err = submgrcli.ExistSubGoodConds(ctx, &submgrpb.Conds{
+		MainGoodID: &npoolpb.StringVal{
+			Op:    cruder.EQ,
+			Value: in.GetMainGoodID(),
+		},
+		SubGoodID: &npoolpb.StringVal{
+			Op:    cruder.EQ,
+			Value: in.GetSubGoodID(),
+		},
+		AppID: &npoolpb.StringVal{
+			Op:    cruder.EQ,
+			Value: in.GetAppID(),
+		},
+	})
+	if err != nil {
+		logger.Sugar().Errorw("validate", "error", err)
+		return &npool.CreateSubGoodResponse{}, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	if exist {
+		logger.Sugar().Errorw("validate", "SubGoodID", in.GetSubGoodID(), "error", err)
+		return &npool.CreateSubGoodResponse{}, status.Error(codes.InvalidArgument, "Sub Good already exist")
+	}
+
+	span = commontracer.TraceInvoker(span, "SubGood", "mw", "CreateSubGood")
 
 	info, err := subgoodm.CreateSubGood(ctx, in)
 	if err != nil {
@@ -96,6 +167,72 @@ func (s *Server) CreateAppSubGood(ctx context.Context, in *npool.CreateAppSubGoo
 	if _, err := uuid.Parse(in.GetSubGoodID()); err != nil {
 		logger.Sugar().Errorw("validate", "SubGoodID", in.GetSubGoodID(), "error", err)
 		return &npool.CreateAppSubGoodResponse{}, status.Error(codes.InvalidArgument, fmt.Sprintf("SubGoodID is invalid: %v", err))
+	}
+
+	exist, err := appgoodmgrcli.ExistAppGoodConds(ctx, &appgoodmgrpb.Conds{
+		AppID: &npoolpb.StringVal{
+			Op:    cruder.EQ,
+			Value: in.GetTargetAppID(),
+		},
+		GoodID: &npoolpb.StringVal{
+			Op:    cruder.EQ,
+			Value: in.GetMainGoodID(),
+		},
+	})
+	if err != nil {
+		logger.Sugar().Errorw("validate", "MainGoodID", in.GetMainGoodID(), "error", err)
+		return &npool.CreateAppSubGoodResponse{}, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	if !exist {
+		logger.Sugar().Errorw("validate", "MainGoodID", in.GetMainGoodID(), "error", err)
+		return &npool.CreateAppSubGoodResponse{}, status.Error(codes.InvalidArgument, "App Good not exist")
+	}
+
+	exist, err = appgoodmgrcli.ExistAppGoodConds(ctx, &appgoodmgrpb.Conds{
+		AppID: &npoolpb.StringVal{
+			Op:    cruder.EQ,
+			Value: in.GetTargetAppID(),
+		},
+		GoodID: &npoolpb.StringVal{
+			Op:    cruder.EQ,
+			Value: in.GetSubGoodID(),
+		},
+		GoodIDs: nil,
+	})
+
+	if err != nil {
+		logger.Sugar().Errorw("validate", "SubGoodID", in.GetSubGoodID(), "error", err)
+		return &npool.CreateAppSubGoodResponse{}, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	if !exist {
+		logger.Sugar().Errorw("validate", "SubGoodID", in.GetSubGoodID(), "error", err)
+		return &npool.CreateAppSubGoodResponse{}, status.Error(codes.InvalidArgument, "App Good not exist")
+	}
+
+	exist, err = submgrcli.ExistSubGoodConds(ctx, &submgrpb.Conds{
+		MainGoodID: &npoolpb.StringVal{
+			Op:    cruder.EQ,
+			Value: in.GetMainGoodID(),
+		},
+		SubGoodID: &npoolpb.StringVal{
+			Op:    cruder.EQ,
+			Value: in.GetSubGoodID(),
+		},
+		AppID: &npoolpb.StringVal{
+			Op:    cruder.EQ,
+			Value: in.GetTargetAppID(),
+		},
+	})
+	if err != nil {
+		logger.Sugar().Errorw("validate", "error", err)
+		return &npool.CreateAppSubGoodResponse{}, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	if exist {
+		logger.Sugar().Errorw("validate", "SubGoodID", in.GetSubGoodID(), "error", err)
+		return &npool.CreateAppSubGoodResponse{}, status.Error(codes.InvalidArgument, "Sub Good already exist")
 	}
 
 	span = commontracer.TraceInvoker(span, "SubGood", "mw", "CreateSubGood")
@@ -200,7 +337,7 @@ func (s *Server) UpdateSubGood(ctx context.Context, in *npool.UpdateSubGoodReque
 		return &npool.UpdateSubGoodResponse{}, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	subGood, err := mgrcli.GetSubGood(ctx, in.GetID())
+	subGood, err := submgrcli.GetSubGood(ctx, in.GetID())
 	if err != nil {
 		logger.Sugar().Errorw("UpdateSubGood", "ID", in.GetID(), "error", err)
 		return &npool.UpdateSubGoodResponse{}, status.Error(codes.Internal, err.Error())
@@ -215,6 +352,28 @@ func (s *Server) UpdateSubGood(ctx context.Context, in *npool.UpdateSubGoodReque
 		if _, err := uuid.Parse(in.GetSubGoodID()); err != nil {
 			logger.Sugar().Errorw("validate", "SubGoodID", in.GetSubGoodID(), "error", err)
 			return &npool.UpdateSubGoodResponse{}, status.Error(codes.InvalidArgument, fmt.Sprintf("SubGoodID is invalid: %v", err))
+		}
+
+		exist, err := appgoodmgrcli.ExistAppGoodConds(ctx, &appgoodmgrpb.Conds{
+			AppID: &npoolpb.StringVal{
+				Op:    cruder.EQ,
+				Value: in.GetAppID(),
+			},
+			GoodID: &npoolpb.StringVal{
+				Op:    cruder.EQ,
+				Value: in.GetSubGoodID(),
+			},
+			GoodIDs: nil,
+		})
+
+		if err != nil {
+			logger.Sugar().Errorw("validate", "SubGood", in.GetSubGoodID(), "error", err)
+			return &npool.UpdateSubGoodResponse{}, status.Error(codes.InvalidArgument, err.Error())
+		}
+
+		if !exist {
+			logger.Sugar().Errorw("validate", "SubGood", in.GetSubGoodID(), "error", err)
+			return &npool.UpdateSubGoodResponse{}, status.Error(codes.InvalidArgument, "App Good not exist")
 		}
 	}
 
@@ -247,10 +406,37 @@ func (s *Server) UpdateAppSubGood(ctx context.Context, in *npool.UpdateAppSubGoo
 		return &npool.UpdateAppSubGoodResponse{}, status.Error(codes.InvalidArgument, err.Error())
 	}
 
+	if _, err := uuid.Parse(in.GetTargetAppID()); err != nil {
+		logger.Sugar().Errorw("validate", "AppID", in.GetTargetAppID(), "error", err)
+		return &npool.UpdateAppSubGoodResponse{}, status.Error(codes.InvalidArgument, fmt.Sprintf("AppID is invalid: %v", err))
+	}
+
 	if in.SubGoodID != nil {
 		if _, err := uuid.Parse(in.GetSubGoodID()); err != nil {
 			logger.Sugar().Errorw("validate", "SubGoodID", in.GetSubGoodID(), "error", err)
 			return &npool.UpdateAppSubGoodResponse{}, status.Error(codes.InvalidArgument, fmt.Sprintf("SubGoodID is invalid: %v", err))
+		}
+
+		exist, err := appgoodmgrcli.ExistAppGoodConds(ctx, &appgoodmgrpb.Conds{
+			AppID: &npoolpb.StringVal{
+				Op:    cruder.EQ,
+				Value: in.GetTargetAppID(),
+			},
+			GoodID: &npoolpb.StringVal{
+				Op:    cruder.EQ,
+				Value: in.GetSubGoodID(),
+			},
+			GoodIDs: nil,
+		})
+
+		if err != nil {
+			logger.Sugar().Errorw("validate", "SubGood", in.GetSubGoodID(), "error", err)
+			return &npool.UpdateAppSubGoodResponse{}, status.Error(codes.InvalidArgument, err.Error())
+		}
+
+		if !exist {
+			logger.Sugar().Errorw("validate", "SubGood", in.GetSubGoodID(), "error", err)
+			return &npool.UpdateAppSubGoodResponse{}, status.Error(codes.InvalidArgument, "App Good not exist")
 		}
 	}
 

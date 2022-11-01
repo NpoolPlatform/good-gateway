@@ -7,6 +7,8 @@ import (
 	mgrcli "github.com/NpoolPlatform/good-manager/pkg/client/recommend"
 	goodmgrpb "github.com/NpoolPlatform/message/npool/good/mgr/v1/good"
 
+	mwcli "github.com/NpoolPlatform/good-middleware/pkg/client/recommend"
+
 	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 	npoolpb "github.com/NpoolPlatform/message/npool"
 	mgrpb "github.com/NpoolPlatform/message/npool/good/mgr/v1/recommend"
@@ -18,13 +20,14 @@ import (
 )
 
 func CreateRecommend(ctx context.Context, in *npool.CreateRecommendRequest) (*npool.Recommend, error) {
-	info, err := mgrcli.CreateRecommend(ctx, &mgrpb.RecommendReq{
+	info, err := mwcli.CreateGood(ctx, &mgrpb.RecommendReq{
 		AppID:          &in.AppID,
 		GoodID:         &in.GoodID,
 		RecommenderID:  &in.RecommenderID,
 		Message:        &in.Message,
 		RecommendIndex: &in.RecommendIndex,
 	})
+
 	if err != nil {
 		return nil, err
 	}

@@ -55,6 +55,11 @@ func (s *Server) CreateGood(ctx context.Context, in *npool.CreateGoodRequest) (*
 		return &npool.CreateGoodResponse{}, status.Error(codes.InvalidArgument, "Price is invalid")
 	}
 
+	if unit, err := decimal.NewFromString(in.GetUnit()); err != nil || unit.Cmp(decimal.NewFromInt(0)) <= 0 {
+		logger.Sugar().Errorw("CreateGood", "Price", in.GetPrice(), "error", err)
+		return &npool.CreateGoodResponse{}, status.Error(codes.InvalidArgument, "Unit is invalid")
+	}
+
 	switch in.GetBenefitType() {
 	case mgrpb.BenefitType_BenefitTypePlatform:
 	case mgrpb.BenefitType_BenefitTypePool:
@@ -277,13 +282,6 @@ func (s *Server) UpdateGood(ctx context.Context, in *npool.UpdateGoodRequest) (*
 		if in.GetTotal() <= 0 {
 			logger.Sugar().Errorw("UpdateGood", "Total", in.GetTotal())
 			return &npool.UpdateGoodResponse{}, status.Error(codes.InvalidArgument, "Total is invalid")
-		}
-	}
-
-	if in.Sold != nil {
-		if in.GetSold() <= 0 {
-			logger.Sugar().Errorw("UpdateGood", "Sold", in.GetSold())
-			return &npool.UpdateGoodResponse{}, status.Error(codes.InvalidArgument, "Sold is invalid")
 		}
 	}
 

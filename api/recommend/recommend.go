@@ -5,16 +5,17 @@ import (
 	"context"
 	"fmt"
 
+	appmgrcli "github.com/NpoolPlatform/appuser-manager/pkg/client/app"
+	appusermgrcli "github.com/NpoolPlatform/appuser-manager/pkg/client/appuser"
+
 	mgrcli "github.com/NpoolPlatform/good-manager/pkg/client/recommend"
 
 	appgoodmgrcli "github.com/NpoolPlatform/good-manager/pkg/client/appgood"
 	appgoodmgrpb "github.com/NpoolPlatform/message/npool/good/mgr/v1/appgood"
 
-	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
-	mgrpb "github.com/NpoolPlatform/message/npool/good/mgr/v1/recommend"
-
 	constant "github.com/NpoolPlatform/good-middleware/pkg/message/const"
 	commontracer "github.com/NpoolPlatform/good-middleware/pkg/tracer"
+	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 
 	"go.opentelemetry.io/otel"
 	scodes "go.opentelemetry.io/otel/codes"
@@ -66,27 +67,7 @@ func (s *Server) CreateRecommend(ctx context.Context, in *npool.CreateRecommendR
 		return &npool.CreateRecommendResponse{}, status.Error(codes.InvalidArgument, fmt.Sprintf("Message is empty"))
 	}
 
-	exist, err := mgrcli.ExistRecommendConds(ctx, &mgrpb.Conds{
-		AppID: &npoolpb.StringVal{
-			Op:    cruder.EQ,
-			Value: in.GetAppID(),
-		},
-		GoodID: &npoolpb.StringVal{
-			Op:    cruder.EQ,
-			Value: in.GetGoodID(),
-		},
-	})
-	if err != nil {
-		logger.Sugar().Errorw("CreateGood", "error", err)
-		return &npool.CreateRecommendResponse{}, status.Error(codes.Internal, err.Error())
-	}
-
-	if exist {
-		logger.Sugar().Errorw("CreateGood", "error", err)
-		return &npool.CreateRecommendResponse{}, status.Error(codes.InvalidArgument, "Recommend already exists")
-	}
-
-	exist, err = appgoodmgrcli.ExistAppGoodConds(ctx, &appgoodmgrpb.Conds{
+	exist, err := appgoodmgrcli.ExistAppGoodConds(ctx, &appgoodmgrpb.Conds{
 		AppID: &npoolpb.StringVal{
 			Op:    cruder.EQ,
 			Value: in.GetAppID(),
@@ -104,6 +85,17 @@ func (s *Server) CreateRecommend(ctx context.Context, in *npool.CreateRecommendR
 	if !exist {
 		logger.Sugar().Errorw("CreateGood", "error", err)
 		return &npool.CreateRecommendResponse{}, status.Error(codes.InvalidArgument, "App Good is not found")
+	}
+
+	exist, err = appusermgrcli.ExistAppUser(ctx, in.GetRecommenderID())
+	if err != nil {
+		logger.Sugar().Errorw("CreateGood", "error", err)
+		return &npool.CreateRecommendResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
+	if !exist {
+		logger.Sugar().Errorw("CreateGood", "error", err)
+		return &npool.CreateRecommendResponse{}, status.Error(codes.InvalidArgument, "Recommender is not found")
 	}
 
 	span = commontracer.TraceInvoker(span, "Recommend", "mw", "CreateRecommend")
@@ -153,7 +145,18 @@ func (s *Server) CreateAppRecommend(ctx context.Context, in *npool.CreateAppReco
 		return &npool.CreateAppRecommendResponse{}, status.Error(codes.InvalidArgument, fmt.Sprintf("Message is empty"))
 	}
 
-	exist, err := mgrcli.ExistRecommendConds(ctx, &mgrpb.Conds{
+	app, err := appmgrcli.GetApp(ctx, in.GetTargetAppID())
+	if err != nil {
+		logger.Sugar().Errorw("validate", "error", err)
+		return &npool.CreateAppRecommendResponse{}, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	if app == nil {
+		logger.Sugar().Errorw("validate", "error", err)
+		return &npool.CreateAppRecommendResponse{}, status.Error(codes.InvalidArgument, "App is not exist")
+	}
+
+	exist, err := appgoodmgrcli.ExistAppGoodConds(ctx, &appgoodmgrpb.Conds{
 		AppID: &npoolpb.StringVal{
 			Op:    cruder.EQ,
 			Value: in.GetTargetAppID(),
@@ -164,13 +167,24 @@ func (s *Server) CreateAppRecommend(ctx context.Context, in *npool.CreateAppReco
 		},
 	})
 	if err != nil {
+		logger.Sugar().Errorw("validate", "error", err)
+		return &npool.CreateAppRecommendResponse{}, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	if !exist {
+		logger.Sugar().Errorw("validate", "GoodID", in.GetGoodID(), "error", err)
+		return &npool.CreateAppRecommendResponse{}, status.Error(codes.InvalidArgument, "App Good not exist")
+	}
+
+	exist, err = appusermgrcli.ExistAppUser(ctx, in.GetRecommenderID())
+	if err != nil {
 		logger.Sugar().Errorw("CreateGood", "error", err)
 		return &npool.CreateAppRecommendResponse{}, status.Error(codes.Internal, err.Error())
 	}
 
-	if exist {
+	if !exist {
 		logger.Sugar().Errorw("CreateGood", "error", err)
-		return &npool.CreateAppRecommendResponse{}, status.Error(codes.InvalidArgument, "Recommend already exists")
+		return &npool.CreateAppRecommendResponse{}, status.Error(codes.InvalidArgument, "Recommender is not found")
 	}
 
 	span = commontracer.TraceInvoker(span, "Recommend", "mw", "CreateRecommend")
@@ -327,6 +341,17 @@ func (s *Server) UpdateAppRecommend(ctx context.Context, in *npool.UpdateAppReco
 		return &npool.UpdateAppRecommendResponse{}, status.Error(codes.InvalidArgument, fmt.Sprintf("GetAppID is invalid: %v", err))
 	}
 
+	app, err := appmgrcli.GetApp(ctx, in.GetTargetAppID())
+	if err != nil {
+		logger.Sugar().Errorw("validate", "error", err)
+		return &npool.UpdateAppRecommendResponse{}, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	if app == nil {
+		logger.Sugar().Errorw("validate", "error", err)
+		return &npool.UpdateAppRecommendResponse{}, status.Error(codes.InvalidArgument, "App is not exist")
+	}
+
 	if in.Message != nil {
 		if in.GetMessage() == "" {
 			logger.Sugar().Errorw("validate", "Message", in.GetMessage(), "error", err)
@@ -347,5 +372,43 @@ func (s *Server) UpdateAppRecommend(ctx context.Context, in *npool.UpdateAppReco
 
 	return &npool.UpdateAppRecommendResponse{
 		Info: info,
+	}, nil
+}
+
+func (s *Server) DeleteRecommend(ctx context.Context, in *npool.DeleteRecommendRequest) (*npool.DeleteRecommendResponse, error) {
+	var err error
+
+	_, span := otel.Tracer(constant.ServiceName).Start(ctx, "UpdateRecommend")
+	defer span.End()
+
+	defer func() {
+		if err != nil {
+			span.SetStatus(scodes.Error, err.Error())
+			span.RecordError(err)
+		}
+	}()
+
+	if _, err := uuid.Parse(in.GetID()); err != nil {
+		logger.Sugar().Errorw("validate", "ID", in.GetID(), "error", err)
+		return &npool.DeleteRecommendResponse{}, status.Error(codes.InvalidArgument, fmt.Sprintf("ID is invalid: %v", err))
+	}
+
+	info, err := mgrcli.DeleteRecommend(ctx, in.GetID())
+	if err != nil {
+		logger.Sugar().Errorw("UpdateRecommend", "error", err)
+		return &npool.DeleteRecommendResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
+	return &npool.DeleteRecommendResponse{
+		Info: &npool.Recommend{
+			ID:             info.ID,
+			AppID:          info.AppID,
+			GoodID:         info.GoodID,
+			RecommenderID:  info.RecommenderID,
+			Message:        info.Message,
+			RecommendIndex: info.RecommendIndex,
+			CreatedAt:      info.CreatedAt,
+			UpdatedAt:      info.UpdatedAt,
+		},
 	}, nil
 }
