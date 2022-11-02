@@ -55,9 +55,9 @@ func (s *Server) CreateGood(ctx context.Context, in *npool.CreateGoodRequest) (*
 		return &npool.CreateGoodResponse{}, status.Error(codes.InvalidArgument, "Price is invalid")
 	}
 
-	if unit, err := decimal.NewFromString(in.GetUnit()); err != nil || unit.Cmp(decimal.NewFromInt(0)) <= 0 {
-		logger.Sugar().Errorw("CreateGood", "Price", in.GetPrice(), "error", err)
-		return &npool.CreateGoodResponse{}, status.Error(codes.InvalidArgument, "Unit is invalid")
+	if in.GetUnit() == "" {
+		logger.Sugar().Errorw("CreateGood", "Unit", in.GetUnit(), "error", err)
+		return &npool.CreateGoodResponse{}, status.Error(codes.InvalidArgument, "Unit is empty")
 	}
 
 	switch in.GetBenefitType() {
