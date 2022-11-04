@@ -270,13 +270,13 @@ func (s *Server) UpdateAppGood(ctx context.Context, in *npool.UpdateAppGoodReque
 		return &npool.UpdateAppGoodResponse{}, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	good, err := appgoodmgrcli.GetAppGood(ctx, in.GetID())
+	appGood, err := appgoodmgrcli.GetAppGood(ctx, in.GetID())
 	if err != nil {
 		logger.Sugar().Errorw("UpdateGood", "error", err)
 		return &npool.UpdateAppGoodResponse{}, status.Error(codes.Internal, err.Error())
 	}
 
-	if good.AppID != in.GetAppID() {
+	if appGood.AppID != in.GetAppID() {
 		logger.Sugar().Errorw("UpdateGood", "AppID", in.GetAppID(), "error", err)
 		return &npool.UpdateAppGoodResponse{}, status.Error(codes.InvalidArgument, "AppID is invalid")
 	}
@@ -285,6 +285,17 @@ func (s *Server) UpdateAppGood(ctx context.Context, in *npool.UpdateAppGoodReque
 		if price, err := decimal.NewFromString(in.GetPrice()); err != nil || price.Cmp(decimal.NewFromInt(0)) <= 0 {
 			logger.Sugar().Errorw("UpdateGood", "Price", in.GetPrice(), "error", err)
 			return &npool.UpdateAppGoodResponse{}, status.Error(codes.InvalidArgument, "Price is invalid")
+		}
+
+		good, err := goodmgrcli.GetGood(ctx, in.GetID())
+		if err != nil {
+			logger.Sugar().Errorw("UpdateGood", "error", err)
+			return &npool.UpdateAppGoodResponse{}, status.Error(codes.Internal, err.Error())
+		}
+
+		if appGood.AppID != in.GetAppID() {
+			logger.Sugar().Errorw("UpdateGood", "AppID", in.GetAppID(), "error", err)
+			return &npool.UpdateAppGoodResponse{}, status.Error(codes.InvalidArgument, "AppID is invalid")
 		}
 
 		if in.GetPrice() < good.GetPrice() {
@@ -375,7 +386,7 @@ func (s *Server) UpdateNAppGood(ctx context.Context, in *npool.UpdateNAppGoodReq
 			return &npool.UpdateNAppGoodResponse{}, status.Error(codes.InvalidArgument, "Price is invalid")
 		}
 
-		good, err := appgoodmgrcli.GetAppGood(ctx, in.GetID())
+		good, err := goodmgrcli.GetGood(ctx, in.GetID())
 		if err != nil {
 			logger.Sugar().Errorw("UpdateNAppGood", "error", err)
 			return &npool.UpdateNAppGoodResponse{}, status.Error(codes.Internal, err.Error())
