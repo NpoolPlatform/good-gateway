@@ -380,13 +380,19 @@ func (s *Server) UpdateNAppGood(ctx context.Context, in *npool.UpdateNAppGoodReq
 		return &npool.UpdateNAppGoodResponse{}, status.Error(codes.InvalidArgument, "App is not exist")
 	}
 
+	appGood, err := appgoodmgrcli.GetAppGood(ctx, in.GetID())
+	if err != nil {
+		logger.Sugar().Errorw("UpdateGood", "error", err)
+		return &npool.UpdateNAppGoodResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
 	if in.Price != nil {
 		if price, err := decimal.NewFromString(in.GetPrice()); err != nil || price.Cmp(decimal.NewFromInt(0)) <= 0 {
 			logger.Sugar().Errorw("UpdateNAppGood", "Price", in.GetPrice(), "error", err)
 			return &npool.UpdateNAppGoodResponse{}, status.Error(codes.InvalidArgument, "Price is invalid")
 		}
 
-		good, err := goodmgrcli.GetGood(ctx, in.GetID())
+		good, err := goodmgrcli.GetGood(ctx, appGood.GetGoodID())
 		if err != nil {
 			logger.Sugar().Errorw("UpdateNAppGood", "error", err)
 			return &npool.UpdateNAppGoodResponse{}, status.Error(codes.Internal, err.Error())

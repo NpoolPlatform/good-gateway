@@ -3,7 +3,6 @@ package good
 
 import (
 	"context"
-	"time"
 
 	"github.com/shopspring/decimal"
 
@@ -96,17 +95,6 @@ func (s *Server) CreateGood(ctx context.Context, in *npool.CreateGoodRequest) (*
 			logger.Sugar().Errorw("CreateGood", "SupportCoinTypeIDs", in.GetSupportCoinTypeIDs(), "error", err)
 			return &npool.CreateGoodResponse{}, status.Error(codes.InvalidArgument, err.Error())
 		}
-	}
-
-	now := uint32(time.Now().Unix())
-	if in.GetDeliveryAt() <= now {
-		logger.Sugar().Errorw("CreateGood", "DeliveryAt", in.GetDeliveryAt(), "now", now)
-		return &npool.CreateGoodResponse{}, status.Error(codes.InvalidArgument, "DeliveryAt is invalid")
-	}
-
-	if in.GetStartAt() <= now {
-		logger.Sugar().Errorw("CreateGood", "StartAt", in.GetStartAt(), "now", now)
-		return &npool.CreateGoodResponse{}, status.Error(codes.InvalidArgument, "StartAt is invalid")
 	}
 
 	if in.GetTotal() <= 0 {
@@ -345,22 +333,6 @@ func (s *Server) UpdateGood(ctx context.Context, in *npool.UpdateGoodRequest) (*
 		if !ok {
 			logger.Sugar().Errorw("UpdateGood", "SupportCoinTypeIDs", in.GetSupportCoinTypeIDs())
 			return &npool.UpdateGoodResponse{}, status.Error(codes.InvalidArgument, "SupportCoinTypeIDs is not exist")
-		}
-	}
-
-	now := uint32(time.Now().Unix())
-
-	if in.DeliveryAt != nil {
-		if in.GetDeliveryAt() <= now {
-			logger.Sugar().Errorw("UpdateGood", "DeliveryAt", in.GetDeliveryAt(), "now", now)
-			return &npool.UpdateGoodResponse{}, status.Error(codes.InvalidArgument, "DeliveryAt is invalid")
-		}
-	}
-
-	if in.StartAt != nil {
-		if in.GetStartAt() <= now {
-			logger.Sugar().Errorw("UpdateGood", "StartAt", in.GetStartAt(), "now", now)
-			return &npool.UpdateGoodResponse{}, status.Error(codes.InvalidArgument, "StartAt is invalid")
 		}
 	}
 

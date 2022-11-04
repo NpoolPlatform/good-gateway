@@ -11,7 +11,7 @@ require (
 	github.com/NpoolPlatform/go-service-framework v0.0.0-20221015040432-cd676d323379
 	github.com/NpoolPlatform/good-manager v0.0.0-20221020034141-bda321f755c8
 	github.com/NpoolPlatform/good-middleware v0.0.0-20221031083439-bcee8660736b
-	github.com/NpoolPlatform/libent-cruder v0.0.0-20220821121920-9559f5776d15
+	github.com/NpoolPlatform/libent-cruder v0.0.0-20221104072329-1d7b4d7f09cb
 	github.com/NpoolPlatform/message v0.0.0-20221103071159-c1d224296245
 	github.com/NpoolPlatform/sphinx-coininfo v0.0.0-20220930040119-1eb8b2e73e3f
 	github.com/NpoolPlatform/stock-manager v0.0.0-20220930040146-676de0bdaf4c

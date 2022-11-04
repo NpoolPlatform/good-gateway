@@ -1,4 +1,4 @@
-//nolint:nolintlint,dupl
+//nolint
 package promotion
 
 import (
@@ -90,6 +90,14 @@ func (s *Server) CreatePromotion(ctx context.Context, in *npool.CreatePromotionR
 			Op:    cruder.EQ,
 			Value: in.GetGoodID(),
 		},
+		StartAt: &npoolpb.Uint32Val{
+			Op:    cruder.LTE,
+			Value: in.GetStartAt(),
+		},
+		EndAt: &npoolpb.Uint32Val{
+			Op:    cruder.GTE,
+			Value: in.GetStartAt(),
+		},
 	})
 	if err != nil {
 		logger.Sugar().Errorw("CreateGood", "error", err)
@@ -98,7 +106,63 @@ func (s *Server) CreatePromotion(ctx context.Context, in *npool.CreatePromotionR
 
 	if exist {
 		logger.Sugar().Errorw("CreateGood", "error", err)
-		return &npool.CreatePromotionResponse{}, status.Error(codes.InvalidArgument, "Promotion already exists")
+		return &npool.CreatePromotionResponse{}, status.Error(codes.InvalidArgument, "already exists promotion within the start time")
+	}
+
+	exist, err = mgrcli.ExistPromotionConds(ctx, &mgrpb.Conds{
+		AppID: &npoolpb.StringVal{
+			Op:    cruder.EQ,
+			Value: in.GetAppID(),
+		},
+		GoodID: &npoolpb.StringVal{
+			Op:    cruder.EQ,
+			Value: in.GetGoodID(),
+		},
+		StartAt: &npoolpb.Uint32Val{
+			Op:    cruder.GTE,
+			Value: in.GetEndAt(),
+		},
+		EndAt: &npoolpb.Uint32Val{
+			Op:    cruder.LTE,
+			Value: in.GetEndAt(),
+		},
+	})
+	if err != nil {
+		logger.Sugar().Errorw("CreateGood", "error", err)
+		return &npool.CreatePromotionResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
+	if exist {
+		logger.Sugar().Errorw("CreateGood", "error", err)
+		return &npool.CreatePromotionResponse{}, status.Error(codes.InvalidArgument, "already exists promotion within the end time")
+	}
+
+	exist, err = mgrcli.ExistPromotionConds(ctx, &mgrpb.Conds{
+		AppID: &npoolpb.StringVal{
+			Op:    cruder.EQ,
+			Value: in.GetAppID(),
+		},
+		GoodID: &npoolpb.StringVal{
+			Op:    cruder.EQ,
+			Value: in.GetGoodID(),
+		},
+		StartAt: &npoolpb.Uint32Val{
+			Op:    cruder.GTE,
+			Value: in.GetStartAt(),
+		},
+		EndAt: &npoolpb.Uint32Val{
+			Op:    cruder.LTE,
+			Value: in.GetEndAt(),
+		},
+	})
+	if err != nil {
+		logger.Sugar().Errorw("CreateGood", "error", err)
+		return &npool.CreatePromotionResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
+	if exist {
+		logger.Sugar().Errorw("CreateGood", "error", err)
+		return &npool.CreatePromotionResponse{}, status.Error(codes.InvalidArgument, "already exists promotion within the time")
 	}
 
 	span = commontracer.TraceInvoker(span, "Promotion", "mw", "CreatePromotion")
@@ -168,8 +232,12 @@ func (s *Server) CreateAppPromotion(ctx context.Context, in *npool.CreateAppProm
 			Op:    cruder.EQ,
 			Value: in.GetGoodID(),
 		},
+		StartAt: &npoolpb.Uint32Val{
+			Op:    cruder.LTE,
+			Value: in.GetStartAt(),
+		},
 		EndAt: &npoolpb.Uint32Val{
-			Op:    cruder.GT,
+			Op:    cruder.GTE,
 			Value: in.GetStartAt(),
 		},
 	})
@@ -180,7 +248,63 @@ func (s *Server) CreateAppPromotion(ctx context.Context, in *npool.CreateAppProm
 
 	if exist {
 		logger.Sugar().Errorw("CreateGood", "error", err)
-		return &npool.CreateAppPromotionResponse{}, status.Error(codes.InvalidArgument, "Promotion already exists")
+		return &npool.CreateAppPromotionResponse{}, status.Error(codes.InvalidArgument, "already exists promotion within the start time")
+	}
+
+	exist, err = mgrcli.ExistPromotionConds(ctx, &mgrpb.Conds{
+		AppID: &npoolpb.StringVal{
+			Op:    cruder.EQ,
+			Value: in.GetTargetAppID(),
+		},
+		GoodID: &npoolpb.StringVal{
+			Op:    cruder.EQ,
+			Value: in.GetGoodID(),
+		},
+		StartAt: &npoolpb.Uint32Val{
+			Op:    cruder.GTE,
+			Value: in.GetEndAt(),
+		},
+		EndAt: &npoolpb.Uint32Val{
+			Op:    cruder.LTE,
+			Value: in.GetEndAt(),
+		},
+	})
+	if err != nil {
+		logger.Sugar().Errorw("CreateGood", "error", err)
+		return &npool.CreateAppPromotionResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
+	if exist {
+		logger.Sugar().Errorw("CreateGood", "error", err)
+		return &npool.CreateAppPromotionResponse{}, status.Error(codes.InvalidArgument, "already exists promotion within the end time")
+	}
+
+	exist, err = mgrcli.ExistPromotionConds(ctx, &mgrpb.Conds{
+		AppID: &npoolpb.StringVal{
+			Op:    cruder.EQ,
+			Value: in.GetTargetAppID(),
+		},
+		GoodID: &npoolpb.StringVal{
+			Op:    cruder.EQ,
+			Value: in.GetGoodID(),
+		},
+		StartAt: &npoolpb.Uint32Val{
+			Op:    cruder.GTE,
+			Value: in.GetStartAt(),
+		},
+		EndAt: &npoolpb.Uint32Val{
+			Op:    cruder.LTE,
+			Value: in.GetEndAt(),
+		},
+	})
+	if err != nil {
+		logger.Sugar().Errorw("CreateGood", "error", err)
+		return &npool.CreateAppPromotionResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
+	if exist {
+		logger.Sugar().Errorw("CreateGood", "error", err)
+		return &npool.CreateAppPromotionResponse{}, status.Error(codes.InvalidArgument, "already exists promotion within the time")
 	}
 
 	exist, err = appgoodmgrcli.ExistAppGoodConds(ctx, &appgoodmgrpb.Conds{
@@ -342,16 +466,143 @@ func (s *Server) UpdatePromotion(ctx context.Context, in *npool.UpdatePromotionR
 	}
 
 	if in.StartAt != nil {
-		now := uint32(time.Now().Unix())
-		if in.GetStartAt() <= now {
-			logger.Sugar().Errorw("validate", "StartAt", in.GetStartAt(), "error", err)
-			return &npool.UpdatePromotionResponse{}, status.Error(codes.InvalidArgument, fmt.Sprintf("StartAt is invalid"))
+		startAt := in.GetStartAt()
+		endAt := in.GetEndAt()
+		if in.EndAt == nil {
+			endAt = promotion.EndAt
 		}
 
-		if in.GetEndAt() <= in.GetStartAt() {
-			logger.Sugar().Errorw("validate", "EndAt", in.GetEndAt(), "error", err)
-			return &npool.UpdatePromotionResponse{}, status.Error(codes.InvalidArgument, fmt.Sprintf("EndAt is invalid"))
+		if startAt > endAt {
+			logger.Sugar().Errorw("CreateGood", "error", err)
+			return &npool.UpdatePromotionResponse{}, status.Error(codes.InvalidArgument, "StartAt greater than EndAt")
 		}
+
+		exist, err := mgrcli.ExistPromotionConds(ctx, &mgrpb.Conds{
+			AppID: &npoolpb.StringVal{
+				Op:    cruder.EQ,
+				Value: in.GetAppID(),
+			},
+			GoodID: &npoolpb.StringVal{
+				Op:    cruder.EQ,
+				Value: promotion.GetGoodID(),
+			},
+			StartAt: &npoolpb.Uint32Val{
+				Op:    cruder.LTE,
+				Value: startAt,
+			},
+			EndAt: &npoolpb.Uint32Val{
+				Op:    cruder.GTE,
+				Value: startAt,
+			},
+		})
+		if err != nil {
+			logger.Sugar().Errorw("CreateGood", "error", err)
+			return &npool.UpdatePromotionResponse{}, status.Error(codes.Internal, err.Error())
+		}
+
+		if exist {
+			logger.Sugar().Errorw("CreateGood", "error", err)
+			return &npool.UpdatePromotionResponse{}, status.Error(codes.InvalidArgument, "already exists promotion within the start time")
+		}
+
+		exist, err = mgrcli.ExistPromotionConds(ctx, &mgrpb.Conds{
+			AppID: &npoolpb.StringVal{
+				Op:    cruder.EQ,
+				Value: in.GetAppID(),
+			},
+			GoodID: &npoolpb.StringVal{
+				Op:    cruder.EQ,
+				Value: promotion.GetGoodID(),
+			},
+			StartAt: &npoolpb.Uint32Val{
+				Op:    cruder.GTE,
+				Value: startAt,
+			},
+			EndAt: &npoolpb.Uint32Val{
+				Op:    cruder.LTE,
+				Value: endAt,
+			},
+		})
+		if err != nil {
+			logger.Sugar().Errorw("CreateGood", "error", err)
+			return &npool.UpdatePromotionResponse{}, status.Error(codes.Internal, err.Error())
+		}
+
+		if exist {
+			logger.Sugar().Errorw("CreateGood", "error", err)
+			return &npool.UpdatePromotionResponse{}, status.Error(codes.InvalidArgument, "already exists promotion within the time")
+		}
+
+	}
+
+	if in.EndAt != nil {
+		startAt := in.GetStartAt()
+		endAt := in.GetEndAt()
+		if in.StartAt == nil {
+			endAt = promotion.StartAt
+		}
+
+		if startAt > endAt {
+			logger.Sugar().Errorw("CreateGood", "error", err)
+			return &npool.UpdatePromotionResponse{}, status.Error(codes.InvalidArgument, "EndAt less than StartAt")
+		}
+
+		exist, err := mgrcli.ExistPromotionConds(ctx, &mgrpb.Conds{
+			AppID: &npoolpb.StringVal{
+				Op:    cruder.EQ,
+				Value: in.GetAppID(),
+			},
+			GoodID: &npoolpb.StringVal{
+				Op:    cruder.EQ,
+				Value: promotion.GetGoodID(),
+			},
+			StartAt: &npoolpb.Uint32Val{
+				Op:    cruder.LTE,
+				Value: endAt,
+			},
+			EndAt: &npoolpb.Uint32Val{
+				Op:    cruder.GTE,
+				Value: endAt,
+			},
+		})
+		if err != nil {
+			logger.Sugar().Errorw("CreateGood", "error", err)
+			return &npool.UpdatePromotionResponse{}, status.Error(codes.Internal, err.Error())
+		}
+
+		if exist {
+			logger.Sugar().Errorw("CreateGood", "error", err)
+			return &npool.UpdatePromotionResponse{}, status.Error(codes.InvalidArgument, "already exists promotion within the start time")
+		}
+
+		exist, err = mgrcli.ExistPromotionConds(ctx, &mgrpb.Conds{
+			AppID: &npoolpb.StringVal{
+				Op:    cruder.EQ,
+				Value: in.GetAppID(),
+			},
+			GoodID: &npoolpb.StringVal{
+				Op:    cruder.EQ,
+				Value: promotion.GetGoodID(),
+			},
+			StartAt: &npoolpb.Uint32Val{
+				Op:    cruder.GTE,
+				Value: startAt,
+			},
+			EndAt: &npoolpb.Uint32Val{
+				Op:    cruder.LTE,
+				Value: endAt,
+			},
+		})
+		if err != nil {
+			logger.Sugar().Errorw("CreateGood", "error", err)
+			return &npool.UpdatePromotionResponse{}, status.Error(codes.Internal, err.Error())
+		}
+
+		if exist {
+			logger.Sugar().Errorw("CreateGood", "error", err)
+			return &npool.UpdatePromotionResponse{}, status.Error(codes.InvalidArgument, "already exists promotion within the time")
+		}
+
 	}
 
 	if in.Price != nil {
@@ -426,6 +677,150 @@ func (s *Server) UpdateAppPromotion(ctx context.Context, in *npool.UpdateAppProm
 	if app == nil {
 		logger.Sugar().Errorw("validate", "error", err)
 		return &npool.UpdateAppPromotionResponse{}, status.Error(codes.InvalidArgument, "App is not exist")
+	}
+
+	promotion, err := mgrcli.GetPromotion(ctx, in.GetID())
+	if err != nil {
+		logger.Sugar().Errorw("validate", "error", err)
+		return &npool.UpdateAppPromotionResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
+	if in.StartAt != nil {
+		startAt := in.GetStartAt()
+		endAt := in.GetEndAt()
+		if in.EndAt == nil {
+			endAt = promotion.EndAt
+		}
+
+		if startAt > endAt {
+			logger.Sugar().Errorw("CreateGood", "error", err)
+			return &npool.UpdateAppPromotionResponse{}, status.Error(codes.InvalidArgument, "StartAt greater than EndAt")
+		}
+
+		exist, err := mgrcli.ExistPromotionConds(ctx, &mgrpb.Conds{
+			AppID: &npoolpb.StringVal{
+				Op:    cruder.EQ,
+				Value: in.GetTargetAppID(),
+			},
+			GoodID: &npoolpb.StringVal{
+				Op:    cruder.EQ,
+				Value: promotion.GetGoodID(),
+			},
+			StartAt: &npoolpb.Uint32Val{
+				Op:    cruder.LTE,
+				Value: startAt,
+			},
+			EndAt: &npoolpb.Uint32Val{
+				Op:    cruder.GTE,
+				Value: startAt,
+			},
+		})
+		if err != nil {
+			logger.Sugar().Errorw("CreateGood", "error", err)
+			return &npool.UpdateAppPromotionResponse{}, status.Error(codes.Internal, err.Error())
+		}
+
+		if exist {
+			logger.Sugar().Errorw("CreateGood", "error", err)
+			return &npool.UpdateAppPromotionResponse{}, status.Error(codes.InvalidArgument, "already exists promotion within the start time")
+		}
+
+		exist, err = mgrcli.ExistPromotionConds(ctx, &mgrpb.Conds{
+			AppID: &npoolpb.StringVal{
+				Op:    cruder.EQ,
+				Value: in.GetTargetAppID(),
+			},
+			GoodID: &npoolpb.StringVal{
+				Op:    cruder.EQ,
+				Value: promotion.GetGoodID(),
+			},
+			StartAt: &npoolpb.Uint32Val{
+				Op:    cruder.GTE,
+				Value: startAt,
+			},
+			EndAt: &npoolpb.Uint32Val{
+				Op:    cruder.LTE,
+				Value: endAt,
+			},
+		})
+		if err != nil {
+			logger.Sugar().Errorw("CreateGood", "error", err)
+			return &npool.UpdateAppPromotionResponse{}, status.Error(codes.Internal, err.Error())
+		}
+
+		if exist {
+			logger.Sugar().Errorw("CreateGood", "error", err)
+			return &npool.UpdateAppPromotionResponse{}, status.Error(codes.InvalidArgument, "already exists promotion within the time")
+		}
+	}
+
+	if in.EndAt != nil {
+		startAt := in.GetStartAt()
+		endAt := in.GetEndAt()
+		if in.StartAt == nil {
+			endAt = promotion.StartAt
+		}
+
+		if startAt > endAt {
+			logger.Sugar().Errorw("CreateGood", "error", err)
+			return &npool.UpdateAppPromotionResponse{}, status.Error(codes.InvalidArgument, "EndAt less than StartAt")
+		}
+
+		exist, err := mgrcli.ExistPromotionConds(ctx, &mgrpb.Conds{
+			AppID: &npoolpb.StringVal{
+				Op:    cruder.EQ,
+				Value: in.GetTargetAppID(),
+			},
+			GoodID: &npoolpb.StringVal{
+				Op:    cruder.EQ,
+				Value: promotion.GetGoodID(),
+			},
+			StartAt: &npoolpb.Uint32Val{
+				Op:    cruder.LTE,
+				Value: endAt,
+			},
+			EndAt: &npoolpb.Uint32Val{
+				Op:    cruder.GTE,
+				Value: endAt,
+			},
+		})
+		if err != nil {
+			logger.Sugar().Errorw("CreateGood", "error", err)
+			return &npool.UpdateAppPromotionResponse{}, status.Error(codes.Internal, err.Error())
+		}
+
+		if exist {
+			logger.Sugar().Errorw("CreateGood", "error", err)
+			return &npool.UpdateAppPromotionResponse{}, status.Error(codes.InvalidArgument, "already exists promotion within the start time")
+		}
+
+		exist, err = mgrcli.ExistPromotionConds(ctx, &mgrpb.Conds{
+			AppID: &npoolpb.StringVal{
+				Op:    cruder.EQ,
+				Value: in.GetTargetAppID(),
+			},
+			GoodID: &npoolpb.StringVal{
+				Op:    cruder.EQ,
+				Value: promotion.GetGoodID(),
+			},
+			StartAt: &npoolpb.Uint32Val{
+				Op:    cruder.GTE,
+				Value: startAt,
+			},
+			EndAt: &npoolpb.Uint32Val{
+				Op:    cruder.LTE,
+				Value: endAt,
+			},
+		})
+		if err != nil {
+			logger.Sugar().Errorw("CreateGood", "error", err)
+			return &npool.UpdateAppPromotionResponse{}, status.Error(codes.Internal, err.Error())
+		}
+
+		if exist {
+			logger.Sugar().Errorw("CreateGood", "error", err)
+			return &npool.UpdateAppPromotionResponse{}, status.Error(codes.InvalidArgument, "already exists promotion within the time")
+		}
 	}
 
 	info, err := promotionm.UpdatePromotion(ctx, &npool.UpdatePromotionRequest{
