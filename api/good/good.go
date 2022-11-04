@@ -24,6 +24,9 @@ import (
 	goodm "github.com/NpoolPlatform/good-gateway/pkg/good"
 
 	"github.com/google/uuid"
+
+	deviceinfocli "github.com/NpoolPlatform/good-manager/pkg/client/deviceinfo"
+	vendorlocationcli "github.com/NpoolPlatform/good-manager/pkg/client/vendorlocation"
 )
 
 // nolint
@@ -112,6 +115,48 @@ func (s *Server) CreateGood(ctx context.Context, in *npool.CreateGoodRequest) (*
 	}
 
 	span = commontracer.TraceInvoker(span, "Good", "mw", "CreateGood")
+
+	exist, err := deviceinfocli.ExistDeviceInfo(ctx, in.GetDeviceInfoID())
+	if err != nil {
+		logger.Sugar().Errorw("CreateGood", "DeviceInfoID", in.GetDeviceInfoID())
+		return &npool.CreateGoodResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
+	if !exist {
+		logger.Sugar().Errorw("CreateGood", "Total", in.GetTotal())
+		return &npool.CreateGoodResponse{}, status.Error(codes.InvalidArgument, "DeviceInfoID is not exist")
+	}
+
+	exist, err = vendorlocationcli.ExistVendorLocation(ctx, in.GetVendorLocationID())
+	if err != nil {
+		logger.Sugar().Errorw("CreateGood", "VendorLocationID", in.GetVendorLocationID())
+		return &npool.CreateGoodResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
+	if !exist {
+		logger.Sugar().Errorw("CreateGood", "VendorLocationID", in.GetVendorLocationID())
+		return &npool.CreateGoodResponse{}, status.Error(codes.InvalidArgument, "VendorLocationID is not exist")
+	}
+
+	coinMap, err := goodm.GetCoinType(ctx)
+	if err != nil {
+		logger.Sugar().Errorw("CreateGood", "VendorLocationID", in.GetVendorLocationID())
+		return &npool.CreateGoodResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
+	_, ok := coinMap[in.GetCoinTypeID()]
+	if !ok {
+		logger.Sugar().Errorw("CreateGood", "CoinTypeID", in.GetCoinTypeID())
+		return &npool.CreateGoodResponse{}, status.Error(codes.InvalidArgument, "CoinTypeID is not exist")
+	}
+
+	for _, val := range in.GetSupportCoinTypeIDs() {
+		_, ok := coinMap[val]
+		if !ok {
+			logger.Sugar().Errorw("CreateGood", "SupportCoinTypeIDs", in.GetSupportCoinTypeIDs())
+			return &npool.CreateGoodResponse{}, status.Error(codes.InvalidArgument, "SupportCoinTypeIDs is not exist")
+		}
+	}
 
 	info, err := goodm.CreateGood(ctx, in)
 	if err != nil {
@@ -206,6 +251,18 @@ func (s *Server) UpdateGood(ctx context.Context, in *npool.UpdateGoodRequest) (*
 			logger.Sugar().Errorw("UpdateGood", "DeviceInfoID", in.GetDeviceInfoID(), "error", err)
 			return &npool.UpdateGoodResponse{}, status.Error(codes.InvalidArgument, err.Error())
 		}
+
+		exist, err := deviceinfocli.ExistDeviceInfo(ctx, in.GetDeviceInfoID())
+		if err != nil {
+			logger.Sugar().Errorw("UpdateGood", "DeviceInfoID", in.GetDeviceInfoID())
+			return &npool.UpdateGoodResponse{}, status.Error(codes.Internal, err.Error())
+		}
+
+		if !exist {
+			logger.Sugar().Errorw("UpdateGood", "Total", in.GetTotal())
+			return &npool.UpdateGoodResponse{}, status.Error(codes.InvalidArgument, "DeviceInfoID is not exist")
+		}
+
 	}
 
 	if in.DurationDays != nil && in.GetDurationDays() <= 0 {
@@ -213,10 +270,22 @@ func (s *Server) UpdateGood(ctx context.Context, in *npool.UpdateGoodRequest) (*
 		return &npool.UpdateGoodResponse{}, status.Error(codes.InvalidArgument, "DurationDays is invalid")
 	}
 
+	coinMap, err := goodm.GetCoinType(ctx)
+	if err != nil {
+		logger.Sugar().Errorw("UpdateGood", "VendorLocationID", in.GetVendorLocationID())
+		return &npool.UpdateGoodResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
 	if in.CoinTypeID != nil {
 		if _, err := uuid.Parse(in.GetCoinTypeID()); err != nil {
 			logger.Sugar().Errorw("UpdateGood", "CoinTypeID", in.GetCoinTypeID(), "error", err)
 			return &npool.UpdateGoodResponse{}, status.Error(codes.InvalidArgument, err.Error())
+		}
+
+		_, ok := coinMap[in.GetCoinTypeID()]
+		if !ok {
+			logger.Sugar().Errorw("UpdateGood", "CoinTypeID", in.GetCoinTypeID())
+			return &npool.UpdateGoodResponse{}, status.Error(codes.InvalidArgument, "CoinTypeID is not exist")
 		}
 	}
 
@@ -231,6 +300,17 @@ func (s *Server) UpdateGood(ctx context.Context, in *npool.UpdateGoodRequest) (*
 		if _, err := uuid.Parse(in.GetVendorLocationID()); err != nil {
 			logger.Sugar().Errorw("UpdateGood", "VendorLocationID", in.GetVendorLocationID(), "error", err)
 			return &npool.UpdateGoodResponse{}, status.Error(codes.InvalidArgument, err.Error())
+		}
+
+		exist, err := vendorlocationcli.ExistVendorLocation(ctx, in.GetVendorLocationID())
+		if err != nil {
+			logger.Sugar().Errorw("UpdateGood", "VendorLocationID", in.GetVendorLocationID())
+			return &npool.UpdateGoodResponse{}, status.Error(codes.Internal, err.Error())
+		}
+
+		if !exist {
+			logger.Sugar().Errorw("CreateGood", "VendorLocationID", in.GetVendorLocationID())
+			return &npool.UpdateGoodResponse{}, status.Error(codes.InvalidArgument, "VendorLocationID is not exist")
 		}
 	}
 
@@ -259,6 +339,12 @@ func (s *Server) UpdateGood(ctx context.Context, in *npool.UpdateGoodRequest) (*
 		if _, err := uuid.Parse(coinTypeID); err != nil {
 			logger.Sugar().Errorw("UpdateGood", "SupportCoinTypeIDs", in.GetSupportCoinTypeIDs(), "error", err)
 			return &npool.UpdateGoodResponse{}, status.Error(codes.InvalidArgument, err.Error())
+		}
+
+		_, ok := coinMap[coinTypeID]
+		if !ok {
+			logger.Sugar().Errorw("UpdateGood", "SupportCoinTypeIDs", in.GetSupportCoinTypeIDs())
+			return &npool.UpdateGoodResponse{}, status.Error(codes.InvalidArgument, "SupportCoinTypeIDs is not exist")
 		}
 	}
 

@@ -24,7 +24,7 @@ func GetGood(ctx context.Context, id string) (*npool.Good, error) {
 		return nil, fmt.Errorf("GoodID not found")
 	}
 
-	coinMap, err := getCoinType(ctx)
+	coinMap, err := GetCoinType(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -37,7 +37,7 @@ func GetGoods(ctx context.Context, offset, limit int32) ([]*npool.Good, uint32, 
 		return nil, 0, err
 	}
 
-	coinMap, err := getCoinType(ctx)
+	coinMap, err := GetCoinType(ctx)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -80,7 +80,7 @@ func CreateGood(ctx context.Context, req *npool.CreateGoodRequest) (*npool.Good,
 		return nil, err
 	}
 
-	coinMap, err := getCoinType(ctx)
+	coinMap, err := GetCoinType(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -112,7 +112,7 @@ func UpdateGood(ctx context.Context, req *npool.UpdateGoodRequest) (*npool.Good,
 		return nil, err
 	}
 
-	coinMap, err := getCoinType(ctx)
+	coinMap, err := GetCoinType(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -120,7 +120,7 @@ func UpdateGood(ctx context.Context, req *npool.UpdateGoodRequest) (*npool.Good,
 	return ScanCoinType(info, coinMap)
 }
 
-func getCoinType(ctx context.Context) (map[string]*coininfopb.CoinInfo, error) {
+func GetCoinType(ctx context.Context) (map[string]*coininfopb.CoinInfo, error) {
 	coinTypes, err := coininfocli.GetCoinInfos(ctx, nil)
 	if err != nil {
 		return nil, err

@@ -393,6 +393,17 @@ func (s *Server) DeleteRecommend(ctx context.Context, in *npool.DeleteRecommendR
 		return &npool.DeleteRecommendResponse{}, status.Error(codes.InvalidArgument, fmt.Sprintf("ID is invalid: %v", err))
 	}
 
+	recommendmInfo, err := mgrcli.GetRecommend(ctx, in.GetID())
+	if err != nil {
+		logger.Sugar().Errorw("validate", "ID", in.GetID(), "error", err)
+		return &npool.DeleteRecommendResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
+	if recommendmInfo.AppID != in.GetAppID() {
+		logger.Sugar().Errorw("validate", "AppID", in.GetAppID(), "error", err)
+		return &npool.DeleteRecommendResponse{}, status.Error(codes.PermissionDenied, "permission denied")
+	}
+
 	info, err := mgrcli.DeleteRecommend(ctx, in.GetID())
 	if err != nil {
 		logger.Sugar().Errorw("UpdateRecommend", "error", err)
