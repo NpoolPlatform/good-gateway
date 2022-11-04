@@ -4,8 +4,6 @@ package promotion
 import (
 	"context"
 	"fmt"
-	"time"
-
 	appgoodmgrcli "github.com/NpoolPlatform/good-manager/pkg/client/appgood"
 	appgoodmgrpb "github.com/NpoolPlatform/message/npool/good/mgr/v1/appgood"
 
@@ -63,12 +61,6 @@ func (s *Server) CreatePromotion(ctx context.Context, in *npool.CreatePromotionR
 	if in.GetMessage() == "" {
 		logger.Sugar().Errorw("validate", "Message", in.GetMessage(), "error", err)
 		return &npool.CreatePromotionResponse{}, status.Error(codes.InvalidArgument, fmt.Sprintf("Message is empty"))
-	}
-
-	now := uint32(time.Now().Unix())
-	if in.GetStartAt() <= now {
-		logger.Sugar().Errorw("validate", "StartAt", in.GetStartAt(), "error", err)
-		return &npool.CreatePromotionResponse{}, status.Error(codes.InvalidArgument, fmt.Sprintf("StartAt is invalid"))
 	}
 
 	if in.GetEndAt() <= in.GetStartAt() {
@@ -205,12 +197,6 @@ func (s *Server) CreateAppPromotion(ctx context.Context, in *npool.CreateAppProm
 	if in.GetMessage() == "" {
 		logger.Sugar().Errorw("validate", "Message", in.GetMessage(), "error", err)
 		return &npool.CreateAppPromotionResponse{}, status.Error(codes.InvalidArgument, fmt.Sprintf("Message is empty"))
-	}
-
-	now := uint32(time.Now().Unix())
-	if in.GetStartAt() <= now {
-		logger.Sugar().Errorw("validate", "StartAt", in.GetStartAt(), "error", err)
-		return &npool.CreateAppPromotionResponse{}, status.Error(codes.InvalidArgument, fmt.Sprintf("StartAt is invalid"))
 	}
 
 	if in.GetEndAt() <= in.GetStartAt() {
@@ -649,12 +635,6 @@ func (s *Server) UpdateAppPromotion(ctx context.Context, in *npool.UpdateAppProm
 	}
 
 	if in.StartAt != nil {
-		now := uint32(time.Now().Unix())
-		if in.GetStartAt() <= now {
-			logger.Sugar().Errorw("validate", "StartAt", in.GetStartAt(), "error", err)
-			return &npool.UpdateAppPromotionResponse{}, status.Error(codes.InvalidArgument, "StartAt is invalid")
-		}
-
 		if in.GetEndAt() <= in.GetStartAt() {
 			logger.Sugar().Errorw("validate", "EndAt", in.GetEndAt(), "error", err)
 			return &npool.UpdateAppPromotionResponse{}, status.Error(codes.InvalidArgument, "EndAt is invalid")
