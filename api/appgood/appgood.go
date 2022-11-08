@@ -287,7 +287,7 @@ func (s *Server) UpdateAppGood(ctx context.Context, in *npool.UpdateAppGoodReque
 			return &npool.UpdateAppGoodResponse{}, status.Error(codes.InvalidArgument, "Price is invalid")
 		}
 
-		good, err := goodmgrcli.GetGood(ctx, in.GetID())
+		good, err := goodmgrcli.GetGood(ctx, appGood.GetGoodID())
 		if err != nil {
 			logger.Sugar().Errorw("UpdateGood", "error", err)
 			return &npool.UpdateAppGoodResponse{}, status.Error(codes.Internal, err.Error())
