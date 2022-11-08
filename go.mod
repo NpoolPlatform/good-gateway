@@ -10,9 +10,9 @@ require (
 	github.com/NpoolPlatform/cloud-hashing-goods v0.0.0-20220930040543-a48dfa502ac4
 	github.com/NpoolPlatform/go-service-framework v0.0.0-20221015040432-cd676d323379
 	github.com/NpoolPlatform/good-manager v0.0.0-20221102090416-48dc2513c88e
-	github.com/NpoolPlatform/good-middleware v0.0.0-20221107072700-45a540874185
+	github.com/NpoolPlatform/good-middleware v0.0.0-20221108075735-7aa9dbda0fc5
 	github.com/NpoolPlatform/libent-cruder v0.0.0-20221104072329-1d7b4d7f09cb
-	github.com/NpoolPlatform/message v0.0.0-20221107065046-fde75f2c40ea
+	github.com/NpoolPlatform/message v0.0.0-20221108014807-12bec2af1221
 	github.com/NpoolPlatform/sphinx-coininfo v0.0.0-20220930040119-1eb8b2e73e3f
 	github.com/NpoolPlatform/stock-manager v0.0.0-20220930040146-676de0bdaf4c
 	github.com/go-resty/resty/v2 v2.7.0

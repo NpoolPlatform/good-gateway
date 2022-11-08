@@ -68,7 +68,7 @@ func GetAppGoods(ctx context.Context, appID string, offset, limit int32) ([]*npo
 }
 
 func GetAppGood(ctx context.Context, appID, goodID string) (*npool.Good, error) {
-	good, err := appgoodmwcli.GetOnlyGood(ctx, &appgoodmgrpb.Conds{
+	good, err := appgoodmwcli.GetGoodOnly(ctx, &appgoodmgrpb.Conds{
 		AppID: &npoolpb.StringVal{
 			Op:    cruder.EQ,
 			Value: appID,
