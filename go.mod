@@ -7,13 +7,13 @@ require (
 	github.com/NpoolPlatform/api-manager v0.0.0-20220826022307-d72866fe3ec0
 	github.com/NpoolPlatform/appuser-manager v0.0.0-20220829153511-c579ddb3686d
 	github.com/NpoolPlatform/appuser-middleware v0.0.0-20220830145114-e7d2cde1cc9c
+	github.com/NpoolPlatform/chain-middleware v0.0.0-20221201084405-d3c3772efbc8
 	github.com/NpoolPlatform/cloud-hashing-goods v0.0.0-20220930040543-a48dfa502ac4
 	github.com/NpoolPlatform/go-service-framework v0.0.0-20221015040432-cd676d323379
 	github.com/NpoolPlatform/good-manager v0.0.0-20221109024349-1459b49a835a
 	github.com/NpoolPlatform/good-middleware v0.0.0-20221109024849-724709e2093e
 	github.com/NpoolPlatform/libent-cruder v0.0.0-20221109023947-366125b690fb
-	github.com/NpoolPlatform/message v0.0.0-20221109022611-ca37512e0c04
-	github.com/NpoolPlatform/sphinx-coininfo v0.0.0-20220930040119-1eb8b2e73e3f
+	github.com/NpoolPlatform/message v0.0.0-20221201081448-db4c8a641f1c
 	github.com/NpoolPlatform/stock-manager v0.0.0-20220930040146-676de0bdaf4c
 	github.com/go-resty/resty/v2 v2.7.0
 	github.com/google/uuid v1.3.0

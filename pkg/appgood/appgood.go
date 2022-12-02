@@ -12,14 +12,12 @@ import (
 
 	goodmwpb "github.com/NpoolPlatform/message/npool/good/mw/v1/appgood"
 
-	coininfocli "github.com/NpoolPlatform/sphinx-coininfo/pkg/client"
-
+	appcoininfocli "github.com/NpoolPlatform/chain-middleware/pkg/client/appcoin"
+	appcoinpb "github.com/NpoolPlatform/message/npool/chain/mw/v1/appcoin"
 	npool "github.com/NpoolPlatform/message/npool/good/gw/v1/appgood"
 	appgoodmgrpb "github.com/NpoolPlatform/message/npool/good/mgr/v1/appgood"
 
 	appgoodmwcli "github.com/NpoolPlatform/good-middleware/pkg/client/appgood"
-
-	coininfopb "github.com/NpoolPlatform/message/npool/coininfo"
 
 	appusermwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/user"
 	appusermwpb "github.com/NpoolPlatform/message/npool/appuser/mw/v1/user"
@@ -126,14 +124,28 @@ func Scan(ctx context.Context, info *goodmwpb.Good) (*npool.Good, error) {
 }
 
 func Scans(ctx context.Context, infos []*goodmwpb.Good, appID string) ([]*npool.Good, error) {
-	coinTypes, err := coininfocli.GetCoinInfos(ctx, nil)
+	coinTypeIDs := []string{}
+	for _, val := range infos {
+		coinTypeIDs = append(coinTypeIDs, val.CoinTypeID)
+	}
+
+	coins, _, err := appcoininfocli.GetCoins(ctx, &appcoinpb.Conds{
+		AppID: &npoolpb.StringVal{
+			Op:    cruder.EQ,
+			Value: appID,
+		},
+		CoinTypeIDs: &npoolpb.StringSliceVal{
+			Op:    cruder.EQ,
+			Value: coinTypeIDs,
+		},
+	}, 0, int32(len(coinTypeIDs)))
 	if err != nil {
 		return nil, err
 	}
 
-	ctMap := map[string]*coininfopb.CoinInfo{}
-	for _, coinType := range coinTypes {
-		ctMap[coinType.ID] = coinType
+	ctMap := map[string]*appcoinpb.Coin{}
+	for _, coin := range coins {
+		ctMap[coin.ID] = coin
 	}
 
 	userIDs := []string{}
@@ -180,7 +192,7 @@ func Scans(ctx context.Context, infos []*goodmwpb.Good, appID string) ([]*npool.
 
 func getSubGoods(
 	ctx context.Context,
-	ctMap map[string]*coininfopb.CoinInfo,
+	ctMap map[string]*appcoinpb.Coin,
 	userMap map[string]*appusermwpb.User,
 	goodIDs []string,
 	appID string,
@@ -241,7 +253,7 @@ func getSubGoods(
 }
 
 func getGoodInfos(
-	ctMap map[string]*coininfopb.CoinInfo,
+	ctMap map[string]*appcoinpb.Coin,
 	userMap map[string]*appusermwpb.User,
 	infos []*goodmwpb.Good,
 ) []*npool.Good {
@@ -258,7 +270,7 @@ func getGoodInfos(
 					CoinLogo:     coinTypeInfo.Logo,
 					CoinName:     coinTypeInfo.Name,
 					CoinUnit:     coinTypeInfo.Unit,
-					CoinPreSale:  coinTypeInfo.PreSale,
+					CoinPreSale:  coinTypeInfo.Presale,
 					CoinEnv:      coinTypeInfo.ENV,
 					CoinHomePage: coinTypeInfo.HomePage,
 					CoinSpecs:    coinTypeInfo.Specs,
@@ -342,7 +354,7 @@ func getGoodInfos(
 			info1.CoinLogo = coinType.Logo
 			info1.CoinName = coinType.Name
 			info1.CoinUnit = coinType.Unit
-			info1.CoinPreSale = coinType.PreSale
+			info1.CoinPreSale = coinType.Presale
 			info1.CoinEnv = coinType.ENV
 			info1.CoinHomePage = coinType.HomePage
 			info1.CoinSpecs = coinType.Specs

@@ -4,14 +4,14 @@ import (
 	"context"
 	"fmt"
 
-	coininfopb "github.com/NpoolPlatform/message/npool/coininfo"
+	coininfopb "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin"
 
 	goodmwcli "github.com/NpoolPlatform/good-middleware/pkg/client/good"
 	goodmwpb "github.com/NpoolPlatform/message/npool/good/mw/v1/good"
 
 	npool "github.com/NpoolPlatform/message/npool/good/gw/v1/good"
 
-	coininfocli "github.com/NpoolPlatform/sphinx-coininfo/pkg/client"
+	coininfocli "github.com/NpoolPlatform/chain-middleware/pkg/client/coin"
 )
 
 func GetGood(ctx context.Context, id string) (*npool.Good, error) {
@@ -120,20 +120,31 @@ func UpdateGood(ctx context.Context, req *npool.UpdateGoodRequest) (*npool.Good,
 	return ScanCoinType(info, coinMap)
 }
 
-func GetCoinType(ctx context.Context) (map[string]*coininfopb.CoinInfo, error) {
-	coinTypes, err := coininfocli.GetCoinInfos(ctx, nil)
-	if err != nil {
-		return nil, err
+func GetCoinType(ctx context.Context) (map[string]*coininfopb.Coin, error) {
+	ofs := 0
+	lim := 1000
+	coins := []*coininfopb.Coin{}
+	for {
+		coinInfos, _, err := coininfocli.GetCoins(ctx, nil, int32(ofs), int32(lim))
+		if err != nil {
+			return nil, err
+		}
+		if len(coinInfos) == 0 {
+			break
+		}
+		coins = append(coins, coinInfos...)
+		ofs += lim
 	}
-	coinMap := map[string]*coininfopb.CoinInfo{}
-	for _, val := range coinTypes {
-		coinMap[val.ID] = val
+
+	coinMap := map[string]*coininfopb.Coin{}
+	for _, coin := range coins {
+		coinMap[coin.ID] = coin
 	}
 
 	return coinMap, nil
 }
 
-func ScanCoinType(info *goodmwpb.Good, coinMap map[string]*coininfopb.CoinInfo) (*npool.Good, error) {
+func ScanCoinType(info *goodmwpb.Good, coinMap map[string]*coininfopb.Coin) (*npool.Good, error) {
 	supportCoins := []*npool.Good_CoinInfo{}
 	for _, val := range info.SupportCoinTypeIDs {
 		subCoinTypeM, ok := coinMap[val]
@@ -143,7 +154,7 @@ func ScanCoinType(info *goodmwpb.Good, coinMap map[string]*coininfopb.CoinInfo) 
 				CoinLogo:    subCoinTypeM.Logo,
 				CoinName:    subCoinTypeM.Name,
 				CoinUnit:    subCoinTypeM.Unit,
-				CoinPreSale: subCoinTypeM.PreSale,
+				CoinPreSale: subCoinTypeM.Presale,
 			})
 		}
 	}
@@ -195,7 +206,7 @@ func ScanCoinType(info *goodmwpb.Good, coinMap map[string]*coininfopb.CoinInfo) 
 		good.CoinLogo = coinTypeM.Logo
 		good.CoinName = coinTypeM.Name
 		good.Unit = coinTypeM.Unit
-		good.CoinPreSale = coinTypeM.PreSale
+		good.CoinPreSale = coinTypeM.Presale
 	}
 
 	return good, nil

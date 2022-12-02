@@ -70,6 +70,9 @@ github.com/NpoolPlatform/appuser-manager v0.0.0-20220829153511-c579ddb3686d h1:E
 github.com/NpoolPlatform/appuser-manager v0.0.0-20220829153511-c579ddb3686d/go.mod h1:hdVWv5E4A+In7DMG4TNIvi6/ywDeADgAiAqn8hTQEzw=
 github.com/NpoolPlatform/appuser-middleware v0.0.0-20220830145114-e7d2cde1cc9c h1:o5/G7T0TE26YOS5l17vwp87hiyjl2Be36vBuTmdCbIo=
 github.com/NpoolPlatform/appuser-middleware v0.0.0-20220830145114-e7d2cde1cc9c/go.mod h1:W9cYd7VNISgskaJ+m6SWNVD5fO4IHuNOovqc7HBLmvY=
+github.com/NpoolPlatform/chain-manager v0.0.0-20221123123131-ca38aa0d6f50 h1:fzM3XFc9GBTpvHevGjBjDY/0U6yKU/2IUjqyiMkriVY=
+github.com/NpoolPlatform/chain-middleware v0.0.0-20221201084405-d3c3772efbc8 h1:ZJoZyb7kZttPlaPHRq3BBURXQPJElaQXOAkZHwT2x4Y=
+github.com/NpoolPlatform/chain-middleware v0.0.0-20221201084405-d3c3772efbc8/go.mod h1:OsJaRyKqezMeuDHRqeMzgt5xb8RITEGXCf4YXhkEOH0=
 github.com/NpoolPlatform/cloud-hashing-goods v0.0.0-20220930040543-a48dfa502ac4 h1:YoH1x7HXDSoYZ9Q6R+2JaxoIM4Uc3RA7IwVHJIbTOfo=
 github.com/NpoolPlatform/cloud-hashing-goods v0.0.0-20220930040543-a48dfa502ac4/go.mod h1:6Da5wgk/BNweh7zItZJhYMXIZZpvxZF8CktNvHjXK8Y=
 github.com/NpoolPlatform/go-service-framework v0.0.0-20220818105452-9457611ae070/go.mod h1:QPI3Fu/AU5iUOUnf9EictZP1lqPQdPcVLqveIB2HovI=
@@ -84,10 +87,8 @@ github.com/NpoolPlatform/libent-cruder v0.0.0-20221109023947-366125b690fb h1:IAQ
 github.com/NpoolPlatform/libent-cruder v0.0.0-20221109023947-366125b690fb/go.mod h1:zvvqlRwbOdTUauPQ9dFDhDuxa91ILV0CQfVdPBZj+eA=
 github.com/NpoolPlatform/message v0.0.0-20220501030927-34f296682c0c/go.mod h1:i/F/sQWjQk44RGvfgEB0zH0oAK/0qLvgJ1AsJDZQDkk=
 github.com/NpoolPlatform/message v0.0.0-20220819134247-1dc75c85fe43/go.mod h1:8YXp4MghMHLZ9bBdQQyfjcRtLI2RbEHAQoNCejT2nZU=
-github.com/NpoolPlatform/message v0.0.0-20221109022611-ca37512e0c04 h1:hmIlT7dNRq2eWjwSd3ooaQV98jBfGGCWLmFGX7x6da0=
-github.com/NpoolPlatform/message v0.0.0-20221109022611-ca37512e0c04/go.mod h1:PPu6xSY6EEmKktC6azkYreJVM4gaGkmxuusqHok2IEA=
-github.com/NpoolPlatform/sphinx-coininfo v0.0.0-20220930040119-1eb8b2e73e3f h1:tFiY+yRZbUr5m/UzkMD8xAO35qkbQPsL0e7zjJT8YJM=
-github.com/NpoolPlatform/sphinx-coininfo v0.0.0-20220930040119-1eb8b2e73e3f/go.mod h1:DlZVXy/eIXjojDWYeB2A/3C/875Ru1Nob+mS9ZSwG3I=
+github.com/NpoolPlatform/message v0.0.0-20221201081448-db4c8a641f1c h1:8CxHWkNrRhIiYOywf/9xrmz9liuZO06q2gzln83vxs4=
+github.com/NpoolPlatform/message v0.0.0-20221201081448-db4c8a641f1c/go.mod h1:LEFKuTcEmL9RtaUbMGsiA+2f3/eZkn9HfGGx/seT6g0=
 github.com/NpoolPlatform/stock-manager v0.0.0-20220930040146-676de0bdaf4c h1:wudgnrLwm+MVr6Nnhfyur/DrgbJsCrAk2mvSur21CL4=
 github.com/NpoolPlatform/stock-manager v0.0.0-20220930040146-676de0bdaf4c/go.mod h1:GSz4JxpSBAR042YY/DKa/dFuAf9qz/7QsJzAG7t+Ssw=
 github.com/OneOfOne/xxhash v1.2.2 h1:KMrpdQIwFcEqXDklaen+P1axHaj9BSKzvpUUfnHldSE=
