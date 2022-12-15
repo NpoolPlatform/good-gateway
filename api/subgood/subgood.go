@@ -61,6 +61,11 @@ func (s *Server) CreateSubGood(ctx context.Context, in *npool.CreateSubGoodReque
 		return &npool.CreateSubGoodResponse{}, status.Error(codes.InvalidArgument, fmt.Sprintf("SubGoodID is invalid: %v", err))
 	}
 
+	if in.GetMainGoodID() == in.GetSubGoodID() {
+		logger.Sugar().Errorw("validate", "MainGoodID", in.GetMainGoodID(), "SubGoodID", in.GetSubGoodID(), "error", err)
+		return &npool.CreateSubGoodResponse{}, status.Error(codes.InvalidArgument, fmt.Sprintf("SubGoodID is MainGoodID"))
+	}
+
 	exist, err := appgoodmgrcli.ExistAppGoodConds(ctx, &appgoodmgrpb.Conds{
 		AppID: &npoolpb.StringVal{
 			Op:    cruder.EQ,
