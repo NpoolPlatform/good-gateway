@@ -3,19 +3,16 @@ module github.com/NpoolPlatform/good-gateway
 go 1.17
 
 require (
-	entgo.io/ent v0.11.3
 	github.com/NpoolPlatform/api-manager v0.0.0-20220826022307-d72866fe3ec0
 	github.com/NpoolPlatform/appuser-manager v0.0.0-20220829153511-c579ddb3686d
 	github.com/NpoolPlatform/appuser-middleware v0.0.0-20220830145114-e7d2cde1cc9c
 	github.com/NpoolPlatform/chain-middleware v0.0.0-20221213132223-5fc8d55fe644
-	github.com/NpoolPlatform/cloud-hashing-goods v0.0.0-20220930040543-a48dfa502ac4
 	github.com/NpoolPlatform/go-service-framework v0.0.0-20221015040432-cd676d323379
 	github.com/NpoolPlatform/good-manager v0.0.0-20221215023637-f029ef974ada
 	github.com/NpoolPlatform/good-middleware v0.0.0-20221215025325-cc14565416e5
 	github.com/NpoolPlatform/libent-cruder v0.0.0-20221109023947-366125b690fb
 	github.com/NpoolPlatform/message v0.0.0-20221215040851-55ab219d2005
 	github.com/NpoolPlatform/order-middleware v0.0.0-20221215042802-7386c6c68457
-	github.com/NpoolPlatform/stock-manager v0.0.0-20220930040146-676de0bdaf4c
 	github.com/go-resty/resty/v2 v2.7.0
 	github.com/google/uuid v1.3.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.10.0
@@ -30,6 +27,7 @@ require (
 
 require (
 	ariga.io/atlas v0.7.2-0.20220927111110-867ee0cca56a // indirect
+	entgo.io/ent v0.11.3 // indirect
 	github.com/Shonminh/apollo-client v0.4.0 // indirect
 	github.com/agext/levenshtein v1.2.1 // indirect
 	github.com/andres-erbsen/clock v0.0.0-20160526145045-9e14626cd129 // indirect
