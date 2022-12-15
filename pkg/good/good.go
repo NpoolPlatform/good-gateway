@@ -9,9 +9,17 @@ import (
 	goodmwcli "github.com/NpoolPlatform/good-middleware/pkg/client/good"
 	goodmwpb "github.com/NpoolPlatform/message/npool/good/mw/v1/good"
 
+	ordermwpb "github.com/NpoolPlatform/message/npool/order/mw/v1/order"
+	ordermwcli "github.com/NpoolPlatform/order-middleware/pkg/client/order"
+
+	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
+	commonpb "github.com/NpoolPlatform/message/npool"
+
 	npool "github.com/NpoolPlatform/message/npool/good/gw/v1/good"
 
 	coininfocli "github.com/NpoolPlatform/chain-middleware/pkg/client/coin"
+
+	constant "github.com/NpoolPlatform/good-gateway/pkg/const"
 )
 
 func GetGood(ctx context.Context, id string) (*npool.Good, error) {
@@ -110,6 +118,39 @@ func UpdateGood(ctx context.Context, req *npool.UpdateGoodRequest) (*npool.Good,
 	})
 	if err != nil {
 		return nil, err
+	}
+
+	if req.StartAt != nil {
+		for {
+			orders, _, err := ordermwcli.GetOrders(ctx, &ordermwpb.Conds{
+				GoodID: &commonpb.StringVal{
+					Op:    cruder.EQ,
+					Value: req.GetID(),
+				},
+			}, int32(0), constant.DefaultRowLimit)
+			if err != nil {
+				return nil, err
+			}
+			if len(orders) == 0 {
+				break
+			}
+
+			reqs := []*ordermwpb.OrderReq{}
+			for _, ord := range orders {
+				if ord.Start > req.GetStartAt() {
+					continue
+				}
+				reqs = append(reqs, &ordermwpb.OrderReq{
+					ID:    &ord.ID,
+					Start: req.StartAt,
+				})
+			}
+
+			_, err = ordermwcli.UpdateOrders(ctx, reqs)
+			if err != nil {
+				return nil, err
+			}
+		}
 	}
 
 	coinMap, err := GetCoinType(ctx)

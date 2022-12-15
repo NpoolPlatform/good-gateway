@@ -6,11 +6,15 @@ import (
 	"fmt"
 
 	goodmgrcli "github.com/NpoolPlatform/good-manager/pkg/client/subgood"
-	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
-	npoolpb "github.com/NpoolPlatform/message/npool"
 	subgoodmgrpb "github.com/NpoolPlatform/message/npool/good/mgr/v1/subgood"
 
 	goodmwpb "github.com/NpoolPlatform/message/npool/good/mw/v1/appgood"
+
+	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
+	commonpb "github.com/NpoolPlatform/message/npool"
+
+	ordermwpb "github.com/NpoolPlatform/message/npool/order/mw/v1/order"
+	ordermwcli "github.com/NpoolPlatform/order-middleware/pkg/client/order"
 
 	appcoininfocli "github.com/NpoolPlatform/chain-middleware/pkg/client/appcoin"
 	appcoinpb "github.com/NpoolPlatform/message/npool/chain/mw/v1/appcoin"
@@ -21,6 +25,8 @@ import (
 
 	appusermwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/user"
 	appusermwpb "github.com/NpoolPlatform/message/npool/appuser/mw/v1/user"
+
+	constant "github.com/NpoolPlatform/good-gateway/pkg/const"
 )
 
 func CreateAppGood(
@@ -56,7 +62,7 @@ func CreateAppGood(
 
 func GetAppGoods(ctx context.Context, appID string, offset, limit int32) ([]*npool.Good, uint32, error) {
 	goods, total, err := appgoodmwcli.GetGoods(ctx, &appgoodmgrpb.Conds{
-		AppID: &npoolpb.StringVal{
+		AppID: &commonpb.StringVal{
 			Op:    cruder.EQ,
 			Value: appID,
 		},
@@ -74,11 +80,11 @@ func GetAppGoods(ctx context.Context, appID string, offset, limit int32) ([]*npo
 
 func GetAppGood(ctx context.Context, appID, goodID string) (*npool.Good, error) {
 	good, err := appgoodmwcli.GetGoodOnly(ctx, &appgoodmgrpb.Conds{
-		AppID: &npoolpb.StringVal{
+		AppID: &commonpb.StringVal{
 			Op:    cruder.EQ,
 			Value: appID,
 		},
-		GoodID: &npoolpb.StringVal{
+		GoodID: &commonpb.StringVal{
 			Op:    cruder.EQ,
 			Value: goodID,
 		},
@@ -119,6 +125,39 @@ func UpdateAppGood(ctx context.Context, in *npool.UpdateAppGoodRequest) (*npool.
 		return nil, err
 	}
 
+	if in.ServiceStartAt != nil {
+		for {
+			orders, _, err := ordermwcli.GetOrders(ctx, &ordermwpb.Conds{
+				GoodID: &commonpb.StringVal{
+					Op:    cruder.EQ,
+					Value: in.GetID(),
+				},
+			}, int32(0), constant.DefaultRowLimit)
+			if err != nil {
+				return nil, err
+			}
+			if len(orders) == 0 {
+				break
+			}
+
+			reqs := []*ordermwpb.OrderReq{}
+			for _, ord := range orders {
+				if ord.Start > in.GetServiceStartAt() {
+					continue
+				}
+				reqs = append(reqs, &ordermwpb.OrderReq{
+					ID:    &ord.ID,
+					Start: in.ServiceStartAt,
+				})
+			}
+
+			_, err = ordermwcli.UpdateOrders(ctx, reqs)
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+
 	return Scan(ctx, info)
 }
 
@@ -142,11 +181,11 @@ func Scans(ctx context.Context, infos []*goodmwpb.Good, appID string) ([]*npool.
 	}
 
 	coins, _, err := appcoininfocli.GetCoins(ctx, &appcoinpb.Conds{
-		AppID: &npoolpb.StringVal{
+		AppID: &commonpb.StringVal{
 			Op:    cruder.EQ,
 			Value: appID,
 		},
-		CoinTypeIDs: &npoolpb.StringSliceVal{
+		CoinTypeIDs: &commonpb.StringSliceVal{
 			Op:    cruder.IN,
 			Value: coinTypeIDs,
 		},
@@ -210,11 +249,11 @@ func getSubGoods(
 	appID string,
 ) (map[string][]*npool.Good, error) {
 	subGoods, _, err := goodmgrcli.GetSubGoods(ctx, &subgoodmgrpb.Conds{
-		AppID: &npoolpb.StringVal{
+		AppID: &commonpb.StringVal{
 			Op:    cruder.EQ,
 			Value: appID,
 		},
-		MainGoodIDs: &npoolpb.StringSliceVal{
+		MainGoodIDs: &commonpb.StringSliceVal{
 			Op:    cruder.IN,
 			Value: goodIDs,
 		},
@@ -232,11 +271,11 @@ func getSubGoods(
 	subAppGoods := []*goodmwpb.Good{}
 	if len(subGoodIDs) > 0 {
 		subAppGoods, _, err = appgoodmwcli.GetGoods(ctx, &appgoodmgrpb.Conds{
-			AppID: &npoolpb.StringVal{
+			AppID: &commonpb.StringVal{
 				Op:    cruder.EQ,
 				Value: appID,
 			},
-			GoodIDs: &npoolpb.StringSliceVal{
+			GoodIDs: &commonpb.StringSliceVal{
 				Op:    cruder.IN,
 				Value: subGoodIDs,
 			},
