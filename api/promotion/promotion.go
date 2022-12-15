@@ -464,6 +464,10 @@ func (s *Server) UpdatePromotion(ctx context.Context, in *npool.UpdatePromotionR
 		}
 
 		exist, err := mgrcli.ExistPromotionConds(ctx, &mgrpb.Conds{
+			ID: &npoolpb.StringVal{
+				Op:    cruder.NEQ,
+				Value: in.GetID(),
+			},
 			AppID: &npoolpb.StringVal{
 				Op:    cruder.EQ,
 				Value: in.GetAppID(),
@@ -492,6 +496,10 @@ func (s *Server) UpdatePromotion(ctx context.Context, in *npool.UpdatePromotionR
 		}
 
 		exist, err = mgrcli.ExistPromotionConds(ctx, &mgrpb.Conds{
+			ID: &npoolpb.StringVal{
+				Op:    cruder.NEQ,
+				Value: in.GetID(),
+			},
 			AppID: &npoolpb.StringVal{
 				Op:    cruder.EQ,
 				Value: in.GetAppID(),
@@ -534,6 +542,10 @@ func (s *Server) UpdatePromotion(ctx context.Context, in *npool.UpdatePromotionR
 		}
 
 		exist, err := mgrcli.ExistPromotionConds(ctx, &mgrpb.Conds{
+			ID: &npoolpb.StringVal{
+				Op:    cruder.NEQ,
+				Value: in.GetID(),
+			},
 			AppID: &npoolpb.StringVal{
 				Op:    cruder.EQ,
 				Value: in.GetAppID(),
@@ -562,6 +574,10 @@ func (s *Server) UpdatePromotion(ctx context.Context, in *npool.UpdatePromotionR
 		}
 
 		exist, err = mgrcli.ExistPromotionConds(ctx, &mgrpb.Conds{
+			ID: &npoolpb.StringVal{
+				Op:    cruder.NEQ,
+				Value: in.GetID(),
+			},
 			AppID: &npoolpb.StringVal{
 				Op:    cruder.EQ,
 				Value: in.GetAppID(),
