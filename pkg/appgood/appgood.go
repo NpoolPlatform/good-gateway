@@ -28,17 +28,24 @@ func CreateAppGood(
 	appID, goodID string, online, visible bool,
 	goodName string, price string,
 	displayIndex, purchaseLimit, commissionPercent int32,
+	saleStart, saleEnd, serviceStart *uint32,
+	techFeeRatio, elecFeeRatio *uint32,
 ) (*npool.Good, error) {
 	info, err := appgoodmwcli.CreateGood(ctx, &appgoodmgrpb.AppGoodReq{
-		AppID:             &appID,
-		GoodID:            &goodID,
-		Online:            &online,
-		Visible:           &visible,
-		GoodName:          &goodName,
-		Price:             &price,
-		DisplayIndex:      &displayIndex,
-		PurchaseLimit:     &purchaseLimit,
-		CommissionPercent: &commissionPercent,
+		AppID:               &appID,
+		GoodID:              &goodID,
+		Online:              &online,
+		Visible:             &visible,
+		GoodName:            &goodName,
+		Price:               &price,
+		DisplayIndex:        &displayIndex,
+		PurchaseLimit:       &purchaseLimit,
+		CommissionPercent:   &commissionPercent,
+		SaleStartAt:         saleStart,
+		SaleEndAt:           saleEnd,
+		ServiceStartAt:      serviceStart,
+		TechnicalFeeRatio:   techFeeRatio,
+		ElectricityFeeRatio: elecFeeRatio,
 	})
 	if err != nil {
 		return nil, err
@@ -94,14 +101,19 @@ func GetAppGood(ctx context.Context, appID, goodID string) (*npool.Good, error) 
 
 func UpdateAppGood(ctx context.Context, in *npool.UpdateAppGoodRequest) (*npool.Good, error) {
 	info, err := appgoodmwcli.UpdateGood(ctx, &appgoodmgrpb.AppGoodReq{
-		ID:                &in.ID,
-		Online:            in.Online,
-		Visible:           in.Visible,
-		GoodName:          in.GoodName,
-		Price:             in.Price,
-		DisplayIndex:      in.DisplayIndex,
-		PurchaseLimit:     in.PurchaseLimit,
-		CommissionPercent: in.CommissionPercent,
+		ID:                  &in.ID,
+		Online:              in.Online,
+		Visible:             in.Visible,
+		GoodName:            in.GoodName,
+		Price:               in.Price,
+		DisplayIndex:        in.DisplayIndex,
+		PurchaseLimit:       in.PurchaseLimit,
+		CommissionPercent:   in.CommissionPercent,
+		SaleStartAt:         in.SaleStartAt,
+		SaleEndAt:           in.SaleEndAt,
+		ServiceStartAt:      in.ServiceStartAt,
+		TechnicalFeeRatio:   in.TechnicalFeeRatio,
+		ElectricityFeeRatio: in.ElectricityFeeRatio,
 	})
 	if err != nil {
 		return nil, err

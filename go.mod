@@ -13,7 +13,7 @@ require (
 	github.com/NpoolPlatform/good-manager v0.0.0-20221215023637-f029ef974ada
 	github.com/NpoolPlatform/good-middleware v0.0.0-20221215025325-cc14565416e5
 	github.com/NpoolPlatform/libent-cruder v0.0.0-20221109023947-366125b690fb
-	github.com/NpoolPlatform/message v0.0.0-20221215022713-5beab8817f1d
+	github.com/NpoolPlatform/message v0.0.0-20221215031239-7e820de4d1c3
 	github.com/NpoolPlatform/stock-manager v0.0.0-20220930040146-676de0bdaf4c
 	github.com/go-resty/resty/v2 v2.7.0
 	github.com/google/uuid v1.3.0

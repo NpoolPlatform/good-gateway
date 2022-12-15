@@ -87,8 +87,8 @@ github.com/NpoolPlatform/libent-cruder v0.0.0-20221109023947-366125b690fb h1:IAQ
 github.com/NpoolPlatform/libent-cruder v0.0.0-20221109023947-366125b690fb/go.mod h1:zvvqlRwbOdTUauPQ9dFDhDuxa91ILV0CQfVdPBZj+eA=
 github.com/NpoolPlatform/message v0.0.0-20220501030927-34f296682c0c/go.mod h1:i/F/sQWjQk44RGvfgEB0zH0oAK/0qLvgJ1AsJDZQDkk=
 github.com/NpoolPlatform/message v0.0.0-20220819134247-1dc75c85fe43/go.mod h1:8YXp4MghMHLZ9bBdQQyfjcRtLI2RbEHAQoNCejT2nZU=
-github.com/NpoolPlatform/message v0.0.0-20221215022713-5beab8817f1d h1:AGtqibE5V0aHzGO0/27UCBjanpiDKa0hfPi/HvDhe3E=
-github.com/NpoolPlatform/message v0.0.0-20221215022713-5beab8817f1d/go.mod h1:G4b3QmQYYHn2okxu8KfD6INUALqno3369SLciqevhtQ=
+github.com/NpoolPlatform/message v0.0.0-20221215031239-7e820de4d1c3 h1:JOMSt+PsyNLrnagmcX7SrmGJkN7oVX0p+m/72uLGtu8=
+github.com/NpoolPlatform/message v0.0.0-20221215031239-7e820de4d1c3/go.mod h1:G4b3QmQYYHn2okxu8KfD6INUALqno3369SLciqevhtQ=
 github.com/NpoolPlatform/stock-manager v0.0.0-20220930040146-676de0bdaf4c h1:wudgnrLwm+MVr6Nnhfyur/DrgbJsCrAk2mvSur21CL4=
 github.com/NpoolPlatform/stock-manager v0.0.0-20220930040146-676de0bdaf4c/go.mod h1:GSz4JxpSBAR042YY/DKa/dFuAf9qz/7QsJzAG7t+Ssw=
 github.com/OneOfOne/xxhash v1.2.2 h1:KMrpdQIwFcEqXDklaen+P1axHaj9BSKzvpUUfnHldSE=
