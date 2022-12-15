@@ -135,7 +135,7 @@ func Scans(ctx context.Context, infos []*goodmwpb.Good, appID string) ([]*npool.
 			Value: appID,
 		},
 		CoinTypeIDs: &npoolpb.StringSliceVal{
-			Op:    cruder.EQ,
+			Op:    cruder.IN,
 			Value: coinTypeIDs,
 		},
 	}, 0, int32(len(coinTypeIDs)))
@@ -145,7 +145,7 @@ func Scans(ctx context.Context, infos []*goodmwpb.Good, appID string) ([]*npool.
 
 	ctMap := map[string]*appcoinpb.Coin{}
 	for _, coin := range coins {
-		ctMap[coin.ID] = coin
+		ctMap[coin.CoinTypeID] = coin
 	}
 
 	userIDs := []string{}

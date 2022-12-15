@@ -30,6 +30,9 @@ import (
 	"github.com/google/uuid"
 
 	appgoodmgrcli "github.com/NpoolPlatform/good-manager/pkg/client/appgood"
+
+	appcoininfocli "github.com/NpoolPlatform/chain-middleware/pkg/client/appcoin"
+	appcoininfopb "github.com/NpoolPlatform/message/npool/chain/mw/v1/appcoin"
 )
 
 // nolint
@@ -90,6 +93,24 @@ func (s *Server) CreateNAppGood(ctx context.Context, in *npool.CreateNAppGoodReq
 	if in.GetPrice() < good.GetPrice() {
 		logger.Sugar().Errorw("CreateNAppGood", "GoodID", in.GetGoodID())
 		return &npool.CreateNAppGoodResponse{}, status.Error(codes.InvalidArgument, "price greater than platform price")
+	}
+
+	coin, err := appcoininfocli.GetCoinOnly(ctx, &appcoininfopb.Conds{
+		AppID: &npoolpb.StringVal{
+			Op:    cruder.EQ,
+			Value: in.GetTargetAppID(),
+		},
+		CoinTypeID: &npoolpb.StringVal{
+			Op:    cruder.EQ,
+			Value: good.CoinTypeID,
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+	if coin == nil {
+		logger.Sugar().Errorw("CreateNAppGood", "GoodID", in.GetGoodID(), "CoinTypeID", good.CoinTypeID)
+		return &npool.CreateNAppGoodResponse{}, status.Error(codes.InvalidArgument, "app coin is not exist")
 	}
 
 	exist, err := appgoodmgrcli.ExistAppGoodConds(ctx, &appgoodmgrpb.Conds{
