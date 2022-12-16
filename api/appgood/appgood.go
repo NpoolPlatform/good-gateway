@@ -30,6 +30,9 @@ import (
 	"github.com/google/uuid"
 
 	appgoodmgrcli "github.com/NpoolPlatform/good-manager/pkg/client/appgood"
+
+	appcoininfocli "github.com/NpoolPlatform/chain-middleware/pkg/client/appcoin"
+	appcoininfopb "github.com/NpoolPlatform/message/npool/chain/mw/v1/appcoin"
 )
 
 // nolint
@@ -92,6 +95,44 @@ func (s *Server) CreateNAppGood(ctx context.Context, in *npool.CreateNAppGoodReq
 		return &npool.CreateNAppGoodResponse{}, status.Error(codes.InvalidArgument, "price greater than platform price")
 	}
 
+	if in.SaleStartAt != nil && in.GetSaleStartAt() == 0 {
+		logger.Sugar().Errorw("CreateNAppGood", "SaleStartAt", in.GetSaleStartAt())
+		return &npool.CreateNAppGoodResponse{}, status.Error(codes.InvalidArgument, "SaleStartAt is invalid")
+	}
+
+	if in.SaleEndAt != nil && in.GetSaleEndAt() == 0 {
+		logger.Sugar().Errorw("CreateNAppGood", "SaleEndAt", in.GetSaleEndAt())
+		return &npool.CreateNAppGoodResponse{}, status.Error(codes.InvalidArgument, "SaleEndAt is invalid")
+	}
+
+	if in.ServiceStartAt != nil && in.GetServiceStartAt() == 0 {
+		logger.Sugar().Errorw("CreateNAppGood", "ServiceStartAt", in.GetServiceStartAt())
+		return &npool.CreateNAppGoodResponse{}, status.Error(codes.InvalidArgument, "ServiceStartAt is invalid")
+	}
+
+	if in.SaleStartAt != nil && in.SaleEndAt != nil && in.GetSaleEndAt() <= in.GetSaleStartAt() {
+		logger.Sugar().Errorw("CreateNAppGood", "SaleStartAt", in.GetSaleStartAt(), "SaleEndAt", in.GetSaleEndAt())
+		return &npool.CreateNAppGoodResponse{}, status.Error(codes.InvalidArgument, "SaleEndAt <= SaleStartAt")
+	}
+
+	coin, err := appcoininfocli.GetCoinOnly(ctx, &appcoininfopb.Conds{
+		AppID: &npoolpb.StringVal{
+			Op:    cruder.EQ,
+			Value: in.GetTargetAppID(),
+		},
+		CoinTypeID: &npoolpb.StringVal{
+			Op:    cruder.EQ,
+			Value: good.CoinTypeID,
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+	if coin == nil {
+		logger.Sugar().Errorw("CreateNAppGood", "GoodID", in.GetGoodID(), "CoinTypeID", good.CoinTypeID)
+		return &npool.CreateNAppGoodResponse{}, status.Error(codes.InvalidArgument, "app coin is not exist")
+	}
+
 	exist, err := appgoodmgrcli.ExistAppGoodConds(ctx, &appgoodmgrpb.Conds{
 		AppID: &npoolpb.StringVal{
 			Op:    cruder.EQ,
@@ -135,6 +176,11 @@ func (s *Server) CreateNAppGood(ctx context.Context, in *npool.CreateNAppGoodReq
 		in.GetDisplayIndex(),
 		in.GetPurchaseLimit(),
 		in.GetCommissionPercent(),
+		in.SaleStartAt,
+		in.SaleEndAt,
+		in.ServiceStartAt,
+		in.TechnicalFeeRatio,
+		in.ElectricityFeeRatio,
 	)
 	if err != nil {
 		logger.Sugar().Errorw("CreateNAppGood", "error", err)
@@ -247,7 +293,7 @@ func (s *Server) GetNAppGoods(ctx context.Context, in *npool.GetNAppGoodsRequest
 }
 
 // nolint
-func (s *Server) UpdateAppGood(ctx context.Context, in *npool.UpdateAppGoodRequest) (*npool.UpdateAppGoodResponse, error) {
+func (s *Server) updateAppGood(ctx context.Context, in *npool.UpdateAppGoodRequest) (*npool.Good, error) {
 	var err error
 
 	_, span := otel.Tracer(constant.ServiceName).Start(ctx, "UpdateAppGood")
@@ -262,81 +308,94 @@ func (s *Server) UpdateAppGood(ctx context.Context, in *npool.UpdateAppGoodReque
 
 	if _, err := uuid.Parse(in.GetID()); err != nil {
 		logger.Sugar().Errorw("UpdateGood", "ID", in.GetID(), "error", err)
-		return &npool.UpdateAppGoodResponse{}, status.Error(codes.InvalidArgument, err.Error())
+		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
 	if _, err := uuid.Parse(in.GetAppID()); err != nil {
 		logger.Sugar().Errorw("UpdateGood", "AppID", in.GetAppID(), "error", err)
-		return &npool.UpdateAppGoodResponse{}, status.Error(codes.InvalidArgument, err.Error())
+		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
 	appGood, err := appgoodmgrcli.GetAppGood(ctx, in.GetID())
 	if err != nil {
 		logger.Sugar().Errorw("UpdateGood", "error", err)
-		return &npool.UpdateAppGoodResponse{}, status.Error(codes.Internal, err.Error())
+		return nil, status.Error(codes.Internal, err.Error())
 	}
 
 	if appGood.AppID != in.GetAppID() {
 		logger.Sugar().Errorw("UpdateGood", "AppID", in.GetAppID(), "error", err)
-		return &npool.UpdateAppGoodResponse{}, status.Error(codes.InvalidArgument, "AppID is invalid")
+		return nil, status.Error(codes.InvalidArgument, "AppID is invalid")
 	}
 
 	if in.Price != nil {
 		if price, err := decimal.NewFromString(in.GetPrice()); err != nil || price.Cmp(decimal.NewFromInt(0)) <= 0 {
 			logger.Sugar().Errorw("UpdateGood", "Price", in.GetPrice(), "error", err)
-			return &npool.UpdateAppGoodResponse{}, status.Error(codes.InvalidArgument, "Price is invalid")
+			return nil, status.Error(codes.InvalidArgument, "Price is invalid")
 		}
 
 		good, err := goodmgrcli.GetGood(ctx, appGood.GetGoodID())
 		if err != nil {
 			logger.Sugar().Errorw("UpdateGood", "error", err)
-			return &npool.UpdateAppGoodResponse{}, status.Error(codes.Internal, err.Error())
+			return nil, status.Error(codes.Internal, err.Error())
 		}
 
 		if appGood.AppID != in.GetAppID() {
 			logger.Sugar().Errorw("UpdateGood", "AppID", in.GetAppID(), "error", err)
-			return &npool.UpdateAppGoodResponse{}, status.Error(codes.InvalidArgument, "AppID is invalid")
+			return nil, status.Error(codes.InvalidArgument, "AppID is invalid")
 		}
 
 		if in.GetPrice() < good.GetPrice() {
 			logger.Sugar().Errorw("CreateNAppGood", "Price", in.GetPrice())
-			return &npool.UpdateAppGoodResponse{}, status.Error(codes.InvalidArgument, "price greater than platform price")
+			return nil, status.Error(codes.InvalidArgument, "price greater than platform price")
 		}
 	}
 
 	if in.GoodName != nil {
 		if in.GetGoodName() == "" {
 			logger.Sugar().Errorw("UpdateGood", "GoodName", in.GetGoodName())
-			return &npool.UpdateAppGoodResponse{}, status.Error(codes.InvalidArgument, "GoodName is invalid")
+			return nil, status.Error(codes.InvalidArgument, "GoodName is invalid")
 		}
 	}
 
 	if in.DisplayIndex != nil {
 		if in.GetDisplayIndex() < 0 {
 			logger.Sugar().Errorw("UpdateGood", "DisplayIndex", in.GetDisplayIndex())
-			return &npool.UpdateAppGoodResponse{}, status.Error(codes.InvalidArgument, "DisplayIndex is invalid")
+			return nil, status.Error(codes.InvalidArgument, "DisplayIndex is invalid")
 		}
 	}
 
 	if in.PurchaseLimit != nil {
 		if in.GetPurchaseLimit() <= 0 {
 			logger.Sugar().Errorw("UpdateGood", "PurchaseLimit", in.GetPurchaseLimit())
-			return &npool.UpdateAppGoodResponse{}, status.Error(codes.InvalidArgument, "PurchaseLimit is invalid")
+			return nil, status.Error(codes.InvalidArgument, "PurchaseLimit is invalid")
 		}
 	}
 
 	if in.CommissionPercent != nil {
 		if in.GetCommissionPercent() >= 100 || in.GetCommissionPercent() < 0 {
 			logger.Sugar().Errorw("UpdateGood", "CommissionPercent", in.GetCommissionPercent())
-			return &npool.UpdateAppGoodResponse{}, status.Error(codes.InvalidArgument, "CommissionPercent is invalid")
+			return nil, status.Error(codes.InvalidArgument, "CommissionPercent is invalid")
 		}
 	}
 
 	span = commontracer.TraceInvoker(span, "Good", "mw", "UpdateGood")
 
-	info, err := appgood1.UpdateAppGood(ctx, in)
+	return appgood1.UpdateAppGood(ctx, in)
+}
+
+func (s *Server) UpdateAppGood(ctx context.Context, in *npool.UpdateAppGoodRequest) (*npool.UpdateAppGoodResponse, error) {
+	if in.ServiceStartAt != nil {
+		return &npool.UpdateAppGoodResponse{}, status.Error(codes.InvalidArgument, "permission denied")
+	}
+	if in.TechnicalFeeRatio != nil {
+		return &npool.UpdateAppGoodResponse{}, status.Error(codes.InvalidArgument, "permission denied")
+	}
+	if in.ElectricityFeeRatio != nil {
+		return &npool.UpdateAppGoodResponse{}, status.Error(codes.InvalidArgument, "permission denied")
+	}
+
+	info, err := s.updateAppGood(ctx, in)
 	if err != nil {
-		logger.Sugar().Errorw("GetAppGood", "error", err)
 		return &npool.UpdateAppGoodResponse{}, status.Error(codes.Internal, err.Error())
 	}
 
@@ -434,15 +493,18 @@ func (s *Server) UpdateNAppGood(ctx context.Context, in *npool.UpdateNAppGoodReq
 
 	span = commontracer.TraceInvoker(span, "Good", "mw", "UpdateGood")
 
-	info, err := appgood1.UpdateAppGood(ctx, &npool.UpdateAppGoodRequest{
-		ID:                in.ID,
-		Online:            in.Online,
-		Visible:           in.Visible,
-		GoodName:          in.GoodName,
-		Price:             in.Price,
-		DisplayIndex:      in.DisplayIndex,
-		PurchaseLimit:     in.PurchaseLimit,
-		CommissionPercent: in.CommissionPercent,
+	info, err := s.updateAppGood(ctx, &npool.UpdateAppGoodRequest{
+		ID:                  in.ID,
+		Online:              in.Online,
+		Visible:             in.Visible,
+		GoodName:            in.GoodName,
+		Price:               in.Price,
+		DisplayIndex:        in.DisplayIndex,
+		PurchaseLimit:       in.PurchaseLimit,
+		CommissionPercent:   in.CommissionPercent,
+		ServiceStartAt:      in.ServiceStartAt,
+		TechnicalFeeRatio:   in.TechnicalFeeRatio,
+		ElectricityFeeRatio: in.ElectricityFeeRatio,
 	})
 	if err != nil {
 		logger.Sugar().Errorw("GetAppGood", "error", err)

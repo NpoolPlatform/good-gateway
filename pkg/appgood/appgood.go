@@ -6,23 +6,27 @@ import (
 	"fmt"
 
 	goodmgrcli "github.com/NpoolPlatform/good-manager/pkg/client/subgood"
-	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
-	npoolpb "github.com/NpoolPlatform/message/npool"
 	subgoodmgrpb "github.com/NpoolPlatform/message/npool/good/mgr/v1/subgood"
 
 	goodmwpb "github.com/NpoolPlatform/message/npool/good/mw/v1/appgood"
 
-	coininfocli "github.com/NpoolPlatform/sphinx-coininfo/pkg/client"
+	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
+	commonpb "github.com/NpoolPlatform/message/npool"
 
+	ordermwpb "github.com/NpoolPlatform/message/npool/order/mw/v1/order"
+	ordermwcli "github.com/NpoolPlatform/order-middleware/pkg/client/order"
+
+	appcoininfocli "github.com/NpoolPlatform/chain-middleware/pkg/client/appcoin"
+	appcoinpb "github.com/NpoolPlatform/message/npool/chain/mw/v1/appcoin"
 	npool "github.com/NpoolPlatform/message/npool/good/gw/v1/appgood"
 	appgoodmgrpb "github.com/NpoolPlatform/message/npool/good/mgr/v1/appgood"
 
 	appgoodmwcli "github.com/NpoolPlatform/good-middleware/pkg/client/appgood"
 
-	coininfopb "github.com/NpoolPlatform/message/npool/coininfo"
-
 	appusermwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/user"
 	appusermwpb "github.com/NpoolPlatform/message/npool/appuser/mw/v1/user"
+
+	constant "github.com/NpoolPlatform/good-gateway/pkg/const"
 )
 
 func CreateAppGood(
@@ -30,17 +34,24 @@ func CreateAppGood(
 	appID, goodID string, online, visible bool,
 	goodName string, price string,
 	displayIndex, purchaseLimit, commissionPercent int32,
+	saleStart, saleEnd, serviceStart *uint32,
+	techFeeRatio, elecFeeRatio *uint32,
 ) (*npool.Good, error) {
 	info, err := appgoodmwcli.CreateGood(ctx, &appgoodmgrpb.AppGoodReq{
-		AppID:             &appID,
-		GoodID:            &goodID,
-		Online:            &online,
-		Visible:           &visible,
-		GoodName:          &goodName,
-		Price:             &price,
-		DisplayIndex:      &displayIndex,
-		PurchaseLimit:     &purchaseLimit,
-		CommissionPercent: &commissionPercent,
+		AppID:               &appID,
+		GoodID:              &goodID,
+		Online:              &online,
+		Visible:             &visible,
+		GoodName:            &goodName,
+		Price:               &price,
+		DisplayIndex:        &displayIndex,
+		PurchaseLimit:       &purchaseLimit,
+		CommissionPercent:   &commissionPercent,
+		SaleStartAt:         saleStart,
+		SaleEndAt:           saleEnd,
+		ServiceStartAt:      serviceStart,
+		TechnicalFeeRatio:   techFeeRatio,
+		ElectricityFeeRatio: elecFeeRatio,
 	})
 	if err != nil {
 		return nil, err
@@ -51,7 +62,7 @@ func CreateAppGood(
 
 func GetAppGoods(ctx context.Context, appID string, offset, limit int32) ([]*npool.Good, uint32, error) {
 	goods, total, err := appgoodmwcli.GetGoods(ctx, &appgoodmgrpb.Conds{
-		AppID: &npoolpb.StringVal{
+		AppID: &commonpb.StringVal{
 			Op:    cruder.EQ,
 			Value: appID,
 		},
@@ -69,11 +80,11 @@ func GetAppGoods(ctx context.Context, appID string, offset, limit int32) ([]*npo
 
 func GetAppGood(ctx context.Context, appID, goodID string) (*npool.Good, error) {
 	good, err := appgoodmwcli.GetGoodOnly(ctx, &appgoodmgrpb.Conds{
-		AppID: &npoolpb.StringVal{
+		AppID: &commonpb.StringVal{
 			Op:    cruder.EQ,
 			Value: appID,
 		},
-		GoodID: &npoolpb.StringVal{
+		GoodID: &commonpb.StringVal{
 			Op:    cruder.EQ,
 			Value: goodID,
 		},
@@ -96,17 +107,55 @@ func GetAppGood(ctx context.Context, appID, goodID string) (*npool.Good, error) 
 
 func UpdateAppGood(ctx context.Context, in *npool.UpdateAppGoodRequest) (*npool.Good, error) {
 	info, err := appgoodmwcli.UpdateGood(ctx, &appgoodmgrpb.AppGoodReq{
-		ID:                &in.ID,
-		Online:            in.Online,
-		Visible:           in.Visible,
-		GoodName:          in.GoodName,
-		Price:             in.Price,
-		DisplayIndex:      in.DisplayIndex,
-		PurchaseLimit:     in.PurchaseLimit,
-		CommissionPercent: in.CommissionPercent,
+		ID:                  &in.ID,
+		Online:              in.Online,
+		Visible:             in.Visible,
+		GoodName:            in.GoodName,
+		Price:               in.Price,
+		DisplayIndex:        in.DisplayIndex,
+		PurchaseLimit:       in.PurchaseLimit,
+		CommissionPercent:   in.CommissionPercent,
+		SaleStartAt:         in.SaleStartAt,
+		SaleEndAt:           in.SaleEndAt,
+		ServiceStartAt:      in.ServiceStartAt,
+		TechnicalFeeRatio:   in.TechnicalFeeRatio,
+		ElectricityFeeRatio: in.ElectricityFeeRatio,
 	})
 	if err != nil {
 		return nil, err
+	}
+
+	if in.ServiceStartAt != nil {
+		for {
+			orders, _, err := ordermwcli.GetOrders(ctx, &ordermwpb.Conds{
+				GoodID: &commonpb.StringVal{
+					Op:    cruder.EQ,
+					Value: in.GetID(),
+				},
+			}, int32(0), constant.DefaultRowLimit)
+			if err != nil {
+				return nil, err
+			}
+			if len(orders) == 0 {
+				break
+			}
+
+			reqs := []*ordermwpb.OrderReq{}
+			for _, ord := range orders {
+				if ord.Start > in.GetServiceStartAt() {
+					continue
+				}
+				reqs = append(reqs, &ordermwpb.OrderReq{
+					ID:    &ord.ID,
+					Start: in.ServiceStartAt,
+				})
+			}
+
+			_, err = ordermwcli.UpdateOrders(ctx, reqs)
+			if err != nil {
+				return nil, err
+			}
+		}
 	}
 
 	return Scan(ctx, info)
@@ -126,14 +175,28 @@ func Scan(ctx context.Context, info *goodmwpb.Good) (*npool.Good, error) {
 }
 
 func Scans(ctx context.Context, infos []*goodmwpb.Good, appID string) ([]*npool.Good, error) {
-	coinTypes, err := coininfocli.GetCoinInfos(ctx, nil)
+	coinTypeIDs := []string{}
+	for _, val := range infos {
+		coinTypeIDs = append(coinTypeIDs, val.CoinTypeID)
+	}
+
+	coins, _, err := appcoininfocli.GetCoins(ctx, &appcoinpb.Conds{
+		AppID: &commonpb.StringVal{
+			Op:    cruder.EQ,
+			Value: appID,
+		},
+		CoinTypeIDs: &commonpb.StringSliceVal{
+			Op:    cruder.IN,
+			Value: coinTypeIDs,
+		},
+	}, 0, int32(len(coinTypeIDs)))
 	if err != nil {
 		return nil, err
 	}
 
-	ctMap := map[string]*coininfopb.CoinInfo{}
-	for _, coinType := range coinTypes {
-		ctMap[coinType.ID] = coinType
+	ctMap := map[string]*appcoinpb.Coin{}
+	for _, coin := range coins {
+		ctMap[coin.CoinTypeID] = coin
 	}
 
 	userIDs := []string{}
@@ -180,17 +243,17 @@ func Scans(ctx context.Context, infos []*goodmwpb.Good, appID string) ([]*npool.
 
 func getSubGoods(
 	ctx context.Context,
-	ctMap map[string]*coininfopb.CoinInfo,
+	ctMap map[string]*appcoinpb.Coin,
 	userMap map[string]*appusermwpb.User,
 	goodIDs []string,
 	appID string,
 ) (map[string][]*npool.Good, error) {
 	subGoods, _, err := goodmgrcli.GetSubGoods(ctx, &subgoodmgrpb.Conds{
-		AppID: &npoolpb.StringVal{
+		AppID: &commonpb.StringVal{
 			Op:    cruder.EQ,
 			Value: appID,
 		},
-		MainGoodIDs: &npoolpb.StringSliceVal{
+		MainGoodIDs: &commonpb.StringSliceVal{
 			Op:    cruder.IN,
 			Value: goodIDs,
 		},
@@ -208,11 +271,11 @@ func getSubGoods(
 	subAppGoods := []*goodmwpb.Good{}
 	if len(subGoodIDs) > 0 {
 		subAppGoods, _, err = appgoodmwcli.GetGoods(ctx, &appgoodmgrpb.Conds{
-			AppID: &npoolpb.StringVal{
+			AppID: &commonpb.StringVal{
 				Op:    cruder.EQ,
 				Value: appID,
 			},
-			GoodIDs: &npoolpb.StringSliceVal{
+			GoodIDs: &commonpb.StringSliceVal{
 				Op:    cruder.IN,
 				Value: subGoodIDs,
 			},
@@ -241,7 +304,7 @@ func getSubGoods(
 }
 
 func getGoodInfos(
-	ctMap map[string]*coininfopb.CoinInfo,
+	ctMap map[string]*appcoinpb.Coin,
 	userMap map[string]*appusermwpb.User,
 	infos []*goodmwpb.Good,
 ) []*npool.Good {
@@ -258,7 +321,7 @@ func getGoodInfos(
 					CoinLogo:     coinTypeInfo.Logo,
 					CoinName:     coinTypeInfo.Name,
 					CoinUnit:     coinTypeInfo.Unit,
-					CoinPreSale:  coinTypeInfo.PreSale,
+					CoinPreSale:  coinTypeInfo.Presale,
 					CoinEnv:      coinTypeInfo.ENV,
 					CoinHomePage: coinTypeInfo.HomePage,
 					CoinSpecs:    coinTypeInfo.Specs,
@@ -342,7 +405,7 @@ func getGoodInfos(
 			info1.CoinLogo = coinType.Logo
 			info1.CoinName = coinType.Name
 			info1.CoinUnit = coinType.Unit
-			info1.CoinPreSale = coinType.PreSale
+			info1.CoinPreSale = coinType.Presale
 			info1.CoinEnv = coinType.ENV
 			info1.CoinHomePage = coinType.HomePage
 			info1.CoinSpecs = coinType.Specs

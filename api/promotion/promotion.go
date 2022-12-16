@@ -464,6 +464,10 @@ func (s *Server) UpdatePromotion(ctx context.Context, in *npool.UpdatePromotionR
 		}
 
 		exist, err := mgrcli.ExistPromotionConds(ctx, &mgrpb.Conds{
+			ID: &npoolpb.StringVal{
+				Op:    cruder.NEQ,
+				Value: in.GetID(),
+			},
 			AppID: &npoolpb.StringVal{
 				Op:    cruder.EQ,
 				Value: in.GetAppID(),
@@ -473,7 +477,7 @@ func (s *Server) UpdatePromotion(ctx context.Context, in *npool.UpdatePromotionR
 				Value: promotion.GetGoodID(),
 			},
 			StartAt: &npoolpb.Uint32Val{
-				Op:    cruder.LTE,
+				Op:    cruder.LT,
 				Value: startAt,
 			},
 			EndAt: &npoolpb.Uint32Val{
@@ -492,6 +496,10 @@ func (s *Server) UpdatePromotion(ctx context.Context, in *npool.UpdatePromotionR
 		}
 
 		exist, err = mgrcli.ExistPromotionConds(ctx, &mgrpb.Conds{
+			ID: &npoolpb.StringVal{
+				Op:    cruder.NEQ,
+				Value: in.GetID(),
+			},
 			AppID: &npoolpb.StringVal{
 				Op:    cruder.EQ,
 				Value: in.GetAppID(),
@@ -501,11 +509,11 @@ func (s *Server) UpdatePromotion(ctx context.Context, in *npool.UpdatePromotionR
 				Value: promotion.GetGoodID(),
 			},
 			StartAt: &npoolpb.Uint32Val{
-				Op:    cruder.GTE,
+				Op:    cruder.GT,
 				Value: startAt,
 			},
 			EndAt: &npoolpb.Uint32Val{
-				Op:    cruder.LTE,
+				Op:    cruder.LT,
 				Value: endAt,
 			},
 		})
@@ -534,6 +542,10 @@ func (s *Server) UpdatePromotion(ctx context.Context, in *npool.UpdatePromotionR
 		}
 
 		exist, err := mgrcli.ExistPromotionConds(ctx, &mgrpb.Conds{
+			ID: &npoolpb.StringVal{
+				Op:    cruder.NEQ,
+				Value: in.GetID(),
+			},
 			AppID: &npoolpb.StringVal{
 				Op:    cruder.EQ,
 				Value: in.GetAppID(),
@@ -547,7 +559,7 @@ func (s *Server) UpdatePromotion(ctx context.Context, in *npool.UpdatePromotionR
 				Value: endAt,
 			},
 			EndAt: &npoolpb.Uint32Val{
-				Op:    cruder.GTE,
+				Op:    cruder.GT,
 				Value: endAt,
 			},
 		})
@@ -562,6 +574,10 @@ func (s *Server) UpdatePromotion(ctx context.Context, in *npool.UpdatePromotionR
 		}
 
 		exist, err = mgrcli.ExistPromotionConds(ctx, &mgrpb.Conds{
+			ID: &npoolpb.StringVal{
+				Op:    cruder.NEQ,
+				Value: in.GetID(),
+			},
 			AppID: &npoolpb.StringVal{
 				Op:    cruder.EQ,
 				Value: in.GetAppID(),
@@ -571,11 +587,11 @@ func (s *Server) UpdatePromotion(ctx context.Context, in *npool.UpdatePromotionR
 				Value: promotion.GetGoodID(),
 			},
 			StartAt: &npoolpb.Uint32Val{
-				Op:    cruder.GTE,
+				Op:    cruder.GT,
 				Value: startAt,
 			},
 			EndAt: &npoolpb.Uint32Val{
-				Op:    cruder.LTE,
+				Op:    cruder.LT,
 				Value: endAt,
 			},
 		})
@@ -687,7 +703,7 @@ func (s *Server) UpdateAppPromotion(ctx context.Context, in *npool.UpdateAppProm
 				Value: promotion.GetGoodID(),
 			},
 			StartAt: &npoolpb.Uint32Val{
-				Op:    cruder.LTE,
+				Op:    cruder.LT,
 				Value: startAt,
 			},
 			EndAt: &npoolpb.Uint32Val{
@@ -715,7 +731,7 @@ func (s *Server) UpdateAppPromotion(ctx context.Context, in *npool.UpdateAppProm
 				Value: promotion.GetGoodID(),
 			},
 			StartAt: &npoolpb.Uint32Val{
-				Op:    cruder.GTE,
+				Op:    cruder.GT,
 				Value: startAt,
 			},
 			EndAt: &npoolpb.Uint32Val{
@@ -756,11 +772,11 @@ func (s *Server) UpdateAppPromotion(ctx context.Context, in *npool.UpdateAppProm
 				Value: promotion.GetGoodID(),
 			},
 			StartAt: &npoolpb.Uint32Val{
-				Op:    cruder.LTE,
+				Op:    cruder.LT,
 				Value: endAt,
 			},
 			EndAt: &npoolpb.Uint32Val{
-				Op:    cruder.GTE,
+				Op:    cruder.GT,
 				Value: endAt,
 			},
 		})

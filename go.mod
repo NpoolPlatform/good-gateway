@@ -3,18 +3,16 @@ module github.com/NpoolPlatform/good-gateway
 go 1.17
 
 require (
-	entgo.io/ent v0.11.3
 	github.com/NpoolPlatform/api-manager v0.0.0-20220826022307-d72866fe3ec0
 	github.com/NpoolPlatform/appuser-manager v0.0.0-20220829153511-c579ddb3686d
 	github.com/NpoolPlatform/appuser-middleware v0.0.0-20220830145114-e7d2cde1cc9c
-	github.com/NpoolPlatform/cloud-hashing-goods v0.0.0-20220930040543-a48dfa502ac4
+	github.com/NpoolPlatform/chain-middleware v0.0.0-20221213132223-5fc8d55fe644
 	github.com/NpoolPlatform/go-service-framework v0.0.0-20221015040432-cd676d323379
-	github.com/NpoolPlatform/good-manager v0.0.0-20221109024349-1459b49a835a
-	github.com/NpoolPlatform/good-middleware v0.0.0-20221109024849-724709e2093e
+	github.com/NpoolPlatform/good-manager v0.0.0-20221216030805-38dedefc7bd0
+	github.com/NpoolPlatform/good-middleware v0.0.0-20221216031911-f2715afb4b66
 	github.com/NpoolPlatform/libent-cruder v0.0.0-20221109023947-366125b690fb
-	github.com/NpoolPlatform/message v0.0.0-20221109022611-ca37512e0c04
-	github.com/NpoolPlatform/sphinx-coininfo v0.0.0-20220930040119-1eb8b2e73e3f
-	github.com/NpoolPlatform/stock-manager v0.0.0-20220930040146-676de0bdaf4c
+	github.com/NpoolPlatform/message v0.0.0-20221216024225-e7572ae5c761
+	github.com/NpoolPlatform/order-middleware v0.0.0-20221215042802-7386c6c68457
 	github.com/go-resty/resty/v2 v2.7.0
 	github.com/google/uuid v1.3.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.10.0
@@ -23,12 +21,13 @@ require (
 	github.com/urfave/cli/v2 v2.5.0
 	go.opentelemetry.io/otel v1.8.0
 	go.opentelemetry.io/otel/trace v1.8.0
-	google.golang.org/grpc v1.50.1
+	google.golang.org/grpc v1.51.0
 	google.golang.org/protobuf v1.28.0
 )
 
 require (
 	ariga.io/atlas v0.7.2-0.20220927111110-867ee0cca56a // indirect
+	entgo.io/ent v0.11.3 // indirect
 	github.com/Shonminh/apollo-client v0.4.0 // indirect
 	github.com/agext/levenshtein v1.2.1 // indirect
 	github.com/andres-erbsen/clock v0.0.0-20160526145045-9e14626cd129 // indirect
@@ -97,7 +96,7 @@ require (
 	golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4 // indirect
 	golang.org/x/net v0.0.0-20220722155237-a158d28d115b // indirect
 	golang.org/x/sys v0.0.0-20220722155257-8c9f86f7a55f // indirect
-	golang.org/x/text v0.3.7 // indirect
+	golang.org/x/text v0.4.0 // indirect
 	golang.org/x/xerrors v0.0.0-20220411194840-2f41105eb62f // indirect
 	google.golang.org/genproto v0.0.0-20220519153652-3a47de7e79bd // indirect
 	gopkg.in/ini.v1 v1.66.4 // indirect
