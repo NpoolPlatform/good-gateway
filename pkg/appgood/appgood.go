@@ -384,6 +384,7 @@ func getGoodInfos(
 			Unit:                    info.Unit,
 			UnitAmount:              info.UnitAmount,
 			TestOnly:                info.TestOnly,
+			BenefitIntervalHours:    info.BenefitIntervalHours,
 			Posters:                 info.Posters,
 			Labels:                  info.Labels,
 			VoteCount:               info.VoteCount,
