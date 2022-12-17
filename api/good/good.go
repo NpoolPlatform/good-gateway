@@ -102,6 +102,13 @@ func (s *Server) CreateGood(ctx context.Context, in *npool.CreateGoodRequest) (*
 		return &npool.CreateGoodResponse{}, status.Error(codes.InvalidArgument, "Total is invalid")
 	}
 
+	if in.BenefitIntervalHours != nil {
+		if in.GetBenefitIntervalHours() <= 0 {
+			logger.Sugar().Errorw("CreateGood", "BenefitIntervalHours", in.GetBenefitIntervalHours())
+			return &npool.CreateGoodResponse{}, status.Error(codes.InvalidArgument, "BenefitIntervalHours is invalid")
+		}
+	}
+
 	span = commontracer.TraceInvoker(span, "Good", "mw", "CreateGood")
 
 	exist, err := deviceinfocli.ExistDeviceInfo(ctx, in.GetDeviceInfoID())
@@ -343,9 +350,16 @@ func (s *Server) UpdateGood(ctx context.Context, in *npool.UpdateGoodRequest) (*
 		}
 	}
 
+	if in.BenefitIntervalHours != nil {
+		if in.GetBenefitIntervalHours() <= 0 {
+			logger.Sugar().Errorw("UpdateGood", "BenefitIntervalHours", in.GetBenefitIntervalHours())
+			return &npool.UpdateGoodResponse{}, status.Error(codes.InvalidArgument, "BenefitIntervalHours is invalid")
+		}
+	}
+
 	info, err := goodm.UpdateGood(ctx, in)
 	if err != nil {
-		logger.Sugar().Errorw("CreateGood", "error", err)
+		logger.Sugar().Errorw("UpdateGood", "error", err)
 		return &npool.UpdateGoodResponse{}, status.Error(codes.Internal, err.Error())
 	}
 
