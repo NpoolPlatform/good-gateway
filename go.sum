@@ -85,8 +85,8 @@ github.com/NpoolPlatform/libent-cruder v0.0.0-20221109023947-366125b690fb h1:IAQ
 github.com/NpoolPlatform/libent-cruder v0.0.0-20221109023947-366125b690fb/go.mod h1:zvvqlRwbOdTUauPQ9dFDhDuxa91ILV0CQfVdPBZj+eA=
 github.com/NpoolPlatform/message v0.0.0-20220501030927-34f296682c0c/go.mod h1:i/F/sQWjQk44RGvfgEB0zH0oAK/0qLvgJ1AsJDZQDkk=
 github.com/NpoolPlatform/message v0.0.0-20220819134247-1dc75c85fe43/go.mod h1:8YXp4MghMHLZ9bBdQQyfjcRtLI2RbEHAQoNCejT2nZU=
-github.com/NpoolPlatform/message v0.0.0-20221217094004-9e2115778058 h1:tDphs1LpPINHzPCla8ar3Gh7t7E0IDsNxqTD4NqNvqw=
-github.com/NpoolPlatform/message v0.0.0-20221217094004-9e2115778058/go.mod h1:G4b3QmQYYHn2okxu8KfD6INUALqno3369SLciqevhtQ=
+github.com/NpoolPlatform/message v0.0.0-20221227070458-a0e3a5d5561d h1:t9oKrgRglWVD0W//LOVuaEDKICGtoxo1+OPEIGtVsyk=
+github.com/NpoolPlatform/message v0.0.0-20221227070458-a0e3a5d5561d/go.mod h1:G4b3QmQYYHn2okxu8KfD6INUALqno3369SLciqevhtQ=
 github.com/NpoolPlatform/order-manager v0.0.0-20221215035849-67d0e844cfd2 h1:VYB0r4McbKJSgJ67TC20c7iBW9VhzUjP2ixdotlFghc=
 github.com/NpoolPlatform/order-middleware v0.0.0-20221215042802-7386c6c68457 h1:R0Ns/F5phaJ6ntQ+xo451bMLRiWomN9gjc7XacamHeM=
 github.com/NpoolPlatform/order-middleware v0.0.0-20221215042802-7386c6c68457/go.mod h1:Iw12DbiH5swWBPjFlO8NMwz84incpCJ4yyO/vzM0FrY=

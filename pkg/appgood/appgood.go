@@ -399,6 +399,12 @@ func getGoodInfos(
 			Commission:              true,
 			StartAt:                 info.StartAt,
 			CreatedAt:               info.CreatedAt,
+			DailyRewardAmount:       info.DailyRewardAmount,
+			SaleStartAt:             info.SaleStartAt,
+			SaleEndAt:               info.SaleEndAt,
+			ServiceStartAt:          info.ServiceStartAt,
+			TechnicalFeeRatio:       info.TechnicalFeeRatio,
+			ElectricityFeeRatio:     info.ElectricityFeeRatio,
 		}
 
 		coinType, ok := ctMap[info.CoinTypeID]
