@@ -495,6 +495,7 @@ func (s *Server) UpdateNAppGood(ctx context.Context, in *npool.UpdateNAppGoodReq
 
 	info, err := s.updateAppGood(ctx, &npool.UpdateAppGoodRequest{
 		ID:                  in.ID,
+		AppID:               in.TargetAppID,
 		Online:              in.Online,
 		Visible:             in.Visible,
 		GoodName:            in.GoodName,

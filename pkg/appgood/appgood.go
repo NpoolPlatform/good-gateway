@@ -128,9 +128,13 @@ func UpdateAppGood(ctx context.Context, in *npool.UpdateAppGoodRequest) (*npool.
 	if in.ServiceStartAt != nil {
 		for {
 			orders, _, err := ordermwcli.GetOrders(ctx, &ordermwpb.Conds{
+				AppID: &commonpb.StringVal{
+					Op:    cruder.EQ,
+					Value: info.AppID,
+				},
 				GoodID: &commonpb.StringVal{
 					Op:    cruder.EQ,
-					Value: in.GetID(),
+					Value: info.GoodID,
 				},
 			}, int32(0), constant.DefaultRowLimit)
 			if err != nil {
