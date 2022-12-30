@@ -27,6 +27,7 @@ import (
 	appusermwpb "github.com/NpoolPlatform/message/npool/appuser/mw/v1/user"
 
 	constant "github.com/NpoolPlatform/good-gateway/pkg/const"
+	uuid1 "github.com/NpoolPlatform/go-service-framework/pkg/const/uuid"
 )
 
 func CreateAppGood(
@@ -126,6 +127,9 @@ func UpdateAppGood(ctx context.Context, in *npool.UpdateAppGoodRequest) (*npool.
 	}
 
 	if in.ServiceStartAt != nil {
+		offset := int32(0)
+		limit := constant.DefaultRowLimit
+
 		for {
 			orders, _, err := ordermwcli.GetOrders(ctx, &ordermwpb.Conds{
 				AppID: &commonpb.StringVal{
@@ -136,7 +140,7 @@ func UpdateAppGood(ctx context.Context, in *npool.UpdateAppGoodRequest) (*npool.
 					Op:    cruder.EQ,
 					Value: info.GoodID,
 				},
-			}, int32(0), constant.DefaultRowLimit)
+			}, offset, limit)
 			if err != nil {
 				return nil, err
 			}
@@ -149,9 +153,13 @@ func UpdateAppGood(ctx context.Context, in *npool.UpdateAppGoodRequest) (*npool.
 				if ord.Start > in.GetServiceStartAt() {
 					continue
 				}
+				if ord.PaymentID == uuid1.InvalidUUIDStr {
+					continue
+				}
 				reqs = append(reqs, &ordermwpb.OrderReq{
-					ID:    &ord.ID,
-					Start: in.ServiceStartAt,
+					ID:        &ord.ID,
+					PaymentID: &ord.PaymentID,
+					Start:     in.ServiceStartAt,
 				})
 			}
 
@@ -159,6 +167,8 @@ func UpdateAppGood(ctx context.Context, in *npool.UpdateAppGoodRequest) (*npool.
 			if err != nil {
 				return nil, err
 			}
+
+			offset += limit
 		}
 	}
 

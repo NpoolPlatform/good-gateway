@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	uuid1 "github.com/NpoolPlatform/go-service-framework/pkg/const/uuid"
 	coininfopb "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin"
 
 	goodmwcli "github.com/NpoolPlatform/good-middleware/pkg/client/good"
@@ -123,13 +124,16 @@ func UpdateGood(ctx context.Context, req *npool.UpdateGoodRequest) (*npool.Good,
 	}
 
 	if req.StartAt != nil {
+		offset := int32(0)
+		limit := constant.DefaultRowLimit
+
 		for {
 			orders, _, err := ordermwcli.GetOrders(ctx, &ordermwpb.Conds{
 				GoodID: &commonpb.StringVal{
 					Op:    cruder.EQ,
 					Value: req.GetID(),
 				},
-			}, int32(0), constant.DefaultRowLimit)
+			}, offset, limit)
 			if err != nil {
 				return nil, err
 			}
@@ -142,9 +146,13 @@ func UpdateGood(ctx context.Context, req *npool.UpdateGoodRequest) (*npool.Good,
 				if ord.Start > req.GetStartAt() {
 					continue
 				}
+				if ord.PaymentID == uuid1.InvalidUUIDStr {
+					continue
+				}
 				reqs = append(reqs, &ordermwpb.OrderReq{
-					ID:    &ord.ID,
-					Start: req.StartAt,
+					ID:        &ord.ID,
+					PaymentID: &ord.PaymentID,
+					Start:     req.StartAt,
 				})
 			}
 
@@ -152,6 +160,8 @@ func UpdateGood(ctx context.Context, req *npool.UpdateGoodRequest) (*npool.Good,
 			if err != nil {
 				return nil, err
 			}
+
+			offset += limit
 		}
 	}
 
