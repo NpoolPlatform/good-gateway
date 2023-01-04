@@ -26,8 +26,8 @@ import (
 	appusermwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/user"
 	appusermwpb "github.com/NpoolPlatform/message/npool/appuser/mw/v1/user"
 
-	constant "github.com/NpoolPlatform/good-gateway/pkg/const"
 	uuid1 "github.com/NpoolPlatform/go-service-framework/pkg/const/uuid"
+	constant "github.com/NpoolPlatform/good-gateway/pkg/const"
 )
 
 func CreateAppGood(
@@ -163,9 +163,11 @@ func UpdateAppGood(ctx context.Context, in *npool.UpdateAppGoodRequest) (*npool.
 				})
 			}
 
-			_, err = ordermwcli.UpdateOrders(ctx, reqs)
-			if err != nil {
-				return nil, err
+			if len(reqs) > 0 {
+				_, err = ordermwcli.UpdateOrders(ctx, reqs)
+				if err != nil {
+					return nil, err
+				}
 			}
 
 			offset += limit

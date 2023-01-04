@@ -156,9 +156,11 @@ func UpdateGood(ctx context.Context, req *npool.UpdateGoodRequest) (*npool.Good,
 				})
 			}
 
-			_, err = ordermwcli.UpdateOrders(ctx, reqs)
-			if err != nil {
-				return nil, err
+			if len(reqs) > 0 {
+				_, err = ordermwcli.UpdateOrders(ctx, reqs)
+				if err != nil {
+					return nil, err
+				}
 			}
 
 			offset += limit
