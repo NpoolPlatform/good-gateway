@@ -247,6 +247,7 @@ func ScanCoinType(info *goodmwpb.Good, coinMap map[string]*coininfopb.Coin) (*np
 		Total:                      info.GoodTotal,
 		Locked:                     info.GoodLocked,
 		InService:                  info.GoodInService,
+		WaitStart:                  info.GoodWaitStart,
 		Sold:                       info.GoodSold,
 		DeliveryAt:                 info.DeliveryAt,
 		StartAt:                    info.StartAt,
