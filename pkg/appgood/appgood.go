@@ -414,6 +414,7 @@ func getGoodInfos(
 			Total:                   info.GoodTotal,
 			Locked:                  info.GoodLocked,
 			InService:               info.GoodInService,
+			WaitStart:               info.GoodWaitStart,
 			Sold:                    info.GoodSold,
 			SubGoods:                nil,
 			Must:                    true,
