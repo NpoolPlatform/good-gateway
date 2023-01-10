@@ -8,10 +8,10 @@ require (
 	github.com/NpoolPlatform/appuser-middleware v0.0.0-20220830145114-e7d2cde1cc9c
 	github.com/NpoolPlatform/chain-middleware v0.0.0-20221213132223-5fc8d55fe644
 	github.com/NpoolPlatform/go-service-framework v0.0.0-20221015040432-cd676d323379
-	github.com/NpoolPlatform/good-manager v0.0.0-20230108071408-61c4323c2147
-	github.com/NpoolPlatform/good-middleware v0.0.0-20230108071609-169b53628797
+	github.com/NpoolPlatform/good-manager v0.0.0-20230110140338-6d23181ff373
+	github.com/NpoolPlatform/good-middleware v0.0.0-20230110140814-10323981f438
 	github.com/NpoolPlatform/libent-cruder v0.0.0-20221109023947-366125b690fb
-	github.com/NpoolPlatform/message v0.0.0-20230107102608-e79cdb4b40e1
+	github.com/NpoolPlatform/message v0.0.0-20230110135328-fe07dd0e1cd8
 	github.com/NpoolPlatform/order-middleware v0.0.0-20221215042802-7386c6c68457
 	github.com/go-resty/resty/v2 v2.7.0
 	github.com/google/uuid v1.3.0
