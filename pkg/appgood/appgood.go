@@ -39,7 +39,7 @@ func CreateAppGood(
 	displayIndex, purchaseLimit, commissionPercent int32,
 	saleStart, saleEnd, serviceStart *uint32,
 	techFeeRatio, elecFeeRatio *uint32,
-	commSettleType *commmgrpb.SettleType,
+	commSettleType commmgrpb.SettleType,
 ) (*npool.Good, error) {
 	info, err := appgoodmwcli.CreateGood(ctx, &appgoodmgrpb.AppGoodReq{
 		AppID:                &appID,
@@ -56,7 +56,7 @@ func CreateAppGood(
 		ServiceStartAt:       serviceStart,
 		TechnicalFeeRatio:    techFeeRatio,
 		ElectricityFeeRatio:  elecFeeRatio,
-		CommissionSettleType: commSettleType,
+		CommissionSettleType: &commSettleType,
 	})
 	if err != nil {
 		return nil, err
