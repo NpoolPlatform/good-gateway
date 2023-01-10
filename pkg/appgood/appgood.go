@@ -427,6 +427,7 @@ func getGoodInfos(
 			ServiceStartAt:          info.ServiceStartAt,
 			TechnicalFeeRatio:       info.TechnicalFeeRatio,
 			ElectricityFeeRatio:     info.ElectricityFeeRatio,
+			CommissionSettleType:    info.CommissionSettleType,
 		}
 
 		coinType, ok := ctMap[info.CoinTypeID]
