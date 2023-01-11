@@ -9,6 +9,10 @@ import (
 )
 
 func Migrate(ctx context.Context) error {
+	if err := db.Init(); err != nil {
+		return err
+	}
+
 	return db.WithClient(ctx, func(_ctx context.Context, cli *ent.Client) error {
 		infos, err := cli.
 			Stock.
