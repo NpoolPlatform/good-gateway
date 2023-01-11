@@ -181,6 +181,7 @@ func (s *Server) CreateNAppGood(ctx context.Context, in *npool.CreateNAppGoodReq
 		in.ServiceStartAt,
 		in.TechnicalFeeRatio,
 		in.ElectricityFeeRatio,
+		in.CommissionSettleType,
 	)
 	if err != nil {
 		logger.Sugar().Errorw("CreateNAppGood", "error", err)
@@ -393,6 +394,9 @@ func (s *Server) UpdateAppGood(ctx context.Context, in *npool.UpdateAppGoodReque
 	if in.ElectricityFeeRatio != nil {
 		return &npool.UpdateAppGoodResponse{}, status.Error(codes.InvalidArgument, "permission denied")
 	}
+	if in.CommissionSettleType != nil {
+		return &npool.UpdateAppGoodResponse{}, status.Error(codes.InvalidArgument, "permission denied")
+	}
 
 	info, err := s.updateAppGood(ctx, in)
 	if err != nil {
@@ -494,18 +498,19 @@ func (s *Server) UpdateNAppGood(ctx context.Context, in *npool.UpdateNAppGoodReq
 	span = commontracer.TraceInvoker(span, "Good", "mw", "UpdateGood")
 
 	info, err := s.updateAppGood(ctx, &npool.UpdateAppGoodRequest{
-		ID:                  in.ID,
-		AppID:               in.TargetAppID,
-		Online:              in.Online,
-		Visible:             in.Visible,
-		GoodName:            in.GoodName,
-		Price:               in.Price,
-		DisplayIndex:        in.DisplayIndex,
-		PurchaseLimit:       in.PurchaseLimit,
-		CommissionPercent:   in.CommissionPercent,
-		ServiceStartAt:      in.ServiceStartAt,
-		TechnicalFeeRatio:   in.TechnicalFeeRatio,
-		ElectricityFeeRatio: in.ElectricityFeeRatio,
+		ID:                   in.ID,
+		AppID:                in.TargetAppID,
+		Online:               in.Online,
+		Visible:              in.Visible,
+		GoodName:             in.GoodName,
+		Price:                in.Price,
+		DisplayIndex:         in.DisplayIndex,
+		PurchaseLimit:        in.PurchaseLimit,
+		CommissionPercent:    in.CommissionPercent,
+		ServiceStartAt:       in.ServiceStartAt,
+		TechnicalFeeRatio:    in.TechnicalFeeRatio,
+		ElectricityFeeRatio:  in.ElectricityFeeRatio,
+		CommissionSettleType: in.CommissionSettleType,
 	})
 	if err != nil {
 		logger.Sugar().Errorw("GetAppGood", "error", err)
