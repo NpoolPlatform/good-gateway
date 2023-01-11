@@ -6,6 +6,10 @@ import (
 
 	"github.com/NpoolPlatform/good-manager/pkg/db"
 	"github.com/NpoolPlatform/good-manager/pkg/db/ent"
+
+	commmgrpb "github.com/NpoolPlatform/message/npool/inspire/mgr/v1/commission"
+
+	"github.com/shopspring/decimal"
 )
 
 func Migrate(ctx context.Context) error {
@@ -14,6 +18,26 @@ func Migrate(ctx context.Context) error {
 	}
 
 	return db.WithClient(ctx, func(_ctx context.Context, cli *ent.Client) error {
+		_, err := cli.
+			AppGood.
+			Update().
+			SetCommissionSettleType(commmgrpb.SettleType_GoodOrderPercent.String()).
+			SetTechnicalFeeRatio(20).
+			Save(_ctx)
+		if err != nil {
+			return err
+		}
+
+		_, err = cli.
+			Good.
+			Update().
+			SetNextBenefitStartAmount(decimal.NewFromInt(0)).
+			SetLastBenefitAmount(decimal.NewFromInt(0)).
+			Save(_ctx)
+		if err != nil {
+			return err
+		}
+
 		infos, err := cli.
 			Stock.
 			Query().
