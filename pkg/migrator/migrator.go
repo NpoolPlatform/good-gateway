@@ -22,7 +22,7 @@ func Migrate(ctx context.Context) error {
 			AppGood.
 			Update().
 			SetCommissionSettleType(commmgrpb.SettleType_GoodOrderPercent.String()).
-			SetTechnicalFeeRatio(20).
+			SetTechnicalFeeRatio(20). //nolint
 			Save(_ctx)
 		if err != nil {
 			return err
