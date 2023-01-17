@@ -7,11 +7,11 @@ require (
 	github.com/NpoolPlatform/appuser-manager v0.0.0-20230111060622-e3a10cc791c1
 	github.com/NpoolPlatform/appuser-middleware v0.0.0-20230111062013-f804f8850e22
 	github.com/NpoolPlatform/chain-middleware v0.0.0-20230111062408-7bc4b269c1d4
-	github.com/NpoolPlatform/go-service-framework v0.0.0-20221015040432-cd676d323379
-	github.com/NpoolPlatform/good-manager v0.0.0-20230111060807-370f3d2a0627
-	github.com/NpoolPlatform/good-middleware v0.0.0-20230111062156-9d26cfe25c94
+	github.com/NpoolPlatform/go-service-framework v0.0.0-20221102072657-7fcc5e6f1012
+	github.com/NpoolPlatform/good-manager v0.0.0-20230117010903-60b51d6c36ec
+	github.com/NpoolPlatform/good-middleware v0.0.0-20230117011834-3ec9172dc615
 	github.com/NpoolPlatform/libent-cruder v0.0.0-20221109023947-366125b690fb
-	github.com/NpoolPlatform/message v0.0.0-20230110162534-83df43757858
+	github.com/NpoolPlatform/message v0.0.0-20230117011612-1e6d63b7e194
 	github.com/NpoolPlatform/order-middleware v0.0.0-20230111062552-aa2af7d0c282
 	github.com/go-resty/resty/v2 v2.7.0
 	github.com/google/uuid v1.3.0
@@ -21,8 +21,8 @@ require (
 	github.com/urfave/cli/v2 v2.5.0
 	go.opentelemetry.io/otel v1.8.0
 	go.opentelemetry.io/otel/trace v1.8.0
-	google.golang.org/grpc v1.51.0
-	google.golang.org/protobuf v1.28.0
+	google.golang.org/grpc v1.52.0
+	google.golang.org/protobuf v1.28.1
 )
 
 require (
@@ -94,11 +94,11 @@ require (
 	go.uber.org/ratelimit v0.2.0 // indirect
 	go.uber.org/zap v1.21.0 // indirect
 	golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4 // indirect
-	golang.org/x/net v0.0.0-20220722155237-a158d28d115b // indirect
-	golang.org/x/sys v0.0.0-20220722155257-8c9f86f7a55f // indirect
-	golang.org/x/text v0.4.0 // indirect
+	golang.org/x/net v0.4.0 // indirect
+	golang.org/x/sys v0.3.0 // indirect
+	golang.org/x/text v0.5.0 // indirect
 	golang.org/x/xerrors v0.0.0-20220411194840-2f41105eb62f // indirect
-	google.golang.org/genproto v0.0.0-20220519153652-3a47de7e79bd // indirect
+	google.golang.org/genproto v0.0.0-20221118155620-16455021b5e6 // indirect
 	gopkg.in/ini.v1 v1.66.4 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
