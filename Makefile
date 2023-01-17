@@ -21,6 +21,7 @@ go.mod:
 	go mod tidy -compat=1.17
 
 deps:
+	go get -u github.com/ugorji/go/codec@latest
 	go get -d ./...
 	go mod tidy -compat=1.17
 
