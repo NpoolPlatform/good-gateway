@@ -3,9 +3,9 @@ module github.com/NpoolPlatform/good-gateway
 go 1.17
 
 require (
-	github.com/NpoolPlatform/api-manager v0.0.0-20220826022307-d72866fe3ec0
 	github.com/NpoolPlatform/appuser-manager v0.0.0-20230111060622-e3a10cc791c1
 	github.com/NpoolPlatform/appuser-middleware v0.0.0-20230111062013-f804f8850e22
+	github.com/NpoolPlatform/basal-middleware v0.0.0-20221228013048-951da3e0461c
 	github.com/NpoolPlatform/chain-middleware v0.0.0-20230111062408-7bc4b269c1d4
 	github.com/NpoolPlatform/go-service-framework v0.0.0-20221102072657-7fcc5e6f1012
 	github.com/NpoolPlatform/good-manager v0.0.0-20230117010903-60b51d6c36ec
