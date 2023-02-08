@@ -129,6 +129,7 @@ func UpdateAppGood(ctx context.Context, in *npool.UpdateAppGoodRequest) (*npool.
 		Descriptions:         in.Descriptions,
 		GoodBanner:           in.GoodBanner,
 		DisplayNames:         in.DisplayNames,
+		DailyRewardAmount:    in.DailyRewardAmount,
 	})
 	if err != nil {
 		return nil, err

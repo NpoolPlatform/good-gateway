@@ -64,8 +64,8 @@ github.com/NpoolPlatform/good-middleware v0.0.0-20230119025626-e2af327d6320 h1:u
 github.com/NpoolPlatform/good-middleware v0.0.0-20230119025626-e2af327d6320/go.mod h1:+2KepevwAqqLzQPQtp42/wRQ4+yxBBSNwTF1OAcqezY=
 github.com/NpoolPlatform/libent-cruder v0.0.0-20221109023947-366125b690fb h1:IAQOJ0xQWdJS1BnimNdM6GZMLgTL/FnIa8C8K4xffUA=
 github.com/NpoolPlatform/libent-cruder v0.0.0-20221109023947-366125b690fb/go.mod h1:zvvqlRwbOdTUauPQ9dFDhDuxa91ILV0CQfVdPBZj+eA=
-github.com/NpoolPlatform/message v0.0.0-20230119024501-d3d584f05d15 h1:d0NPjUDYcBICsWESvffjSjULAkGQHGgonFOAQ3xyw/s=
-github.com/NpoolPlatform/message v0.0.0-20230119024501-d3d584f05d15/go.mod h1:1+x0MiGmn9vsOFSZl9wF0tGJJg95IDTs35zDMSBjXMw=
+github.com/NpoolPlatform/message v0.0.0-20230208023300-a5d6bc6d573d h1:0oVKknvcRFAP+zreWwPToG+OGenqetVYo3A8YqhbJ0E=
+github.com/NpoolPlatform/message v0.0.0-20230208023300-a5d6bc6d573d/go.mod h1:1+x0MiGmn9vsOFSZl9wF0tGJJg95IDTs35zDMSBjXMw=
 github.com/NpoolPlatform/order-manager v0.0.0-20230111061107-a2737f006192 h1:J5IQVT9N//7R2DUvmwlkDOfi/YPgNSJCxVw8sqCj6uc=
 github.com/NpoolPlatform/order-middleware v0.0.0-20230111062552-aa2af7d0c282 h1:hDUJNRdE1uAsPHPgfXF9XIExijrEqGu7ZniwnzILJZE=
 github.com/NpoolPlatform/order-middleware v0.0.0-20230111062552-aa2af7d0c282/go.mod h1:qDWHtPeyRpc+RLr2ACuf/fX1r/qhJ2pWVRReHu8yEKw=
@@ -446,7 +446,8 @@ github.com/subosito/gotenv v1.2.0 h1:Slr1R9HxAlEKefgq5jn9U+DnETlIUa6HfgEzj0g5d7s
 github.com/subosito/gotenv v1.2.0/go.mod h1:N0PQaV/YGNqwC0u51sEeR/aUtSLEXKX9iv69rRypqCw=
 github.com/tv42/httpunix v0.0.0-20150427012821-b75d8614f926/go.mod h1:9ESjWnEqriFuLhtthL60Sar/7RFoluCcXsuvEwTV5KM=
 github.com/ugorji/go v1.1.4/go.mod h1:uQMGLiO92mf5W77hV/PUCpI3pbzQx3CRekS0kk+RGrc=
-github.com/ugorji/go/codec v1.2.8 h1:sgBJS6COt0b/P40VouWKdseidkDgHxYGm0SAglUHfP0=
+github.com/ugorji/go/codec v1.2.9 h1:rmenucSohSTiyL09Y+l2OCk+FrMxGMzho2+tjr5ticU=
+github.com/ugorji/go/codec v1.2.9/go.mod h1:UNopzCgEMSXjBc6AOMqYvWC1ktqTAfzJZUZgYf6w6lg=
 github.com/urfave/cli/v2 v2.5.0 h1:2sqblaW62ebcTIEvwb8eRvDfNHeBAeKxfhdynaanhug=
 github.com/urfave/cli/v2 v2.5.0/go.mod h1:oDzoM7pVwz6wHn5ogWgFUU1s4VJayeQS+aEZDqXIEJs=
 github.com/vmihailenco/msgpack/v4 v4.3.12/go.mod h1:gborTTJjAo/GWTqqRjrLCn9pgNN+NXzzngzBKDPIqw4=
