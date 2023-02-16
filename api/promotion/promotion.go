@@ -4,6 +4,7 @@ package promotion
 import (
 	"context"
 	"fmt"
+
 	appgoodmgrcli "github.com/NpoolPlatform/good-manager/pkg/client/appgood"
 	appgoodmgrpb "github.com/NpoolPlatform/message/npool/good/mgr/v1/appgood"
 

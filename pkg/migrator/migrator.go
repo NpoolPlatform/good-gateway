@@ -3,6 +3,7 @@ package migrator
 
 import (
 	"context"
+
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
 
 	"github.com/NpoolPlatform/good-manager/pkg/db"
@@ -20,6 +21,9 @@ func Migrate(ctx context.Context) error {
 	}
 
 	cli, err := db.Client()
+	if err != nil {
+		return err
+	}
 	row, err := cli.StockV1.Query().Limit(1).All(ctx)
 	if err != nil {
 		return err
