@@ -97,7 +97,12 @@ func (s *Server) CreateGood(ctx context.Context, in *npool.CreateGoodRequest) (*
 		}
 	}
 
-	if in.GetTotal() <= 0 {
+	total, err := decimal.NewFromString(in.GetTotal())
+	if err != nil {
+		logger.Sugar().Errorw("CreateGood", "Total", in.GetTotal())
+		return &npool.CreateGoodResponse{}, status.Error(codes.InvalidArgument, err.Error())
+	}
+	if total.Cmp(decimal.NewFromInt(0)) <= 0 {
 		logger.Sugar().Errorw("CreateGood", "Total", in.GetTotal())
 		return &npool.CreateGoodResponse{}, status.Error(codes.InvalidArgument, "Total is invalid")
 	}
@@ -344,7 +349,12 @@ func (s *Server) UpdateGood(ctx context.Context, in *npool.UpdateGoodRequest) (*
 	}
 
 	if in.Total != nil {
-		if in.GetTotal() <= 0 {
+		total, err := decimal.NewFromString(in.GetTotal())
+		if err != nil {
+			logger.Sugar().Errorw("UpdateGood", "Total", in.GetTotal())
+			return &npool.UpdateGoodResponse{}, status.Error(codes.InvalidArgument, err.Error())
+		}
+		if total.Cmp(decimal.NewFromInt(0)) <= 0 {
 			logger.Sugar().Errorw("UpdateGood", "Total", in.GetTotal())
 			return &npool.UpdateGoodResponse{}, status.Error(codes.InvalidArgument, "Total is invalid")
 		}
