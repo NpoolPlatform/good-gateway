@@ -3,6 +3,10 @@ package migrator
 
 import (
 	"context"
+	"fmt"
+
+	"github.com/NpoolPlatform/go-service-framework/pkg/config"
+	constant "github.com/NpoolPlatform/good-gateway/pkg/message/const"
 
 	"github.com/google/uuid"
 	"github.com/shopspring/decimal"
@@ -14,7 +18,12 @@ import (
 	"github.com/NpoolPlatform/good-manager/pkg/db/ent"
 )
 
-const LockKey = "stock_migration_lock"
+const keyServiceID = "serviceid"
+
+func lockKey() string {
+	serviceID := config.GetStringValueWithNameSpace(constant.ServiceName, keyServiceID)
+	return fmt.Sprintf("migrator:%v", serviceID)
+}
 
 //nolint:funlen
 func Migrate(ctx context.Context) error {
@@ -36,11 +45,11 @@ func Migrate(ctx context.Context) error {
 
 	logger.Sugar().Infow("Migrate order", "Start", "...")
 	defer func() {
-		_ = redis2.Unlock(LockKey)
+		_ = redis2.Unlock(lockKey())
 		logger.Sugar().Infow("Migrate order", "Done", "...", "error", err)
 	}()
 
-	err = redis2.TryLock(LockKey, 0)
+	err = redis2.TryLock(lockKey(), 0)
 	if err != nil {
 		return err
 	}
@@ -61,7 +70,21 @@ func Migrate(ctx context.Context) error {
 	stocks := []stockStruct{}
 
 	err = db.WithTx(ctx, func(_ctx context.Context, tx *ent.Tx) error {
-		stockRow, err := tx.QueryContext(ctx, "select * from stocks")
+		stockRow, err := tx.QueryContext(
+			ctx,
+			"select "+
+				"id,"+
+				"created_at,"+
+				"updated_at,"+
+				"deleted_at,"+
+				"good_id,"+
+				"total,"+
+				"locked,"+
+				"in_service,"+
+				"wait_start,"+
+				"sold"+
+				" from stocks",
+		)
 		if err != nil {
 			return err
 		}
@@ -117,7 +140,7 @@ func Migrate(ctx context.Context) error {
 		return nil
 	})
 	if err != nil {
-		_ = redis2.Unlock(LockKey)
+		_ = redis2.Unlock(lockKey())
 		return err
 	}
 
