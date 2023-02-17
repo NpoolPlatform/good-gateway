@@ -8,7 +8,7 @@ require (
 	github.com/NpoolPlatform/basal-middleware v0.0.0-20221228013048-951da3e0461c
 	github.com/NpoolPlatform/chain-middleware v0.0.0-20230111062408-7bc4b269c1d4
 	github.com/NpoolPlatform/go-service-framework v0.0.0-20221102072657-7fcc5e6f1012
-	github.com/NpoolPlatform/good-manager v0.0.0-20230215095827-3cc651a2c0c7
+	github.com/NpoolPlatform/good-manager v0.0.0-20230217031007-f087d5f2963a
 	github.com/NpoolPlatform/good-middleware v0.0.0-20230215093837-95584ba4a666
 	github.com/NpoolPlatform/libent-cruder v0.0.0-20221109023947-366125b690fb
 	github.com/NpoolPlatform/message v0.0.0-20230215094533-af9a01633490

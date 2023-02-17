@@ -4,17 +4,19 @@ package migrator
 import (
 	"context"
 
-	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
-
-	"github.com/NpoolPlatform/good-manager/pkg/db"
-	"github.com/NpoolPlatform/good-manager/pkg/db/ent"
+	"github.com/google/uuid"
 	"github.com/shopspring/decimal"
 
+	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
+
 	redis2 "github.com/NpoolPlatform/go-service-framework/pkg/redis"
+	"github.com/NpoolPlatform/good-manager/pkg/db"
+	"github.com/NpoolPlatform/good-manager/pkg/db/ent"
 )
 
 const LockKey = "stock_migration_lock"
 
+//nolint:funlen
 func Migrate(ctx context.Context) error {
 	if err := db.Init(); err != nil {
 		return err
@@ -43,17 +45,49 @@ func Migrate(ctx context.Context) error {
 		return err
 	}
 
+	type stockStruct struct {
+		ID        uuid.UUID
+		CreatedAt uint32
+		UpdatedAt uint32
+		DeletedAt uint32
+		GoodID    uuid.UUID
+		Total     uint32
+		Locked    uint32
+		InService uint32
+		WaitStart uint32
+		Sold      uint32
+	}
+
+	stocks := []stockStruct{}
+
 	err = db.WithTx(ctx, func(_ctx context.Context, tx *ent.Tx) error {
-		infos, err := tx.
-			Stock.
-			Query().
-			All(_ctx)
+		stockRow, err := tx.QueryContext(ctx, "select * from stocks")
 		if err != nil {
 			return err
 		}
 
-		bulk := make([]*ent.StockV1Create, len(infos))
-		for i, info := range infos {
+		for stockRow.Next() {
+			stock := stockStruct{}
+			err = stockRow.Scan(
+				&stock.ID,
+				&stock.CreatedAt,
+				&stock.UpdatedAt,
+				&stock.DeletedAt,
+				&stock.GoodID,
+				&stock.Total,
+				&stock.Locked,
+				&stock.InService,
+				&stock.WaitStart,
+				&stock.Sold,
+			)
+			if err != nil {
+				return err
+			}
+			stocks = append(stocks, stock)
+		}
+
+		bulk := make([]*ent.StockV1Create, len(stocks))
+		for i, info := range stocks {
 			total := decimal.NewFromInt32(int32(info.Total))
 			locked := decimal.NewFromInt32(int32(info.Locked))
 			inService := decimal.NewFromInt32(int32(info.InService))
