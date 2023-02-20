@@ -126,6 +126,10 @@ func UpdateAppGood(ctx context.Context, in *npool.UpdateAppGoodRequest) (*npool.
 		TechnicalFeeRatio:    in.TechnicalFeeRatio,
 		ElectricityFeeRatio:  in.ElectricityFeeRatio,
 		CommissionSettleType: in.CommissionSettleType,
+		Descriptions:         in.Descriptions,
+		GoodBanner:           in.GoodBanner,
+		DisplayNames:         in.DisplayNames,
+		DailyRewardAmount:    in.DailyRewardAmount,
 	})
 	if err != nil {
 		return nil, err
@@ -428,6 +432,9 @@ func getGoodInfos(
 			TechnicalFeeRatio:       info.TechnicalFeeRatio,
 			ElectricityFeeRatio:     info.ElectricityFeeRatio,
 			CommissionSettleType:    info.CommissionSettleType,
+			Descriptions:            info.Descriptions,
+			GoodBanner:              info.GoodBanner,
+			DisplayNames:            info.DisplayNames,
 		}
 
 		coinType, ok := ctMap[info.CoinTypeID]

@@ -328,8 +328,14 @@ func (s *Server) updateAppGood(ctx context.Context, in *npool.UpdateAppGoodReque
 		return nil, status.Error(codes.InvalidArgument, "AppID is invalid")
 	}
 
+	if appGood.AppID != in.GetAppID() {
+		logger.Sugar().Errorw("UpdateGood", "AppID", in.GetAppID(), "error", err)
+		return nil, status.Error(codes.InvalidArgument, "AppID is invalid")
+	}
+
 	if in.Price != nil {
-		if price, err := decimal.NewFromString(in.GetPrice()); err != nil || price.Cmp(decimal.NewFromInt(0)) <= 0 {
+		price, err := decimal.NewFromString(in.GetPrice())
+		if err != nil || price.Cmp(decimal.NewFromInt(0)) <= 0 {
 			logger.Sugar().Errorw("UpdateGood", "Price", in.GetPrice(), "error", err)
 			return nil, status.Error(codes.InvalidArgument, "Price is invalid")
 		}
@@ -340,14 +346,14 @@ func (s *Server) updateAppGood(ctx context.Context, in *npool.UpdateAppGoodReque
 			return nil, status.Error(codes.Internal, err.Error())
 		}
 
-		if appGood.AppID != in.GetAppID() {
-			logger.Sugar().Errorw("UpdateGood", "AppID", in.GetAppID(), "error", err)
-			return nil, status.Error(codes.InvalidArgument, "AppID is invalid")
+		price1, err := decimal.NewFromString(good.Price)
+		if err != nil {
+			return nil, status.Error(codes.InvalidArgument, err.Error())
 		}
 
-		if in.GetPrice() < good.GetPrice() {
+		if price.Cmp(price1) < 0 {
 			logger.Sugar().Errorw("CreateNAppGood", "Price", in.GetPrice())
-			return nil, status.Error(codes.InvalidArgument, "price greater than platform price")
+			return nil, status.Error(codes.InvalidArgument, "invalid price")
 		}
 	}
 
@@ -450,7 +456,8 @@ func (s *Server) UpdateNAppGood(ctx context.Context, in *npool.UpdateNAppGoodReq
 	}
 
 	if in.Price != nil {
-		if price, err := decimal.NewFromString(in.GetPrice()); err != nil || price.Cmp(decimal.NewFromInt(0)) <= 0 {
+		price, err := decimal.NewFromString(in.GetPrice())
+		if err != nil || price.Cmp(decimal.NewFromInt(0)) <= 0 {
 			logger.Sugar().Errorw("UpdateNAppGood", "Price", in.GetPrice(), "error", err)
 			return &npool.UpdateNAppGoodResponse{}, status.Error(codes.InvalidArgument, "Price is invalid")
 		}
@@ -461,9 +468,14 @@ func (s *Server) UpdateNAppGood(ctx context.Context, in *npool.UpdateNAppGoodReq
 			return &npool.UpdateNAppGoodResponse{}, status.Error(codes.Internal, err.Error())
 		}
 
-		if in.GetPrice() < good.GetPrice() {
+		price1, err := decimal.NewFromString(good.Price)
+		if err != nil {
+			return nil, status.Error(codes.InvalidArgument, err.Error())
+		}
+
+		if price.Cmp(price1) < 0 {
 			logger.Sugar().Errorw("UpdateNAppGood", "Price", in.GetPrice())
-			return &npool.UpdateNAppGoodResponse{}, status.Error(codes.InvalidArgument, "price greater than platform price")
+			return &npool.UpdateNAppGoodResponse{}, status.Error(codes.InvalidArgument, "invalid price")
 		}
 	}
 
