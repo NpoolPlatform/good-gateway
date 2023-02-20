@@ -35,7 +35,7 @@ func Migrate(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	row, err := cli.StockV1.Query().Limit(1).All(ctx)
+	row, err := cli.Stock.Query().Limit(1).All(ctx)
 	if err != nil {
 		return err
 	}
@@ -109,7 +109,7 @@ func Migrate(ctx context.Context) error {
 			stocks = append(stocks, stock)
 		}
 
-		bulk := make([]*ent.StockV1Create, len(stocks))
+		bulk := make([]*ent.StockCreate, len(stocks))
 		for i, info := range stocks {
 			total := decimal.NewFromInt32(int32(info.Total))
 			locked := decimal.NewFromInt32(int32(info.Locked))
@@ -117,7 +117,7 @@ func Migrate(ctx context.Context) error {
 			waitStart := decimal.NewFromInt32(int32(info.WaitStart))
 			sold := decimal.NewFromInt32(int32(info.Sold))
 			bulk[i] = tx.
-				StockV1.
+				Stock.
 				Create().
 				SetID(info.ID).
 				SetCreatedAt(info.CreatedAt).
@@ -133,7 +133,7 @@ func Migrate(ctx context.Context) error {
 				return err
 			}
 		}
-		_, err = tx.StockV1.CreateBulk(bulk...).Save(_ctx)
+		_, err = tx.Stock.CreateBulk(bulk...).Save(_ctx)
 		if err != nil {
 			return err
 		}
