@@ -5,6 +5,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
+
 	goodmgrcli "github.com/NpoolPlatform/good-manager/pkg/client/subgood"
 	subgoodmgrpb "github.com/NpoolPlatform/message/npool/good/mgr/v1/subgood"
 
@@ -14,6 +16,7 @@ import (
 	commonpb "github.com/NpoolPlatform/message/npool"
 
 	ordermwpb "github.com/NpoolPlatform/message/npool/order/mw/v1/order"
+	ordermgrpb "github.com/NpoolPlatform/message/npool/order/mgr/v1/order"
 	ordermwcli "github.com/NpoolPlatform/order-middleware/pkg/client/order"
 
 	appcoininfocli "github.com/NpoolPlatform/chain-middleware/pkg/client/appcoin"
@@ -162,7 +165,15 @@ func UpdateAppGood(ctx context.Context, in *npool.UpdateAppGoodRequest) (*npool.
 				if ord.Start > in.GetServiceStartAt() {
 					continue
 				}
-				if ord.PaymentID == uuid1.InvalidUUIDStr {
+				if ord.PaymentID == uuid1.InvalidUUIDStr || ord.PaymentID == "" {
+					switch ord.OrderState {
+					case ordermgrpb.OrderState_Paid:
+						fallthrough //nolint
+					case ordermgrpb.OrderState_InService:
+						fallthrough //nolint
+					case ordermgrpb.OrderState_Expired:
+						logger.Sugar().Warnw("UpdateAppGood", "OrderID", ord.ID, "State", ord.OrderState, "PaymentID", ord.PaymentID)
+					}
 					continue
 				}
 				reqs = append(reqs, &ordermwpb.OrderReq{
