@@ -59,10 +59,10 @@ github.com/NpoolPlatform/chain-middleware v0.0.0-20230111062408-7bc4b269c1d4 h1:
 github.com/NpoolPlatform/chain-middleware v0.0.0-20230111062408-7bc4b269c1d4/go.mod h1:GoHFTnBqr6Yd7vHoZj3JsjgCd0dZIf1PgIKltlJY73Y=
 github.com/NpoolPlatform/go-service-framework v0.0.0-20221102072657-7fcc5e6f1012 h1:agWdYMDo1nBXR0w/PQz9Kze5IZsROOwSL8WcQFTMT4Q=
 github.com/NpoolPlatform/go-service-framework v0.0.0-20221102072657-7fcc5e6f1012/go.mod h1:/sor3E0i0XR8BaKInJwWC85aXLmbMFRNLdIuw+ed+ig=
-github.com/NpoolPlatform/good-manager v0.0.0-20230220030202-d4e35b067545 h1:vZN1ue/dkTefphmJKIaKXl0hdc6ICXeKuFzRxyTP2Fg=
-github.com/NpoolPlatform/good-manager v0.0.0-20230220030202-d4e35b067545/go.mod h1:NFlLeMoR95C5pf7x2f/VNBvZnW/QcLgeiMDMidUDkII=
-github.com/NpoolPlatform/good-middleware v0.0.0-20230220031303-b891e6351465 h1:vjIvB1LhzVWbO3I8xEQNqLa+TN0strWK1LMWr2VkVlA=
-github.com/NpoolPlatform/good-middleware v0.0.0-20230220031303-b891e6351465/go.mod h1:L2ICAyl/Xh9wz/cJzNY5chngTM+/Wq/CvePx6KEg8/Q=
+github.com/NpoolPlatform/good-manager v0.0.0-20230223124153-79299117abc3 h1:8kMdjq5v7nGgwyD+cnZfB9QrSS3UJ2vZM/4C3LsrWQg=
+github.com/NpoolPlatform/good-manager v0.0.0-20230223124153-79299117abc3/go.mod h1:sDmadKrhxBKM9SRwL4N87sOluxGLCgw0gH5u+W9Z5dk=
+github.com/NpoolPlatform/good-middleware v0.0.0-20230223124510-9cdbfd6dcf53 h1:TZY3hgrIg1d40fbbV9r4ucAgRrzOQ0Cj3iIGjFaeSmI=
+github.com/NpoolPlatform/good-middleware v0.0.0-20230223124510-9cdbfd6dcf53/go.mod h1:RPS+V1ekCUrY0js0VCK3+zhYqE/R5lBXQXpqcjIQL5M=
 github.com/NpoolPlatform/libent-cruder v0.0.0-20221109023947-366125b690fb h1:IAQOJ0xQWdJS1BnimNdM6GZMLgTL/FnIa8C8K4xffUA=
 github.com/NpoolPlatform/libent-cruder v0.0.0-20221109023947-366125b690fb/go.mod h1:zvvqlRwbOdTUauPQ9dFDhDuxa91ILV0CQfVdPBZj+eA=
 github.com/NpoolPlatform/message v0.0.0-20230215094533-af9a01633490 h1:jgLVxhHfHnuizCcvTdC9n553sOBHAnnZc7aA2oLCLgo=
@@ -466,9 +466,9 @@ github.com/stretchr/testify v1.8.0/go.mod h1:yNjHg4UonilssWZ8iaSj1OCr/vHnekPRkoO
 github.com/subosito/gotenv v1.2.0 h1:Slr1R9HxAlEKefgq5jn9U+DnETlIUa6HfgEzj0g5d7s=
 github.com/subosito/gotenv v1.2.0/go.mod h1:N0PQaV/YGNqwC0u51sEeR/aUtSLEXKX9iv69rRypqCw=
 github.com/tv42/httpunix v0.0.0-20150427012821-b75d8614f926/go.mod h1:9ESjWnEqriFuLhtthL60Sar/7RFoluCcXsuvEwTV5KM=
+github.com/ugorji/go v0.0.0-20190204201341-e444a5086c43 h1:nLURyLzmXqqnferXOGs9EA2kbhl/bks8vSyptHCxH34=
 github.com/ugorji/go v0.0.0-20190204201341-e444a5086c43/go.mod h1:hnLbHMwcvSihnDhEfx2/BzKp2xb0Y+ErdfYcrs9tkJQ=
 github.com/ugorji/go/codec v1.2.10 h1:eimT6Lsr+2lzmSZxPhLFoOWFmQqwk0fllJJ5hEbTXtQ=
-github.com/ugorji/go/codec v1.2.10/go.mod h1:UNopzCgEMSXjBc6AOMqYvWC1ktqTAfzJZUZgYf6w6lg=
 github.com/urfave/cli/v2 v2.5.0 h1:2sqblaW62ebcTIEvwb8eRvDfNHeBAeKxfhdynaanhug=
 github.com/urfave/cli/v2 v2.5.0/go.mod h1:oDzoM7pVwz6wHn5ogWgFUU1s4VJayeQS+aEZDqXIEJs=
 github.com/vmihailenco/msgpack/v4 v4.3.12/go.mod h1:gborTTJjAo/GWTqqRjrLCn9pgNN+NXzzngzBKDPIqw4=

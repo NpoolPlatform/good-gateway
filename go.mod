@@ -8,8 +8,8 @@ require (
 	github.com/NpoolPlatform/basal-middleware v0.0.0-20221228013048-951da3e0461c
 	github.com/NpoolPlatform/chain-middleware v0.0.0-20230111062408-7bc4b269c1d4
 	github.com/NpoolPlatform/go-service-framework v0.0.0-20221102072657-7fcc5e6f1012
-	github.com/NpoolPlatform/good-manager v0.0.0-20230220030202-d4e35b067545
-	github.com/NpoolPlatform/good-middleware v0.0.0-20230220031303-b891e6351465
+	github.com/NpoolPlatform/good-manager v0.0.0-20230223124153-79299117abc3
+	github.com/NpoolPlatform/good-middleware v0.0.0-20230223124510-9cdbfd6dcf53
 	github.com/NpoolPlatform/libent-cruder v0.0.0-20221109023947-366125b690fb
 	github.com/NpoolPlatform/message v0.0.0-20230215094533-af9a01633490
 	github.com/NpoolPlatform/order-middleware v0.0.0-20230111062552-aa2af7d0c282
@@ -87,7 +87,6 @@ require (
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/spf13/viper v1.11.0 // indirect
 	github.com/subosito/gotenv v1.2.0 // indirect
-	github.com/ugorji/go/codec v1.2.10 // indirect
 	github.com/zclconf/go-cty v1.8.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.31.0 // indirect
 	go.opentelemetry.io/otel/exporters/jaeger v1.6.3 // indirect
