@@ -3,15 +3,15 @@ module github.com/NpoolPlatform/good-gateway
 go 1.17
 
 require (
-	github.com/NpoolPlatform/appuser-manager v0.0.0-20230111060622-e3a10cc791c1
-	github.com/NpoolPlatform/appuser-middleware v0.0.0-20230210194000-019f2641c2be
-	github.com/NpoolPlatform/basal-middleware v0.0.0-20221228013048-951da3e0461c
+	github.com/NpoolPlatform/appuser-manager v0.0.0-20230221094907-4452d99d9f56
+	github.com/NpoolPlatform/appuser-middleware v0.0.0-20230221095346-3f4e44fb0b41
+	github.com/NpoolPlatform/basal-middleware v0.0.0-20230221094657-688f81366495
 	github.com/NpoolPlatform/chain-middleware v0.0.0-20230111062408-7bc4b269c1d4
 	github.com/NpoolPlatform/go-service-framework v0.0.0-20221102072657-7fcc5e6f1012
 	github.com/NpoolPlatform/good-manager v0.0.0-20230223125558-4c69977f78af
 	github.com/NpoolPlatform/good-middleware v0.0.0-20230223125801-85ee04ec057e
 	github.com/NpoolPlatform/libent-cruder v0.0.0-20221109023947-366125b690fb
-	github.com/NpoolPlatform/message v0.0.0-20230215094533-af9a01633490
+	github.com/NpoolPlatform/message v0.0.0-20230224092851-7f46691c0dd1
 	github.com/NpoolPlatform/order-middleware v0.0.0-20230111062552-aa2af7d0c282
 	github.com/go-resty/resty/v2 v2.7.0
 	github.com/google/uuid v1.3.0
