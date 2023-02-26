@@ -15,8 +15,8 @@ import (
 	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 	commonpb "github.com/NpoolPlatform/message/npool"
 
-	ordermwpb "github.com/NpoolPlatform/message/npool/order/mw/v1/order"
 	ordermgrpb "github.com/NpoolPlatform/message/npool/order/mgr/v1/order"
+	ordermwpb "github.com/NpoolPlatform/message/npool/order/mw/v1/order"
 	ordermwcli "github.com/NpoolPlatform/order-middleware/pkg/client/order"
 
 	appcoininfocli "github.com/NpoolPlatform/chain-middleware/pkg/client/appcoin"
