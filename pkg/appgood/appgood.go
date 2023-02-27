@@ -43,6 +43,9 @@ func CreateAppGood(
 	saleStart, saleEnd, serviceStart *uint32,
 	techFeeRatio, elecFeeRatio *uint32,
 	commSettleType commmgrpb.SettleType,
+	openPurchase, intoProductPage bool,
+	cancelableBefore uint32,
+	userPurchaseLimit string,
 ) (*npool.Good, error) {
 	info, err := appgoodmwcli.CreateGood(ctx, &appgoodmgrpb.AppGoodReq{
 		AppID:                &appID,
@@ -60,6 +63,10 @@ func CreateAppGood(
 		TechnicalFeeRatio:    techFeeRatio,
 		ElectricityFeeRatio:  elecFeeRatio,
 		CommissionSettleType: &commSettleType,
+		OpenPurchase:         &openPurchase,
+		IntoProductPage:      &intoProductPage,
+		CancelableBefore:     &cancelableBefore,
+		UserPurchaseLimit:    &userPurchaseLimit,
 	})
 	if err != nil {
 		return nil, err
@@ -128,11 +135,15 @@ func UpdateAppGood(ctx context.Context, in *npool.UpdateAppGoodRequest) (*npool.
 		ServiceStartAt:       in.ServiceStartAt,
 		TechnicalFeeRatio:    in.TechnicalFeeRatio,
 		ElectricityFeeRatio:  in.ElectricityFeeRatio,
+		DailyRewardAmount:    in.DailyRewardAmount,
 		CommissionSettleType: in.CommissionSettleType,
 		Descriptions:         in.Descriptions,
 		GoodBanner:           in.GoodBanner,
 		DisplayNames:         in.DisplayNames,
-		DailyRewardAmount:    in.DailyRewardAmount,
+		OpenPurchase:         in.OpenPurchase,
+		IntoProductPage:      in.IntoProductPage,
+		CancelableBefore:     in.CancelableBefore,
+		UserPurchaseLimit:    in.UserPurchaseLimit,
 	})
 	if err != nil {
 		return nil, err
@@ -413,14 +424,13 @@ func getGoodInfos(
 			DevicePosters:           info.DevicePosters,
 			DurationDays:            info.DurationDays,
 			VendorLocationCountry:   info.VendorLocationCountry,
-			CoinTypeID:              info.CoinTypeID,
 			GoodType:                info.GoodType,
 			BenefitType:             info.BenefitType,
 			GoodName:                info.GoodName,
 			Unit:                    info.Unit,
 			UnitAmount:              info.UnitAmount,
-			TestOnly:                info.TestOnly,
 			BenefitIntervalHours:    info.BenefitIntervalHours,
+			TestOnly:                info.TestOnly,
 			Posters:                 info.Posters,
 			Labels:                  info.Labels,
 			VoteCount:               info.VoteCount,
@@ -431,21 +441,22 @@ func getGoodInfos(
 			InService:               info.GoodInService,
 			WaitStart:               info.GoodWaitStart,
 			Sold:                    info.GoodSold,
-			SubGoods:                nil,
-			Must:                    true,
-			Commission:              true,
 			StartAt:                 info.StartAt,
 			CreatedAt:               info.CreatedAt,
-			DailyRewardAmount:       info.DailyRewardAmount,
 			SaleStartAt:             info.SaleStartAt,
 			SaleEndAt:               info.SaleEndAt,
 			ServiceStartAt:          info.ServiceStartAt,
 			TechnicalFeeRatio:       info.TechnicalFeeRatio,
 			ElectricityFeeRatio:     info.ElectricityFeeRatio,
+			DailyRewardAmount:       info.DailyRewardAmount,
 			CommissionSettleType:    info.CommissionSettleType,
 			Descriptions:            info.Descriptions,
 			GoodBanner:              info.GoodBanner,
 			DisplayNames:            info.DisplayNames,
+			OpenPurchase:            info.OpenPurchase,
+			IntoProductPage:         info.IntoProductPage,
+			CancelableBefore:        info.CancelableBefore,
+			UserPurchaseLimit:       info.UserPurchaseLimit,
 		}
 
 		coinType, ok := ctMap[info.CoinTypeID]

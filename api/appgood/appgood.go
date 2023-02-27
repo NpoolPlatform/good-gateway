@@ -75,6 +75,16 @@ func (s *Server) CreateNAppGood(ctx context.Context, in *npool.CreateNAppGoodReq
 		return &npool.CreateNAppGoodResponse{}, status.Error(codes.InvalidArgument, "PurchaseLimit is invalid")
 	}
 
+	userPurchaseLimit, err := decimal.NewFromString(in.GetUserPurchaseLimit())
+	if err != nil {
+		logger.Sugar().Errorw("CreateNAppGood", "UserPurchaseLimit", in.GetUserPurchaseLimit())
+		return &npool.CreateNAppGoodResponse{}, status.Error(codes.InvalidArgument, err.Error())
+	}
+	if userPurchaseLimit.Cmp(decimal.NewFromInt(0)) <= 0 {
+		logger.Sugar().Errorw("CreateNAppGood", "UserPurchaseLimit", in.GetUserPurchaseLimit())
+		return &npool.CreateNAppGoodResponse{}, status.Error(codes.InvalidArgument, "UserPurchaseLimit is invalid")
+	}
+
 	if in.GetCommissionPercent() >= 100 || in.GetCommissionPercent() < 0 {
 		logger.Sugar().Errorw("CreateNAppGood", "CommissionPercent", in.GetCommissionPercent())
 		return &npool.CreateNAppGoodResponse{}, status.Error(codes.InvalidArgument, "CommissionPercent is invalid")
@@ -182,6 +192,10 @@ func (s *Server) CreateNAppGood(ctx context.Context, in *npool.CreateNAppGoodReq
 		in.TechnicalFeeRatio,
 		in.ElectricityFeeRatio,
 		in.CommissionSettleType,
+		in.OpenPurchase,
+		in.IntoProductPage,
+		in.CancelableBefore,
+		in.UserPurchaseLimit,
 	)
 	if err != nil {
 		logger.Sugar().Errorw("CreateNAppGood", "error", err)
@@ -523,6 +537,10 @@ func (s *Server) UpdateNAppGood(ctx context.Context, in *npool.UpdateNAppGoodReq
 		TechnicalFeeRatio:    in.TechnicalFeeRatio,
 		ElectricityFeeRatio:  in.ElectricityFeeRatio,
 		CommissionSettleType: in.CommissionSettleType,
+		OpenPurchase:         in.OpenPurchase,
+		IntoProductPage:      in.IntoProductPage,
+		CancelableBefore:     in.CancelableBefore,
+		UserPurchaseLimit:    in.UserPurchaseLimit,
 	})
 	if err != nil {
 		logger.Sugar().Errorw("GetAppGood", "error", err)
