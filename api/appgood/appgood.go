@@ -173,6 +173,15 @@ func (s *Server) CreateNAppGood(ctx context.Context, in *npool.CreateNAppGoodReq
 		return &npool.CreateNAppGoodResponse{}, status.Error(codes.InvalidArgument, "AppID is not exist")
 	}
 
+	switch in.GetCancelMode() {
+	case appgoodmgrpb.CancelMode_CancellableBeforeStart:
+	case appgoodmgrpb.CancelMode_CancellableBeforeBenefit:
+	case appgoodmgrpb.CancelMode_Uncancellable:
+	default:
+		logger.Sugar().Errorw("UpdateNAppGood", "CancelMode", in.GetCancelMode())
+		return &npool.CreateNAppGoodResponse{}, status.Error(codes.InvalidArgument, "CancelMode is invalid")
+	}
+
 	span = commontracer.TraceInvoker(span, "Good", "mw", "CreateNAppGood")
 
 	info, err := appgood1.CreateAppGood(
@@ -192,9 +201,9 @@ func (s *Server) CreateNAppGood(ctx context.Context, in *npool.CreateNAppGoodReq
 		in.TechnicalFeeRatio,
 		in.ElectricityFeeRatio,
 		in.CommissionSettleType,
-		in.OpenPurchase,
-		in.IntoProductPage,
-		in.CancelableBefore,
+		in.EnableProductPage,
+		in.EnableProductPage,
+		in.CancelMode,
 		in.UserPurchaseLimit,
 	)
 	if err != nil {
@@ -398,7 +407,16 @@ func (s *Server) updateAppGood(ctx context.Context, in *npool.UpdateAppGoodReque
 			return nil, status.Error(codes.InvalidArgument, "CommissionPercent is invalid")
 		}
 	}
-
+	if in.CancelMode != nil {
+		switch in.GetCancelMode() {
+		case appgoodmgrpb.CancelMode_CancellableBeforeStart:
+		case appgoodmgrpb.CancelMode_CancellableBeforeBenefit:
+		case appgoodmgrpb.CancelMode_Uncancellable:
+		default:
+			logger.Sugar().Errorw("UpdateNAppGood", "CancelMode", in.GetCancelMode())
+			return nil, status.Error(codes.InvalidArgument, "CancelMode is invalid")
+		}
+	}
 	span = commontracer.TraceInvoker(span, "Good", "mw", "UpdateGood")
 
 	return appgood1.UpdateAppGood(ctx, in)
@@ -417,7 +435,6 @@ func (s *Server) UpdateAppGood(ctx context.Context, in *npool.UpdateAppGoodReque
 	if in.CommissionSettleType != nil {
 		return &npool.UpdateAppGoodResponse{}, status.Error(codes.InvalidArgument, "permission denied")
 	}
-
 	info, err := s.updateAppGood(ctx, in)
 	if err != nil {
 		return &npool.UpdateAppGoodResponse{}, status.Error(codes.Internal, err.Error())
@@ -537,9 +554,9 @@ func (s *Server) UpdateNAppGood(ctx context.Context, in *npool.UpdateNAppGoodReq
 		TechnicalFeeRatio:    in.TechnicalFeeRatio,
 		ElectricityFeeRatio:  in.ElectricityFeeRatio,
 		CommissionSettleType: in.CommissionSettleType,
-		OpenPurchase:         in.OpenPurchase,
-		IntoProductPage:      in.IntoProductPage,
-		CancelableBefore:     in.CancelableBefore,
+		EnablePurchase:       in.EnablePurchase,
+		EnableProductPage:    in.EnableProductPage,
+		CancelMode:           in.CancelMode,
 		UserPurchaseLimit:    in.UserPurchaseLimit,
 	})
 	if err != nil {

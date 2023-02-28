@@ -44,7 +44,7 @@ func CreateAppGood(
 	techFeeRatio, elecFeeRatio *uint32,
 	commSettleType commmgrpb.SettleType,
 	openPurchase, intoProductPage bool,
-	cancelableBefore uint32,
+	cancelMode appgoodmgrpb.CancelMode,
 	userPurchaseLimit string,
 ) (*npool.Good, error) {
 	info, err := appgoodmwcli.CreateGood(ctx, &appgoodmgrpb.AppGoodReq{
@@ -63,9 +63,9 @@ func CreateAppGood(
 		TechnicalFeeRatio:    techFeeRatio,
 		ElectricityFeeRatio:  elecFeeRatio,
 		CommissionSettleType: &commSettleType,
-		OpenPurchase:         &openPurchase,
-		IntoProductPage:      &intoProductPage,
-		CancelableBefore:     &cancelableBefore,
+		EnablePurchase:       &openPurchase,
+		EnableProductPage:    &intoProductPage,
+		CancelMode:           &cancelMode,
 		UserPurchaseLimit:    &userPurchaseLimit,
 	})
 	if err != nil {
@@ -140,9 +140,9 @@ func UpdateAppGood(ctx context.Context, in *npool.UpdateAppGoodRequest) (*npool.
 		Descriptions:         in.Descriptions,
 		GoodBanner:           in.GoodBanner,
 		DisplayNames:         in.DisplayNames,
-		OpenPurchase:         in.OpenPurchase,
-		IntoProductPage:      in.IntoProductPage,
-		CancelableBefore:     in.CancelableBefore,
+		EnablePurchase:       in.EnablePurchase,
+		EnableProductPage:    in.EnableProductPage,
+		CancelMode:           in.CancelMode,
 		UserPurchaseLimit:    in.UserPurchaseLimit,
 	})
 	if err != nil {
@@ -453,9 +453,9 @@ func getGoodInfos(
 			Descriptions:            info.Descriptions,
 			GoodBanner:              info.GoodBanner,
 			DisplayNames:            info.DisplayNames,
-			OpenPurchase:            info.OpenPurchase,
-			IntoProductPage:         info.IntoProductPage,
-			CancelableBefore:        info.CancelableBefore,
+			EnablePurchase:          info.EnablePurchase,
+			EnableProductPage:       info.EnableProductPage,
+			CancelMode:              info.CancelMode,
 			UserPurchaseLimit:       info.UserPurchaseLimit,
 		}
 
