@@ -43,10 +43,10 @@ func CreateAppGood(
 	saleStart, saleEnd, serviceStart *uint32,
 	techFeeRatio, elecFeeRatio *uint32,
 	commSettleType commmgrpb.SettleType,
-	openPurchase, intoProductPage bool,
-	cancelMode appgoodmgrpb.CancelMode,
-	userPurchaseLimit, displayColors string,
-	cancellableBeforeStart uint32,
+	openPurchase, intoProductPage *bool,
+	cancelMode *appgoodmgrpb.CancelMode,
+	userPurchaseLimit, displayColors *string,
+	cancellableBeforeStart *uint32,
 ) (*npool.Good, error) {
 	info, err := appgoodmwcli.CreateGood(ctx, &appgoodmgrpb.AppGoodReq{
 		AppID:                  &appID,
@@ -64,12 +64,12 @@ func CreateAppGood(
 		TechnicalFeeRatio:      techFeeRatio,
 		ElectricityFeeRatio:    elecFeeRatio,
 		CommissionSettleType:   &commSettleType,
-		EnablePurchase:         &openPurchase,
-		EnableProductPage:      &intoProductPage,
-		CancelMode:             &cancelMode,
-		UserPurchaseLimit:      &userPurchaseLimit,
-		DisplayColors:          &displayColors,
-		CancellableBeforeStart: &cancellableBeforeStart,
+		EnablePurchase:         openPurchase,
+		EnableProductPage:      intoProductPage,
+		CancelMode:             cancelMode,
+		UserPurchaseLimit:      userPurchaseLimit,
+		DisplayColors:          displayColors,
+		CancellableBeforeStart: cancellableBeforeStart,
 	})
 	if err != nil {
 		return nil, err
