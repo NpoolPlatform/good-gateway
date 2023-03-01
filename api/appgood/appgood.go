@@ -205,6 +205,8 @@ func (s *Server) CreateNAppGood(ctx context.Context, in *npool.CreateNAppGoodReq
 		in.EnableProductPage,
 		in.CancelMode,
 		in.UserPurchaseLimit,
+		in.DisplayColors,
+		in.CancellableBeforeStart,
 	)
 	if err != nil {
 		logger.Sugar().Errorw("CreateNAppGood", "error", err)
@@ -541,23 +543,25 @@ func (s *Server) UpdateNAppGood(ctx context.Context, in *npool.UpdateNAppGoodReq
 	span = commontracer.TraceInvoker(span, "Good", "mw", "UpdateGood")
 
 	info, err := s.updateAppGood(ctx, &npool.UpdateAppGoodRequest{
-		ID:                   in.ID,
-		AppID:                in.TargetAppID,
-		Online:               in.Online,
-		Visible:              in.Visible,
-		GoodName:             in.GoodName,
-		Price:                in.Price,
-		DisplayIndex:         in.DisplayIndex,
-		PurchaseLimit:        in.PurchaseLimit,
-		CommissionPercent:    in.CommissionPercent,
-		ServiceStartAt:       in.ServiceStartAt,
-		TechnicalFeeRatio:    in.TechnicalFeeRatio,
-		ElectricityFeeRatio:  in.ElectricityFeeRatio,
-		CommissionSettleType: in.CommissionSettleType,
-		EnablePurchase:       in.EnablePurchase,
-		EnableProductPage:    in.EnableProductPage,
-		CancelMode:           in.CancelMode,
-		UserPurchaseLimit:    in.UserPurchaseLimit,
+		ID:                     in.ID,
+		AppID:                  in.TargetAppID,
+		Online:                 in.Online,
+		Visible:                in.Visible,
+		GoodName:               in.GoodName,
+		Price:                  in.Price,
+		DisplayIndex:           in.DisplayIndex,
+		PurchaseLimit:          in.PurchaseLimit,
+		CommissionPercent:      in.CommissionPercent,
+		ServiceStartAt:         in.ServiceStartAt,
+		TechnicalFeeRatio:      in.TechnicalFeeRatio,
+		ElectricityFeeRatio:    in.ElectricityFeeRatio,
+		CommissionSettleType:   in.CommissionSettleType,
+		EnablePurchase:         in.EnablePurchase,
+		EnableProductPage:      in.EnableProductPage,
+		CancelMode:             in.CancelMode,
+		UserPurchaseLimit:      in.UserPurchaseLimit,
+		DisplayColors:          in.DisplayColors,
+		CancellableBeforeStart: in.CancellableBeforeStart,
 	})
 	if err != nil {
 		logger.Sugar().Errorw("GetAppGood", "error", err)
