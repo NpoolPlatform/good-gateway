@@ -49,6 +49,14 @@ func Migrate(ctx context.Context) error {
 		if err != nil {
 			return err
 		}
+		_, err = tx.
+			ExecContext(
+				ctx,
+				"update app_goods set display_colors='[]' where display_colors is NULL",
+			)
+		if err != nil {
+			return err
+		}
 		return nil
 	})
 }

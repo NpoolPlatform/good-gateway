@@ -45,8 +45,9 @@ func CreateAppGood(
 	commSettleType commmgrpb.SettleType,
 	openPurchase, intoProductPage *bool,
 	cancelMode *appgoodmgrpb.CancelMode,
-	userPurchaseLimit, displayColors *string,
+	userPurchaseLimit *string, displayColors []string,
 	cancellableBeforeStart *uint32,
+	productPage *string,
 ) (*npool.Good, error) {
 	info, err := appgoodmwcli.CreateGood(ctx, &appgoodmgrpb.AppGoodReq{
 		AppID:                  &appID,
@@ -70,6 +71,7 @@ func CreateAppGood(
 		UserPurchaseLimit:      userPurchaseLimit,
 		DisplayColors:          displayColors,
 		CancellableBeforeStart: cancellableBeforeStart,
+		ProductPage:            productPage,
 	})
 	if err != nil {
 		return nil, err
@@ -125,28 +127,31 @@ func GetAppGood(ctx context.Context, appID, goodID string) (*npool.Good, error) 
 
 func UpdateAppGood(ctx context.Context, in *npool.UpdateAppGoodRequest) (*npool.Good, error) {
 	info, err := appgoodmwcli.UpdateGood(ctx, &appgoodmgrpb.AppGoodReq{
-		ID:                   &in.ID,
-		Online:               in.Online,
-		Visible:              in.Visible,
-		GoodName:             in.GoodName,
-		Price:                in.Price,
-		DisplayIndex:         in.DisplayIndex,
-		PurchaseLimit:        in.PurchaseLimit,
-		CommissionPercent:    in.CommissionPercent,
-		SaleStartAt:          in.SaleStartAt,
-		SaleEndAt:            in.SaleEndAt,
-		ServiceStartAt:       in.ServiceStartAt,
-		TechnicalFeeRatio:    in.TechnicalFeeRatio,
-		ElectricityFeeRatio:  in.ElectricityFeeRatio,
-		DailyRewardAmount:    in.DailyRewardAmount,
-		CommissionSettleType: in.CommissionSettleType,
-		Descriptions:         in.Descriptions,
-		GoodBanner:           in.GoodBanner,
-		DisplayNames:         in.DisplayNames,
-		EnablePurchase:       in.EnablePurchase,
-		EnableProductPage:    in.EnableProductPage,
-		CancelMode:           in.CancelMode,
-		UserPurchaseLimit:    in.UserPurchaseLimit,
+		ID:                     &in.ID,
+		Online:                 in.Online,
+		Visible:                in.Visible,
+		GoodName:               in.GoodName,
+		Price:                  in.Price,
+		DisplayIndex:           in.DisplayIndex,
+		PurchaseLimit:          in.PurchaseLimit,
+		CommissionPercent:      in.CommissionPercent,
+		SaleStartAt:            in.SaleStartAt,
+		SaleEndAt:              in.SaleEndAt,
+		ServiceStartAt:         in.ServiceStartAt,
+		TechnicalFeeRatio:      in.TechnicalFeeRatio,
+		ElectricityFeeRatio:    in.ElectricityFeeRatio,
+		DailyRewardAmount:      in.DailyRewardAmount,
+		CommissionSettleType:   in.CommissionSettleType,
+		Descriptions:           in.Descriptions,
+		GoodBanner:             in.GoodBanner,
+		DisplayNames:           in.DisplayNames,
+		EnablePurchase:         in.EnablePurchase,
+		EnableProductPage:      in.EnableProductPage,
+		CancelMode:             in.CancelMode,
+		UserPurchaseLimit:      in.UserPurchaseLimit,
+		DisplayColors:          in.DisplayColors,
+		CancellableBeforeStart: in.CancellableBeforeStart,
+		ProductPage:            in.ProductPage,
 	})
 	if err != nil {
 		return nil, err
@@ -466,6 +471,7 @@ func getGoodInfos(
 			UserPurchaseLimit:       info.UserPurchaseLimit,
 			DisplayColors:           info.DisplayColors,
 			CancellableBeforeStart:  info.CancellableBeforeStart,
+			ProductPage:             info.ProductPage,
 		}
 
 		coinType, ok := ctMap[info.CoinTypeID]

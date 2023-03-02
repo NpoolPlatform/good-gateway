@@ -207,6 +207,7 @@ func (s *Server) CreateNAppGood(ctx context.Context, in *npool.CreateNAppGoodReq
 		in.UserPurchaseLimit,
 		in.DisplayColors,
 		in.CancellableBeforeStart,
+		in.ProductPage,
 	)
 	if err != nil {
 		logger.Sugar().Errorw("CreateNAppGood", "error", err)
