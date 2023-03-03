@@ -48,6 +48,7 @@ func CreateAppGood(
 	userPurchaseLimit *string, displayColors []string,
 	cancellableBeforeStart *uint32,
 	productPage *string,
+	enableSetCommission *bool,
 ) (*npool.Good, error) {
 	info, err := appgoodmwcli.CreateGood(ctx, &appgoodmgrpb.AppGoodReq{
 		AppID:                  &appID,
@@ -72,6 +73,7 @@ func CreateAppGood(
 		DisplayColors:          displayColors,
 		CancellableBeforeStart: cancellableBeforeStart,
 		ProductPage:            productPage,
+		EnableSetCommission:    enableSetCommission,
 	})
 	if err != nil {
 		return nil, err
@@ -152,6 +154,7 @@ func UpdateAppGood(ctx context.Context, in *npool.UpdateAppGoodRequest) (*npool.
 		DisplayColors:          in.DisplayColors,
 		CancellableBeforeStart: in.CancellableBeforeStart,
 		ProductPage:            in.ProductPage,
+		EnableSetCommission:    in.EnableSetCommission,
 	})
 	if err != nil {
 		return nil, err
@@ -472,6 +475,7 @@ func getGoodInfos(
 			DisplayColors:           info.DisplayColors,
 			CancellableBeforeStart:  info.CancellableBeforeStart,
 			ProductPage:             info.ProductPage,
+			EnableSetCommission:     info.EnableSetCommission,
 		}
 
 		coinType, ok := ctMap[info.CoinTypeID]

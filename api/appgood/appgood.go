@@ -208,6 +208,7 @@ func (s *Server) CreateNAppGood(ctx context.Context, in *npool.CreateNAppGoodReq
 		in.DisplayColors,
 		in.CancellableBeforeStart,
 		in.ProductPage,
+		in.EnableSetCommission,
 	)
 	if err != nil {
 		logger.Sugar().Errorw("CreateNAppGood", "error", err)
@@ -563,6 +564,7 @@ func (s *Server) UpdateNAppGood(ctx context.Context, in *npool.UpdateNAppGoodReq
 		UserPurchaseLimit:      in.UserPurchaseLimit,
 		DisplayColors:          in.DisplayColors,
 		CancellableBeforeStart: in.CancellableBeforeStart,
+		EnableSetCommission:    in.EnableSetCommission,
 	})
 	if err != nil {
 		logger.Sugar().Errorw("GetAppGood", "error", err)
