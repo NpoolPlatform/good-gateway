@@ -100,7 +100,17 @@ func (s *Server) CreateNAppGood(ctx context.Context, in *npool.CreateNAppGoodReq
 		return &npool.CreateNAppGoodResponse{}, status.Error(codes.InvalidArgument, "GoodID not exist")
 	}
 
-	if in.GetPrice() < good.GetPrice() {
+	price, err = decimal.NewFromString(in.GetPrice())
+	if err != nil {
+		logger.Sugar().Errorw("CreateNAppGood", "GoodID", in.GetGoodID())
+		return &npool.CreateNAppGoodResponse{}, status.Error(codes.InvalidArgument, err.Error())
+	}
+	goodPrice, err := decimal.NewFromString(good.GetPrice())
+	if err != nil {
+		logger.Sugar().Errorw("CreateNAppGood", "GoodID", in.GetGoodID())
+		return &npool.CreateNAppGoodResponse{}, status.Error(codes.InvalidArgument, err.Error())
+	}
+	if price.Cmp(goodPrice) < 0 {
 		logger.Sugar().Errorw(
 			"CreateNAppGood",
 			"GoodID",
@@ -111,6 +121,7 @@ func (s *Server) CreateNAppGood(ctx context.Context, in *npool.CreateNAppGoodReq
 			in.GetPrice(),
 		)
 		return &npool.CreateNAppGoodResponse{}, status.Error(codes.InvalidArgument, "price greater than platform price")
+
 	}
 
 	if in.SaleStartAt != nil && in.GetSaleStartAt() == 0 {
