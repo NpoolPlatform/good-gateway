@@ -139,7 +139,7 @@ func (s *Server) CreateNAppGood(ctx context.Context, in *npool.CreateNAppGoodReq
 		return nil, err
 	}
 	if coin == nil {
-		logger.Sugar().Errorw("CreateNAppGood", "GoodID", in.GetGoodID(), "CoinTypeID", good.CoinTypeID)
+		logger.Sugar().Errorw("CreateNAppGood", "AppID", in.GetTargetAppID(), "GoodID", in.GetGoodID(), "CoinTypeID", good.CoinTypeID)
 		return &npool.CreateNAppGoodResponse{}, status.Error(codes.InvalidArgument, "app coin is not exist")
 	}
 
