@@ -564,6 +564,7 @@ func (s *Server) UpdateNAppGood(ctx context.Context, in *npool.UpdateNAppGoodReq
 		UserPurchaseLimit:      in.UserPurchaseLimit,
 		DisplayColors:          in.DisplayColors,
 		CancellableBeforeStart: in.CancellableBeforeStart,
+		ProductPage:            in.ProductPage,
 		EnableSetCommission:    in.EnableSetCommission,
 	})
 	if err != nil {
