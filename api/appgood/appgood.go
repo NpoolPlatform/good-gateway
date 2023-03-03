@@ -101,7 +101,7 @@ func (s *Server) CreateNAppGood(ctx context.Context, in *npool.CreateNAppGoodReq
 	}
 
 	if in.GetPrice() < good.GetPrice() {
-		logger.Sugar().Errorw("CreateNAppGood", "GoodID", in.GetGoodID())
+		logger.Sugar().Errorw("CreateNAppGood", "GoodID", in.GetGoodID(), "Price", good.GetPrice())
 		return &npool.CreateNAppGoodResponse{}, status.Error(codes.InvalidArgument, "price greater than platform price")
 	}
 
