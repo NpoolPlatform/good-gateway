@@ -200,6 +200,7 @@ func GetCoinType(ctx context.Context) (map[string]*coininfopb.Coin, error) {
 }
 
 func ScanCoinType(info *goodmwpb.Good, coinMap map[string]*coininfopb.Coin) (*npool.Good, error) {
+
 	supportCoins := []*npool.Good_CoinInfo{}
 	for _, val := range info.SupportCoinTypeIDs {
 		subCoinTypeM, ok := coinMap[val]
@@ -262,7 +263,7 @@ func ScanCoinType(info *goodmwpb.Good, coinMap map[string]*coininfopb.Coin) (*np
 	if ok {
 		good.CoinLogo = coinTypeM.Logo
 		good.CoinName = coinTypeM.Name
-		good.Unit = coinTypeM.Unit
+		good.CoinUnit = coinTypeM.Unit
 		good.CoinPreSale = coinTypeM.Presale
 	}
 
