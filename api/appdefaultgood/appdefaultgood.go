@@ -30,6 +30,8 @@ import (
 
 	appcoininfocli "github.com/NpoolPlatform/chain-middleware/pkg/client/appcoin"
 	appcoininfopb "github.com/NpoolPlatform/message/npool/chain/mw/v1/appcoin"
+
+	appdefaultgood1 "github.com/NpoolPlatform/good-gateway/pkg/appdefaultgood"
 )
 
 func validate(ctx context.Context, in *npool.CreateAppDefaultGoodRequest) error {
@@ -134,13 +136,8 @@ func (s *Server) CreateNAppDefaultGood(
 		logger.Sugar().Errorw("CreateNAppDefaultGood", "CoinTypeID", in.GetCoinTypeID(), "error", err)
 		return &npool.CreateNAppDefaultGoodResponse{}, status.Error(codes.InvalidArgument, err.Error())
 	}
-	info, err := appdefaultgoodmgrcli.CreateAppDefaultGood(
-		ctx,
-		&appdefaultgoodmgrpb.AppDefaultGoodReq{
-			AppID:      &in.TargetAppID,
-			GoodID:     &in.GoodID,
-			CoinTypeID: &in.CoinTypeID,
-		},
+	info, err := appdefaultgood1.CreateAppDefaultGood(
+		ctx, in.GetTargetAppID(), in.GetGoodID(), in.GetCoinTypeID(),
 	)
 	if err != nil {
 		logger.Sugar().Errorw("CreateNAppDefaultGood", "error", err)
@@ -176,13 +173,8 @@ func (s *Server) CreateAppDefaultGood(
 		return &npool.CreateAppDefaultGoodResponse{}, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	info, err := appdefaultgoodmgrcli.CreateAppDefaultGood(
-		ctx,
-		&appdefaultgoodmgrpb.AppDefaultGoodReq{
-			AppID:      &in.AppID,
-			GoodID:     &in.GoodID,
-			CoinTypeID: &in.CoinTypeID,
-		},
+	info, err := appdefaultgood1.CreateAppDefaultGood(
+		ctx, in.GetAppID(), in.GetGoodID(), in.GetCoinTypeID(),
 	)
 	if err != nil {
 		logger.Sugar().Errorw("CreateAppDefaultGood", "error", err)
@@ -220,12 +212,7 @@ func (s *Server) GetAppDefaultGoods(
 		return &npool.GetAppDefaultGoodsResponse{}, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	infos, total, err := appdefaultgoodmgrcli.GetAppDefaultGoods(ctx, &appdefaultgoodmgrpb.Conds{
-		AppID: &npoolpb.StringVal{
-			Op:    cruder.EQ,
-			Value: in.GetAppID(),
-		},
-	}, in.GetOffset(), in.GetLimit())
+	infos, total, err := appdefaultgood1.GetAppDefaultGoods(ctx, in.GetAppID(), in.GetOffset(), in.GetLimit())
 	if err != nil {
 		logger.Sugar().Errorw("GetAppDefaultGoods", "error", err)
 		return &npool.GetAppDefaultGoodsResponse{}, status.Error(codes.Internal, err.Error())
@@ -263,12 +250,7 @@ func (s *Server) GetNAppDefaultGoods(
 		return &npool.GetNAppDefaultGoodsResponse{}, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	infos, total, err := appdefaultgoodmgrcli.GetAppDefaultGoods(ctx, &appdefaultgoodmgrpb.Conds{
-		AppID: &npoolpb.StringVal{
-			Op:    cruder.EQ,
-			Value: in.GetTargetAppID(),
-		},
-	}, in.GetOffset(), in.GetLimit())
+	infos, total, err := appdefaultgood1.GetAppDefaultGoods(ctx, in.GetTargetAppID(), in.GetOffset(), in.GetLimit())
 	if err != nil {
 		logger.Sugar().Errorw("GetAppDefaultGoods", "error", err)
 		return &npool.GetNAppDefaultGoodsResponse{}, status.Error(codes.Internal, err.Error())
@@ -306,7 +288,7 @@ func (s *Server) DeleteAppDefaultGood(
 		return &npool.DeleteAppDefaultGoodResponse{}, status.Error(codes.PermissionDenied, "permission denied")
 	}
 
-	info, err := appdefaultgoodmgrcli.DeleteAppDefaultGood(ctx, in.GetID())
+	info, err := appdefaultgood1.DeleteAppDefaultGood(ctx, in.GetID())
 	if err != nil {
 		return &npool.DeleteAppDefaultGoodResponse{}, status.Error(codes.Internal, err.Error())
 	}
