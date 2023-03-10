@@ -226,23 +226,23 @@ spec:
               serviceName: good-gateway
               servicePort: 50550
 
-          - path: /v1/create/appdefaultgood
+          - path: /api/good/v1/create/appdefaultgood
             backend:
               serviceName: good-gateway
               servicePort: 50550
-          - path: /v1/create/n/appdefaultgood
+          - path: /api/good/v1/create/n/appdefaultgood
             backend:
               serviceName: good-gateway
               servicePort: 50550
-          - path: /v1/get/appdefaultgoods
+          - path: /api/good/v1/get/appdefaultgoods
             backend:
               serviceName: good-gateway
               servicePort: 50550
-          - path: /v1/get/n/appdefaultgoods
+          - path: /api/good/v1/get/n/appdefaultgoods
             backend:
               serviceName: good-gateway
               servicePort: 50550
-          - path: /v1/delete/appdefaultgoods
+          - path: /api/good/v1/delete/appdefaultgoods
             backend:
               serviceName: good-gateway
               servicePort: 50550
