@@ -102,6 +102,25 @@ func validate(ctx context.Context, in *npool.CreateAppDefaultGoodRequest) error 
 		logger.Sugar().Errorw("validate", "GoodID", in.GetGoodID())
 		return fmt.Errorf("app default good already exist")
 	}
+
+	exist, err = appdefaultgoodmgrcli.ExistAppDefaultGoodConds(ctx, &appdefaultgoodmgrpb.Conds{
+		AppID: &npoolpb.StringVal{
+			Op:    cruder.EQ,
+			Value: in.GetAppID(),
+		},
+		GoodID: &npoolpb.StringVal{
+			Op:    cruder.EQ,
+			Value: in.GetGoodID(),
+		},
+	})
+	if err != nil {
+		logger.Sugar().Errorw("validate", "GoodID", in.GetGoodID(), "error", err)
+		return err
+	}
+	if exist {
+		logger.Sugar().Errorw("validate", "GoodID", in.GetGoodID())
+		return fmt.Errorf("app default good already exist")
+	}
 	return nil
 }
 
