@@ -10,7 +10,7 @@ import (
 	npool "github.com/NpoolPlatform/message/npool/good/gw/v1/appdefaultgood"
 	appdefaultgoodmgrpb "github.com/NpoolPlatform/message/npool/good/mgr/v1/appdefaultgood"
 
-	coincli "github.com/NpoolPlatform/chain-middleware/pkg/coin"
+	coincli "github.com/NpoolPlatform/chain-middleware/pkg/client/coin"
 	appdefaultgoodmgrcli "github.com/NpoolPlatform/good-manager/pkg/client/appdefaultgood"
 
 	coinpb "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin"
@@ -76,7 +76,12 @@ func GetAppDefaultGoods(ctx context.Context, appID string, offset, limit int32) 
 	for _, id := range rows {
 		coinTypeIDs = append(coinTypeIDs, id.CoinTypeID)
 	}
-	coinInfos, err := coincli.GetManyCoins(ctx, coinTypeIDs)
+	coinInfos, _, err := coincli.GetCoins(ctx, &coinpb.Conds{
+		IDs: &commonpb.StringSliceVal{
+			Op:    cruder.EQ,
+			Value: coinTypeIDs,
+		},
+	}, 0, int32(len(coinTypeIDs)))
 	if err != nil {
 		return nil, 0, err
 	}
