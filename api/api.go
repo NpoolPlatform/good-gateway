@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"github.com/NpoolPlatform/good-gateway/api/appdefaultgood"
 
 	"github.com/NpoolPlatform/good-gateway/api/promotion"
 	"github.com/NpoolPlatform/good-gateway/api/recommend"
@@ -31,6 +32,7 @@ func Register(server grpc.ServiceRegistrar) {
 	vendorlocation.Register(server)
 	promotion.Register(server)
 	recommend.Register(server)
+	appdefaultgood.Register(server)
 }
 
 func RegisterGateway(mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) error {
@@ -56,6 +58,9 @@ func RegisterGateway(mux *runtime.ServeMux, endpoint string, opts []grpc.DialOpt
 		return err
 	}
 	if err := recommend.RegisterGateway(mux, endpoint, opts); err != nil {
+		return err
+	}
+	if err := appdefaultgood.RegisterGateway(mux, endpoint, opts); err != nil {
 		return err
 	}
 	return nil
