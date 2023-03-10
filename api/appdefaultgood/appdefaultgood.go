@@ -89,10 +89,6 @@ func validate(ctx context.Context, in *npool.CreateAppDefaultGoodRequest) error 
 			Op:    cruder.EQ,
 			Value: in.GetAppID(),
 		},
-		GoodID: &npoolpb.StringVal{
-			Op:    cruder.EQ,
-			Value: in.GetGoodID(),
-		},
 		CoinTypeID: &npoolpb.StringVal{
 			Op:    cruder.EQ,
 			Value: in.GetCoinTypeID(),
