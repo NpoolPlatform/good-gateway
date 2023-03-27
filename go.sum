@@ -65,8 +65,8 @@ github.com/NpoolPlatform/good-middleware v0.0.0-20230307083138-b7c4220e0746 h1:1
 github.com/NpoolPlatform/good-middleware v0.0.0-20230307083138-b7c4220e0746/go.mod h1:8C7LyQenhTtAM7QUKtasCXpFzzYfOJTp3d3/hLja1Zo=
 github.com/NpoolPlatform/libent-cruder v0.0.0-20221109023947-366125b690fb h1:IAQOJ0xQWdJS1BnimNdM6GZMLgTL/FnIa8C8K4xffUA=
 github.com/NpoolPlatform/libent-cruder v0.0.0-20221109023947-366125b690fb/go.mod h1:zvvqlRwbOdTUauPQ9dFDhDuxa91ILV0CQfVdPBZj+eA=
-github.com/NpoolPlatform/message v0.0.0-20230310102624-1f557d24945e h1:JHYK4YI7vlAEJBDeeINLjwEu/FGl6NMGkYUxXhO/XzE=
-github.com/NpoolPlatform/message v0.0.0-20230310102624-1f557d24945e/go.mod h1:bblNegLa6PLnrfbc7MEzwa1pjQOjJ8vJ/5K497ckiig=
+github.com/NpoolPlatform/message v0.0.0-20230327090631-2d5bb6ddcaff h1:3s5Uc9DrRzqXGS8C3Cm5g/nLOsvczKJzredzRX7EJiI=
+github.com/NpoolPlatform/message v0.0.0-20230327090631-2d5bb6ddcaff/go.mod h1:bblNegLa6PLnrfbc7MEzwa1pjQOjJ8vJ/5K497ckiig=
 github.com/NpoolPlatform/order-manager v0.0.0-20230226024220-9751e14c7cf9 h1:Ht27+vZlQku5Aq6wd7OpEEoVWva0kqedtMpN1AoLnGI=
 github.com/NpoolPlatform/order-middleware v0.0.0-20230226025300-b335a4be0fbb h1:rSJB/xXxpI9aItCTRYxah0ogndNGUz0+TUm6zeqOs1Y=
 github.com/NpoolPlatform/order-middleware v0.0.0-20230226025300-b335a4be0fbb/go.mod h1:VzoppBpQZX3cEBuaUWyFd8bQm2gyqRmLvM1dXz79xko=

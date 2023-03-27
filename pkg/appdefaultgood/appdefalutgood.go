@@ -31,6 +31,20 @@ func CreateAppDefaultGood(
 	return GetAppDefaultGood(ctx, info.ID)
 }
 
+func UpdateAppDefaultGood(
+	ctx context.Context,
+	id, goodID string,
+) (*npool.AppDefaultGood, error) {
+	info, err := appdefaultgoodmgrcli.UpdateAppDefaultGood(ctx, &appdefaultgoodmgrpb.AppDefaultGoodReq{
+		ID:     &id,
+		GoodID: &goodID,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return GetAppDefaultGood(ctx, info.ID)
+}
+
 func DeleteAppDefaultGood(
 	ctx context.Context,
 	id string,
