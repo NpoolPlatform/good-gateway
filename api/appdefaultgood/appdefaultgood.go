@@ -277,6 +277,118 @@ func (s *Server) GetNAppDefaultGoods(
 	}, nil
 }
 
+func (s *Server) UpdateAppDefaultGood(
+	ctx context.Context,
+	in *npool.UpdateAppDefaultGoodRequest,
+) (
+	*npool.UpdateAppDefaultGoodResponse,
+	error,
+) {
+	if _, err := uuid.Parse(in.GetID()); err != nil {
+		logger.Sugar().Errorw("validate", "ID", in.GetID(), "error", err)
+		return &npool.UpdateAppDefaultGoodResponse{}, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	if _, err := uuid.Parse(in.GetAppID()); err != nil {
+		logger.Sugar().Errorw("validate", "AppID", in.GetAppID(), "error", err)
+		return &npool.UpdateAppDefaultGoodResponse{}, status.Error(codes.InvalidArgument, err.Error())
+	}
+	row, err := appdefaultgoodmgrcli.GetAppDefaultGood(ctx, in.GetID())
+	if err != nil {
+		logger.Sugar().Errorw("validate", "AppID", in.GetAppID(), "error", err)
+		return &npool.UpdateAppDefaultGoodResponse{}, status.Error(codes.Internal, err.Error())
+	}
+	if row.GetAppID() != in.GetAppID() {
+		logger.Sugar().Errorw("validate", "AppID", in.GetAppID(), "error", "permission denied")
+		return &npool.UpdateAppDefaultGoodResponse{}, status.Error(codes.PermissionDenied, "permission denied")
+	}
+
+	if row.GetGoodID() != in.GetGoodID() {
+		exist, err := appgoodmgrcli.ExistAppGoodConds(ctx, &appgoodmgrpb.Conds{
+			AppID: &npoolpb.StringVal{
+				Op:    cruder.EQ,
+				Value: in.GetAppID(),
+			},
+			GoodID: &npoolpb.StringVal{
+				Op:    cruder.EQ,
+				Value: in.GetGoodID(),
+			},
+		})
+		if err != nil {
+			logger.Sugar().Errorw("validate", "GoodID", in.GetGoodID(), "error", err)
+			return &npool.UpdateAppDefaultGoodResponse{}, status.Error(codes.Internal, err.Error())
+		}
+		if !exist {
+			logger.Sugar().Errorw("validate", "GoodID", in.GetGoodID())
+			return &npool.UpdateAppDefaultGoodResponse{}, status.Error(codes.Internal, "good is not exist")
+		}
+	}
+	info, err := appdefaultgood1.UpdateAppDefaultGood(ctx, in.GetID(), in.GetGoodID())
+	if err != nil {
+		return &npool.UpdateAppDefaultGoodResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
+	return &npool.UpdateAppDefaultGoodResponse{
+		Info: info,
+	}, nil
+}
+
+func (s *Server) UpdateNAppDefaultGood(
+	ctx context.Context,
+	in *npool.UpdateNAppDefaultGoodRequest,
+) (
+	*npool.UpdateNAppDefaultGoodResponse,
+	error,
+) {
+	if _, err := uuid.Parse(in.GetID()); err != nil {
+		logger.Sugar().Errorw("validate", "ID", in.GetID(), "error", err)
+		return &npool.UpdateNAppDefaultGoodResponse{}, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	if _, err := uuid.Parse(in.GetTargetAppID()); err != nil {
+		logger.Sugar().Errorw("validate", "TargetAppID", in.GetTargetAppID(), "error", err)
+		return &npool.UpdateNAppDefaultGoodResponse{}, status.Error(codes.InvalidArgument, err.Error())
+	}
+	row, err := appdefaultgoodmgrcli.GetAppDefaultGood(ctx, in.GetID())
+	if err != nil {
+		logger.Sugar().Errorw("validate", "TargetAppID", in.GetTargetAppID(), "error", err)
+		return &npool.UpdateNAppDefaultGoodResponse{}, status.Error(codes.Internal, err.Error())
+	}
+	if row.GetAppID() != in.GetTargetAppID() {
+		logger.Sugar().Errorw("validate", "TargetAppID", in.GetTargetAppID(), "error", "permission denied")
+		return &npool.UpdateNAppDefaultGoodResponse{}, status.Error(codes.PermissionDenied, "permission denied")
+	}
+
+	if row.GetGoodID() != in.GetGoodID() {
+		exist, err := appgoodmgrcli.ExistAppGoodConds(ctx, &appgoodmgrpb.Conds{
+			AppID: &npoolpb.StringVal{
+				Op:    cruder.EQ,
+				Value: in.GetTargetAppID(),
+			},
+			GoodID: &npoolpb.StringVal{
+				Op:    cruder.EQ,
+				Value: in.GetGoodID(),
+			},
+		})
+		if err != nil {
+			logger.Sugar().Errorw("validate", "GoodID", in.GetGoodID(), "error", err)
+			return &npool.UpdateNAppDefaultGoodResponse{}, status.Error(codes.Internal, err.Error())
+		}
+		if !exist {
+			logger.Sugar().Errorw("validate", "GoodID", in.GetGoodID())
+			return &npool.UpdateNAppDefaultGoodResponse{}, status.Error(codes.Internal, "good is not exist")
+		}
+	}
+	info, err := appdefaultgood1.UpdateAppDefaultGood(ctx, in.GetID(), in.GetGoodID())
+	if err != nil {
+		return &npool.UpdateNAppDefaultGoodResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
+	return &npool.UpdateNAppDefaultGoodResponse{
+		Info: info,
+	}, nil
+}
+
 func (s *Server) DeleteAppDefaultGood(
 	ctx context.Context,
 	in *npool.DeleteAppDefaultGoodRequest,
