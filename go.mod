@@ -8,11 +8,11 @@ require (
 	github.com/NpoolPlatform/basal-middleware v0.0.0-20230221094657-688f81366495
 	github.com/NpoolPlatform/chain-middleware v0.0.0-20230216025740-e05d9f4b4fe0
 	github.com/NpoolPlatform/go-service-framework v0.0.0-20221102072657-7fcc5e6f1012
-	github.com/NpoolPlatform/good-manager v0.0.0-20230303151225-8c3dc117497f
-	github.com/NpoolPlatform/good-middleware v0.0.0-20230303155006-242e91f361dc
+	github.com/NpoolPlatform/good-manager v0.0.0-20230329074643-f68de0b2b1eb
+	github.com/NpoolPlatform/good-middleware v0.0.0-20230329083545-39324dec7ff3
 	github.com/NpoolPlatform/libent-cruder v0.0.0-20221109023947-366125b690fb
-	github.com/NpoolPlatform/message v0.0.0-20230316133715-23961236f164
-	github.com/NpoolPlatform/order-middleware v0.0.0-20230309092635-1de3cca96920
+	github.com/NpoolPlatform/message v0.0.0-20230329064500-da8e14fda821
+	github.com/NpoolPlatform/order-middleware v0.0.0-20230226025300-b335a4be0fbb
 	github.com/go-resty/resty/v2 v2.7.0
 	github.com/google/uuid v1.3.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.10.0
@@ -27,7 +27,6 @@ require (
 
 require (
 	ariga.io/atlas v0.7.2-0.20220927111110-867ee0cca56a // indirect
-	cloud.google.com/go/compute/metadata v0.2.3 // indirect
 	entgo.io/ent v0.11.3 // indirect
 	github.com/Shonminh/apollo-client v0.4.0 // indirect
 	github.com/agext/levenshtein v1.2.1 // indirect
