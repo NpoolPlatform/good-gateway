@@ -53,7 +53,14 @@ func DeleteAppDefaultGood(
 	if err != nil {
 		return nil, err
 	}
-	return GetAppDefaultGood(ctx, info.ID)
+	return &npool.AppDefaultGood{
+		ID:         info.ID,
+		AppID:      info.AppID,
+		GoodID:     info.GoodID,
+		CoinTypeID: info.CoinTypeID,
+		CreatedAt:  info.CreatedAt,
+		UpdatedAt:  info.UpdatedAt,
+	}, nil
 }
 
 func GetAppDefaultGood(ctx context.Context, id string) (*npool.AppDefaultGood, error) {
