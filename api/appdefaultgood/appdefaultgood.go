@@ -274,6 +274,12 @@ func (s *Server) UpdateAppDefaultGood(
 		logger.Sugar().Errorw("validate", "AppID", in.GetAppID(), "error", err)
 		return &npool.UpdateAppDefaultGoodResponse{}, status.Error(codes.InvalidArgument, err.Error())
 	}
+
+	if _, err := uuid.Parse(in.GetGoodID()); err != nil {
+		logger.Sugar().Errorw("validate", "GoodID", in.GetGoodID(), "error", err)
+		return &npool.UpdateAppDefaultGoodResponse{}, status.Error(codes.InvalidArgument, err.Error())
+	}
+
 	row, err := appdefaultgoodmgrcli.GetAppDefaultGood(ctx, in.GetID())
 	if err != nil {
 		logger.Sugar().Errorw("validate", "AppID", in.GetAppID(), "error", err)
