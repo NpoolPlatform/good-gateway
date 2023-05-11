@@ -32,7 +32,7 @@ import (
 
 	promotionm "github.com/NpoolPlatform/good-gateway/pkg/promotion"
 
-	appmgrcli "github.com/NpoolPlatform/appuser-manager/pkg/client/app"
+	appmwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/app"
 )
 
 // nolint
@@ -314,7 +314,7 @@ func (s *Server) CreateAppPromotion(ctx context.Context, in *npool.CreateAppProm
 		return &npool.CreateAppPromotionResponse{}, status.Error(codes.InvalidArgument, "App Good not exist")
 	}
 
-	app, err := appmgrcli.GetApp(ctx, in.GetTargetAppID())
+	app, err := appmwcli.GetApp(ctx, in.GetTargetAppID())
 	if err != nil {
 		logger.Sugar().Errorw("validate", "error", err)
 		return &npool.CreateAppPromotionResponse{}, status.Error(codes.InvalidArgument, err.Error())
@@ -665,7 +665,7 @@ func (s *Server) UpdateAppPromotion(ctx context.Context, in *npool.UpdateAppProm
 		}
 	}
 
-	app, err := appmgrcli.GetApp(ctx, in.GetTargetAppID())
+	app, err := appmwcli.GetApp(ctx, in.GetTargetAppID())
 	if err != nil {
 		logger.Sugar().Errorw("validate", "error", err)
 		return &npool.UpdateAppPromotionResponse{}, status.Error(codes.InvalidArgument, err.Error())

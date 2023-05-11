@@ -14,6 +14,7 @@ import (
 
 	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 	commonpb "github.com/NpoolPlatform/message/npool"
+	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 
 	ordermgrpb "github.com/NpoolPlatform/message/npool/order/mgr/v1/order"
 	ordermwpb "github.com/NpoolPlatform/message/npool/order/mw/v1/order"
@@ -26,8 +27,8 @@ import (
 
 	appgoodmwcli "github.com/NpoolPlatform/good-middleware/pkg/client/appgood"
 
-	appusermwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/user"
-	appusermwpb "github.com/NpoolPlatform/message/npool/appuser/mw/v1/user"
+	usermwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/user"
+	usermwpb "github.com/NpoolPlatform/message/npool/appuser/mw/v1/user"
 
 	commmgrpb "github.com/NpoolPlatform/message/npool/inspire/mgr/v1/commission"
 
@@ -266,16 +267,18 @@ func Scans(ctx context.Context, infos []*goodmwpb.Good, appID string) ([]*npool.
 		goodIDs = append(goodIDs, val.GoodID)
 	}
 
-	userInfos := []*appusermwpb.User{}
+	userInfos := []*usermwpb.User{}
 
 	if len(userIDs) > 0 {
-		userInfos, _, err = appusermwcli.GetManyUsers(ctx, userIDs)
+		userInfos, _, err = usermwcli.GetUsers(ctx, &usermwpb.Conds{
+			IDs: &basetypes.StringSliceVal{Op: cruder.IN, Value: userIDs},
+		}, 0, int32(len(userIDs)))
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	userMap := map[string]*appusermwpb.User{}
+	userMap := map[string]*usermwpb.User{}
 	for _, userInfo := range userInfos {
 		userMap[userInfo.ID] = userInfo
 	}
@@ -302,7 +305,7 @@ func Scans(ctx context.Context, infos []*goodmwpb.Good, appID string) ([]*npool.
 func getSubGoods(
 	ctx context.Context,
 	ctMap map[string]*appcoinpb.Coin,
-	userMap map[string]*appusermwpb.User,
+	userMap map[string]*usermwpb.User,
 	goodIDs []string,
 	appID string,
 ) (map[string][]*npool.Good, error) {
@@ -363,7 +366,7 @@ func getSubGoods(
 
 func getGoodInfos(
 	ctMap map[string]*appcoinpb.Coin,
-	userMap map[string]*appusermwpb.User,
+	userMap map[string]*usermwpb.User,
 	infos []*goodmwpb.Good,
 ) []*npool.Good {
 
