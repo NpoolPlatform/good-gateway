@@ -5,8 +5,8 @@ import (
 	"context"
 	"fmt"
 
-	appmgrcli "github.com/NpoolPlatform/appuser-manager/pkg/client/app"
-	appusermgrcli "github.com/NpoolPlatform/appuser-manager/pkg/client/appuser"
+	appmwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/app"
+	usermwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/user"
 
 	mgrcli "github.com/NpoolPlatform/good-manager/pkg/client/recommend"
 
@@ -87,7 +87,7 @@ func (s *Server) CreateRecommend(ctx context.Context, in *npool.CreateRecommendR
 		return &npool.CreateRecommendResponse{}, status.Error(codes.InvalidArgument, "App Good is not found")
 	}
 
-	exist, err = appusermgrcli.ExistAppUser(ctx, in.GetRecommenderID())
+	exist, err = usermwcli.ExistUser(ctx, in.GetAppID(), in.GetRecommenderID())
 	if err != nil {
 		logger.Sugar().Errorw("CreateGood", "error", err)
 		return &npool.CreateRecommendResponse{}, status.Error(codes.Internal, err.Error())
@@ -145,7 +145,7 @@ func (s *Server) CreateAppRecommend(ctx context.Context, in *npool.CreateAppReco
 		return &npool.CreateAppRecommendResponse{}, status.Error(codes.InvalidArgument, fmt.Sprintf("Message is empty"))
 	}
 
-	app, err := appmgrcli.GetApp(ctx, in.GetTargetAppID())
+	app, err := appmwcli.GetApp(ctx, in.GetTargetAppID())
 	if err != nil {
 		logger.Sugar().Errorw("validate", "error", err)
 		return &npool.CreateAppRecommendResponse{}, status.Error(codes.InvalidArgument, err.Error())
@@ -176,7 +176,7 @@ func (s *Server) CreateAppRecommend(ctx context.Context, in *npool.CreateAppReco
 		return &npool.CreateAppRecommendResponse{}, status.Error(codes.InvalidArgument, "App Good not exist")
 	}
 
-	exist, err = appusermgrcli.ExistAppUser(ctx, in.GetRecommenderID())
+	exist, err = usermwcli.ExistUser(ctx, in.GetTargetAppID(), in.GetRecommenderID())
 	if err != nil {
 		logger.Sugar().Errorw("CreateGood", "error", err)
 		return &npool.CreateAppRecommendResponse{}, status.Error(codes.Internal, err.Error())
@@ -341,7 +341,7 @@ func (s *Server) UpdateAppRecommend(ctx context.Context, in *npool.UpdateAppReco
 		return &npool.UpdateAppRecommendResponse{}, status.Error(codes.InvalidArgument, fmt.Sprintf("GetAppID is invalid: %v", err))
 	}
 
-	app, err := appmgrcli.GetApp(ctx, in.GetTargetAppID())
+	app, err := appmwcli.GetApp(ctx, in.GetTargetAppID())
 	if err != nil {
 		logger.Sugar().Errorw("validate", "error", err)
 		return &npool.UpdateAppRecommendResponse{}, status.Error(codes.InvalidArgument, err.Error())

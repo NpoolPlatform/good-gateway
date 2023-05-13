@@ -4,7 +4,7 @@ package appgood
 import (
 	"context"
 
-	appmgrcli "github.com/NpoolPlatform/appuser-manager/pkg/client/app"
+	appmwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/app"
 	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 	npoolpb "github.com/NpoolPlatform/message/npool"
 	appgoodmgrpb "github.com/NpoolPlatform/message/npool/good/mgr/v1/appgood"
@@ -181,7 +181,7 @@ func (s *Server) CreateNAppGood(ctx context.Context, in *npool.CreateNAppGoodReq
 		return &npool.CreateNAppGoodResponse{}, status.Error(codes.InvalidArgument, "Good is already exist")
 	}
 
-	exist, err = appmgrcli.ExistApp(ctx, in.GetTargetAppID())
+	exist, err = appmwcli.ExistApp(ctx, in.GetTargetAppID())
 	if err != nil {
 		logger.Sugar().Errorw("CreateNAppGood", "err", err)
 		return &npool.CreateNAppGoodResponse{}, status.Error(codes.Internal, err.Error())
@@ -492,7 +492,7 @@ func (s *Server) UpdateNAppGood(ctx context.Context, in *npool.UpdateNAppGoodReq
 		return &npool.UpdateNAppGoodResponse{}, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	app, err := appmgrcli.GetApp(ctx, in.GetTargetAppID())
+	app, err := appmwcli.GetApp(ctx, in.GetTargetAppID())
 	if err != nil {
 		logger.Sugar().Errorw("validate", "error", err)
 		return &npool.UpdateNAppGoodResponse{}, status.Error(codes.InvalidArgument, err.Error())

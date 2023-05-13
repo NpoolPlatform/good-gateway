@@ -11,12 +11,13 @@ import (
 
 	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 	npoolpb "github.com/NpoolPlatform/message/npool"
+	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 	mgrpb "github.com/NpoolPlatform/message/npool/good/mgr/v1/recommend"
 
 	npool "github.com/NpoolPlatform/message/npool/good/gw/v1/recommend"
 
-	appusermwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/user"
-	appusermwpb "github.com/NpoolPlatform/message/npool/appuser/mw/v1/user"
+	usermwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/user"
+	usermwpb "github.com/NpoolPlatform/message/npool/appuser/mw/v1/user"
 )
 
 func CreateRecommend(ctx context.Context, in *npool.CreateRecommendRequest) (*npool.Recommend, error) {
@@ -85,12 +86,14 @@ func GetRecommends(ctx context.Context, appID string, offset, limit int32) ([]*n
 		goodMap[val.ID] = val
 	}
 
-	users, _, err := appusermwcli.GetManyUsers(ctx, userIDs)
+	users, _, err := usermwcli.GetUsers(ctx, &usermwpb.Conds{
+		IDs: &basetypes.StringSliceVal{Op: cruder.IN, Value: userIDs},
+	}, 0, int32(len(userIDs)))
 	if err != nil {
 		return nil, 0, err
 	}
 
-	userMap := map[string]*appusermwpb.User{}
+	userMap := map[string]*usermwpb.User{}
 	for _, val := range users {
 		userMap[val.ID] = val
 	}
@@ -152,7 +155,7 @@ func GetRecommend(ctx context.Context, id string) (*npool.Recommend, error) {
 		recommend.GoodName = good.Title
 	}
 
-	user, err := appusermwcli.GetUser(ctx, info.AppID, info.RecommenderID)
+	user, err := usermwcli.GetUser(ctx, info.AppID, info.RecommenderID)
 	if err != nil {
 		return nil, err
 	}
