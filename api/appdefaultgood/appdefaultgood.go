@@ -10,6 +10,7 @@ import (
 
 	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 	npoolpb "github.com/NpoolPlatform/message/npool"
+	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 	appdefaultgoodmgrpb "github.com/NpoolPlatform/message/npool/good/mgr/v1/appdefaultgood"
 
 	constant "github.com/NpoolPlatform/good-middleware/pkg/message/const"
@@ -28,8 +29,8 @@ import (
 
 	appdefaultgoodmgrcli "github.com/NpoolPlatform/good-manager/pkg/client/appdefaultgood"
 
-	appcoininfocli "github.com/NpoolPlatform/chain-middleware/pkg/client/appcoin"
-	appcoininfopb "github.com/NpoolPlatform/message/npool/chain/mw/v1/appcoin"
+	appcoinmwcli "github.com/NpoolPlatform/chain-middleware/pkg/client/app/coin"
+	appcoinmwpb "github.com/NpoolPlatform/message/npool/chain/mw/v1/app/coin"
 
 	appdefaultgood1 "github.com/NpoolPlatform/good-gateway/pkg/appdefaultgood"
 )
@@ -47,12 +48,12 @@ func validate(ctx context.Context, in *npool.CreateAppDefaultGoodRequest) error 
 		logger.Sugar().Errorw("validate", "CoinTypeID", in.GetCoinTypeID(), "error", err)
 		return err
 	}
-	coin, err := appcoininfocli.GetCoinOnly(ctx, &appcoininfopb.Conds{
-		AppID: &npoolpb.StringVal{
+	coin, err := appcoinmwcli.GetCoinOnly(ctx, &appcoinmwpb.Conds{
+		AppID: &basetypes.StringVal{
 			Op:    cruder.EQ,
 			Value: in.GetAppID(),
 		},
-		CoinTypeID: &npoolpb.StringVal{
+		CoinTypeID: &basetypes.StringVal{
 			Op:    cruder.EQ,
 			Value: in.GetCoinTypeID(),
 		},

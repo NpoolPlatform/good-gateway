@@ -7,6 +7,7 @@ import (
 	appmwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/app"
 	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 	npoolpb "github.com/NpoolPlatform/message/npool"
+	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 	appgoodmgrpb "github.com/NpoolPlatform/message/npool/good/mgr/v1/appgood"
 
 	"github.com/shopspring/decimal"
@@ -31,8 +32,8 @@ import (
 
 	appgoodmgrcli "github.com/NpoolPlatform/good-manager/pkg/client/appgood"
 
-	appcoininfocli "github.com/NpoolPlatform/chain-middleware/pkg/client/appcoin"
-	appcoininfopb "github.com/NpoolPlatform/message/npool/chain/mw/v1/appcoin"
+	appcoinmwcli "github.com/NpoolPlatform/chain-middleware/pkg/client/app/coin"
+	appcoinmwpb "github.com/NpoolPlatform/message/npool/chain/mw/v1/app/coin"
 )
 
 // nolint
@@ -144,12 +145,12 @@ func (s *Server) CreateNAppGood(ctx context.Context, in *npool.CreateNAppGoodReq
 		return &npool.CreateNAppGoodResponse{}, status.Error(codes.InvalidArgument, "SaleEndAt <= SaleStartAt")
 	}
 
-	coin, err := appcoininfocli.GetCoinOnly(ctx, &appcoininfopb.Conds{
-		AppID: &npoolpb.StringVal{
+	coin, err := appcoinmwcli.GetCoinOnly(ctx, &appcoinmwpb.Conds{
+		AppID: &basetypes.StringVal{
 			Op:    cruder.EQ,
 			Value: in.GetTargetAppID(),
 		},
-		CoinTypeID: &npoolpb.StringVal{
+		CoinTypeID: &basetypes.StringVal{
 			Op:    cruder.EQ,
 			Value: good.CoinTypeID,
 		},
