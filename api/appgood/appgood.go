@@ -193,13 +193,15 @@ func (s *Server) CreateNAppGood(ctx context.Context, in *npool.CreateNAppGoodReq
 		return &npool.CreateNAppGoodResponse{}, status.Error(codes.InvalidArgument, "AppID is not exist")
 	}
 
-	switch in.GetCancelMode() {
-	case appgoodmgrpb.CancelMode_CancellableBeforeStart:
-	case appgoodmgrpb.CancelMode_CancellableBeforeBenefit:
-	case appgoodmgrpb.CancelMode_Uncancellable:
-	default:
-		logger.Sugar().Errorw("UpdateNAppGood", "CancelMode", in.GetCancelMode())
-		return &npool.CreateNAppGoodResponse{}, status.Error(codes.InvalidArgument, "CancelMode is invalid")
+	if in.CancelMode != nil {
+		switch in.GetCancelMode() {
+		case appgoodmgrpb.CancelMode_CancellableBeforeStart:
+		case appgoodmgrpb.CancelMode_CancellableBeforeBenefit:
+		case appgoodmgrpb.CancelMode_Uncancellable:
+		default:
+			logger.Sugar().Errorw("UpdateNAppGood", "CancelMode", in.GetCancelMode())
+			return &npool.CreateNAppGoodResponse{}, status.Error(codes.InvalidArgument, "CancelMode is invalid")
+		}
 	}
 
 	span = commontracer.TraceInvoker(span, "Good", "mw", "CreateNAppGood")
