@@ -100,7 +100,7 @@ func GetAppDefaultGoods(ctx context.Context, appID string, offset, limit int32) 
 	}
 	coinInfos, _, err := coincli.GetCoins(ctx, &coinpb.Conds{
 		IDs: &basetypes.StringSliceVal{
-			Op:    cruder.EQ,
+			Op:    cruder.IN,
 			Value: coinTypeIDs,
 		},
 	}, 0, int32(len(coinTypeIDs)))
