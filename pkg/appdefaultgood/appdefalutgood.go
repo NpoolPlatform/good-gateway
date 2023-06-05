@@ -6,6 +6,7 @@ import (
 
 	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 	commonpb "github.com/NpoolPlatform/message/npool"
+	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 
 	npool "github.com/NpoolPlatform/message/npool/good/gw/v1/appdefaultgood"
 	appdefaultgoodmgrpb "github.com/NpoolPlatform/message/npool/good/mgr/v1/appdefaultgood"
@@ -98,8 +99,8 @@ func GetAppDefaultGoods(ctx context.Context, appID string, offset, limit int32) 
 		coinTypeIDs = append(coinTypeIDs, id.CoinTypeID)
 	}
 	coinInfos, _, err := coincli.GetCoins(ctx, &coinpb.Conds{
-		IDs: &commonpb.StringSliceVal{
-			Op:    cruder.EQ,
+		IDs: &basetypes.StringSliceVal{
+			Op:    cruder.IN,
 			Value: coinTypeIDs,
 		},
 	}, 0, int32(len(coinTypeIDs)))

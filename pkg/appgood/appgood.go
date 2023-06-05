@@ -20,8 +20,8 @@ import (
 	ordermwpb "github.com/NpoolPlatform/message/npool/order/mw/v1/order"
 	ordermwcli "github.com/NpoolPlatform/order-middleware/pkg/client/order"
 
-	appcoininfocli "github.com/NpoolPlatform/chain-middleware/pkg/client/appcoin"
-	appcoinpb "github.com/NpoolPlatform/message/npool/chain/mw/v1/appcoin"
+	appcoinmwcli "github.com/NpoolPlatform/chain-middleware/pkg/client/app/coin"
+	appcoinmwpb "github.com/NpoolPlatform/message/npool/chain/mw/v1/app/coin"
 	npool "github.com/NpoolPlatform/message/npool/good/gw/v1/appgood"
 	appgoodmgrpb "github.com/NpoolPlatform/message/npool/good/mgr/v1/appgood"
 
@@ -43,7 +43,7 @@ func CreateAppGood(
 	displayIndex, purchaseLimit, commissionPercent int32,
 	saleStart, saleEnd, serviceStart *uint32,
 	techFeeRatio, elecFeeRatio *uint32,
-	commSettleType commmgrpb.SettleType,
+	commSettleType *commmgrpb.SettleType,
 	openPurchase, intoProductPage *bool,
 	cancelMode *appgoodmgrpb.CancelMode,
 	userPurchaseLimit *string, displayColors []string,
@@ -66,7 +66,7 @@ func CreateAppGood(
 		ServiceStartAt:         serviceStart,
 		TechnicalFeeRatio:      techFeeRatio,
 		ElectricityFeeRatio:    elecFeeRatio,
-		CommissionSettleType:   &commSettleType,
+		CommissionSettleType:   commSettleType,
 		EnablePurchase:         openPurchase,
 		EnableProductPage:      intoProductPage,
 		CancelMode:             cancelMode,
@@ -239,12 +239,12 @@ func Scans(ctx context.Context, infos []*goodmwpb.Good, appID string) ([]*npool.
 		coinTypeIDs = append(coinTypeIDs, val.CoinTypeID)
 	}
 
-	coins, _, err := appcoininfocli.GetCoins(ctx, &appcoinpb.Conds{
-		AppID: &commonpb.StringVal{
+	coins, _, err := appcoinmwcli.GetCoins(ctx, &appcoinmwpb.Conds{
+		AppID: &basetypes.StringVal{
 			Op:    cruder.EQ,
 			Value: appID,
 		},
-		CoinTypeIDs: &commonpb.StringSliceVal{
+		CoinTypeIDs: &basetypes.StringSliceVal{
 			Op:    cruder.IN,
 			Value: coinTypeIDs,
 		},
@@ -253,7 +253,7 @@ func Scans(ctx context.Context, infos []*goodmwpb.Good, appID string) ([]*npool.
 		return nil, err
 	}
 
-	ctMap := map[string]*appcoinpb.Coin{}
+	ctMap := map[string]*appcoinmwpb.Coin{}
 	for _, coin := range coins {
 		ctMap[coin.CoinTypeID] = coin
 	}
@@ -304,7 +304,7 @@ func Scans(ctx context.Context, infos []*goodmwpb.Good, appID string) ([]*npool.
 
 func getSubGoods(
 	ctx context.Context,
-	ctMap map[string]*appcoinpb.Coin,
+	ctMap map[string]*appcoinmwpb.Coin,
 	userMap map[string]*usermwpb.User,
 	goodIDs []string,
 	appID string,
@@ -365,7 +365,7 @@ func getSubGoods(
 }
 
 func getGoodInfos(
-	ctMap map[string]*appcoinpb.Coin,
+	ctMap map[string]*appcoinmwpb.Coin,
 	userMap map[string]*usermwpb.User,
 	infos []*goodmwpb.Good,
 ) []*npool.Good {
