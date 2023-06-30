@@ -101,6 +101,7 @@ func CreateGood(ctx context.Context, req *npool.CreateGoodRequest) (*npool.Good,
 	return ScanCoinType(info, coinMap)
 }
 
+//nolint:gocyclo
 func UpdateGood(ctx context.Context, req *npool.UpdateGoodRequest) (*npool.Good, error) {
 	info, err := goodmwcli.UpdateGood(ctx, &goodmwpb.GoodReq{
 		ID:                   &req.ID,
