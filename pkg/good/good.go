@@ -4,12 +4,15 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
+
 	uuid1 "github.com/NpoolPlatform/go-service-framework/pkg/const/uuid"
 	coininfopb "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin"
 
 	goodmwcli "github.com/NpoolPlatform/good-middleware/pkg/client/good"
 	goodmwpb "github.com/NpoolPlatform/message/npool/good/mw/v1/good"
 
+	ordermgrpb "github.com/NpoolPlatform/message/npool/order/mgr/v1/order"
 	ordermwpb "github.com/NpoolPlatform/message/npool/order/mw/v1/order"
 	ordermwcli "github.com/NpoolPlatform/order-middleware/pkg/client/order"
 
@@ -146,7 +149,15 @@ func UpdateGood(ctx context.Context, req *npool.UpdateGoodRequest) (*npool.Good,
 				if ord.Start > req.GetStartAt() {
 					continue
 				}
-				if ord.PaymentID == uuid1.InvalidUUIDStr {
+				if ord.PaymentID == uuid1.InvalidUUIDStr || ord.PaymentID == "" {
+					switch ord.OrderState {
+					case ordermgrpb.OrderState_Paid:
+						fallthrough //nolint
+					case ordermgrpb.OrderState_InService:
+						fallthrough //nolint
+					case ordermgrpb.OrderState_Expired:
+						logger.Sugar().Warnw("UpdateGood", "OrderID", ord.ID, "State", ord.OrderState, "PaymentID", ord.PaymentID)
+					}
 					continue
 				}
 				reqs = append(reqs, &ordermwpb.OrderReq{
