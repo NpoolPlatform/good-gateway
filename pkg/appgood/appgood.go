@@ -30,7 +30,7 @@ import (
 	usermwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/user"
 	usermwpb "github.com/NpoolPlatform/message/npool/appuser/mw/v1/user"
 
-	commmgrpb "github.com/NpoolPlatform/message/npool/inspire/mgr/v1/commission"
+	inspiretypes "github.com/NpoolPlatform/message/npool/basetypes/inspire/v1"
 
 	uuid1 "github.com/NpoolPlatform/go-service-framework/pkg/const/uuid"
 	constant "github.com/NpoolPlatform/good-gateway/pkg/const"
@@ -43,7 +43,7 @@ func CreateAppGood(
 	displayIndex, purchaseLimit, commissionPercent int32,
 	saleStart, saleEnd, serviceStart *uint32,
 	techFeeRatio, elecFeeRatio *uint32,
-	commSettleType *commmgrpb.SettleType,
+	commSettleType *inspiretypes.SettleType,
 	openPurchase, intoProductPage *bool,
 	cancelMode *appgoodmgrpb.CancelMode,
 	userPurchaseLimit *string, displayColors []string,
