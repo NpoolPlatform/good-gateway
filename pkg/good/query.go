@@ -139,3 +139,30 @@ func (h *Handler) GetGood(ctx context.Context) (*npool.Good, error) {
 
 	return handler.infos[0], nil
 }
+
+func (h *Handler) GetGoods(ctx context.Context) ([]*npool.Good, uint32, error) {
+	goods, total, err := goodmwcli.GetGoods(ctx, &goodmwpb.Conds{}, h.Offset, h.Limit)
+	if err != nil {
+		return nil, 0, err
+	}
+	if len(goods) == 0 {
+		return nil, total, nil
+	}
+
+	handler := &queryHandler{
+		Handler: h,
+		goods:   goods,
+		coins:   map[string]*coinmwpb.Coin{},
+	}
+
+	if err := handler.getCoins(ctx); err != nil {
+		return nil, 0, err
+	}
+
+	handler.formalize()
+	if len(handler.infos) == 0 {
+		return nil, total, nil
+	}
+
+	return handler.infos, total, nil
+}
