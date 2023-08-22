@@ -104,10 +104,6 @@ func (h *queryHandler) formalize() {
 }
 
 func (h *Handler) GetComment(ctx context.Context) (*npool.Comment, error) {
-	if h.ID == nil {
-		return nil, fmt.Errorf("invalid id")
-	}
-
 	comment, err := commentmwcli.GetComment(ctx, *h.ID)
 	if err != nil {
 		return nil, err
@@ -135,4 +131,42 @@ func (h *Handler) GetComment(ctx context.Context) (*npool.Comment, error) {
 	}
 
 	return handler.infos[0], nil
+}
+
+func (h *Handler) GetComments(ctx context.Context) ([]*npool.Comment, uint32, error) {
+	conds := &commentmwpb.Conds{}
+	if h.GoodID != nil {
+		conds.GoodID = &basetypes.StringVal{Op: cruder.EQ, Value: *h.GoodID}
+	}
+	if h.AppID != nil {
+		conds.AppID = &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID}
+	}
+	if h.UserID != nil {
+		conds.UserID = &basetypes.StringVal{Op: cruder.EQ, Value: *h.UserID}
+	}
+
+	comments, total, err := commentmwcli.GetComments(ctx, conds, h.Offset, h.Limit)
+	if err != nil {
+		return nil, 0, err
+	}
+	if len(comments) == 0 {
+		return nil, total, nil
+	}
+
+	handler := &queryHandler{
+		Handler:  h,
+		comments: comments,
+		apps:     map[string]*appmwpb.App{},
+		users:    map[string]*usermwpb.User{},
+	}
+	if err := handler.getApps(ctx); err != nil {
+		return nil, 0, err
+	}
+	if err := handler.getUsers(ctx); err != nil {
+		return nil, 0, err
+	}
+
+	handler.formalize()
+
+	return handler.infos, total, nil
 }
