@@ -3,6 +3,10 @@ package api
 import (
 	"context"
 
+	appgood "github.com/NpoolPlatform/good-gateway/api/app/good"
+	default1 "github.com/NpoolPlatform/good-gateway/api/app/good/default"
+	"github.com/NpoolPlatform/good-gateway/api/app/good/topmost"
+	topmostgood "github.com/NpoolPlatform/good-gateway/api/app/good/topmost/good"
 	"github.com/NpoolPlatform/good-gateway/api/deviceinfo"
 	"github.com/NpoolPlatform/good-gateway/api/good"
 	"github.com/NpoolPlatform/good-gateway/api/good/comment"
@@ -34,8 +38,13 @@ func Register(server grpc.ServiceRegistrar) {
 	required.Register(server)
 	history.Register(server)
 	score.Register(server)
+	appgood.Register(server)
+	default1.Register(server)
+	topmost.Register(server)
+	topmostgood.Register(server)
 }
 
+//nolint:gocyclo
 func RegisterGateway(mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) error {
 	if err := v1.RegisterGatewayHandlerFromEndpoint(context.Background(), mux, endpoint, opts); err != nil {
 		return err
@@ -68,6 +77,18 @@ func RegisterGateway(mux *runtime.ServeMux, endpoint string, opts []grpc.DialOpt
 		return err
 	}
 	if err := score.RegisterGateway(mux, endpoint, opts); err != nil {
+		return err
+	}
+	if err := appgood.RegisterGateway(mux, endpoint, opts); err != nil {
+		return err
+	}
+	if err := default1.RegisterGateway(mux, endpoint, opts); err != nil {
+		return err
+	}
+	if err := topmost.RegisterGateway(mux, endpoint, opts); err != nil {
+		return err
+	}
+	if err := topmostgood.RegisterGateway(mux, endpoint, opts); err != nil {
 		return err
 	}
 	return nil

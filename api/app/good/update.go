@@ -1,4 +1,3 @@
-//nolint:dupl
 package good
 
 import (
@@ -13,7 +12,7 @@ import (
 	npool "github.com/NpoolPlatform/message/npool/good/gw/v1/app/good"
 )
 
-func (s *Server) UpdateAppGood(ctx context.Context, in *npool.UpdateAppGoodRequest) (*npool.UpdateAppGoodResponse, error) {
+func (s *Server) UpdateGood(ctx context.Context, in *npool.UpdateGoodRequest) (*npool.UpdateGoodResponse, error) {
 	handler, err := good1.NewHandler(
 		ctx,
 		good1.WithID(&in.ID, true),
@@ -41,29 +40,29 @@ func (s *Server) UpdateAppGood(ctx context.Context, in *npool.UpdateAppGoodReque
 	)
 	if err != nil {
 		logger.Sugar().Errorw(
-			"UpdateAppGood",
+			"UpdateGood",
 			"In", in,
 			"Error", err,
 		)
-		return &npool.UpdateAppGoodResponse{}, status.Error(codes.Aborted, err.Error())
+		return &npool.UpdateGoodResponse{}, status.Error(codes.Aborted, err.Error())
 	}
 
 	info, err := handler.UpdateGood(ctx)
 	if err != nil {
 		logger.Sugar().Errorw(
-			"UpdateAppGood",
+			"UpdateGood",
 			"In", in,
 			"Error", err,
 		)
-		return &npool.UpdateAppGoodResponse{}, status.Error(codes.Aborted, err.Error())
+		return &npool.UpdateGoodResponse{}, status.Error(codes.Aborted, err.Error())
 	}
 
-	return &npool.UpdateAppGoodResponse{
+	return &npool.UpdateGoodResponse{
 		Info: info,
 	}, nil
 }
 
-func (s *Server) UpdateNAppGood(ctx context.Context, in *npool.UpdateNAppGoodRequest) (*npool.UpdateNAppGoodResponse, error) {
+func (s *Server) UpdateNGood(ctx context.Context, in *npool.UpdateNGoodRequest) (*npool.UpdateNGoodResponse, error) {
 	handler, err := good1.NewHandler(
 		ctx,
 		good1.WithID(&in.ID, true),
@@ -89,24 +88,24 @@ func (s *Server) UpdateNAppGood(ctx context.Context, in *npool.UpdateNAppGoodReq
 	)
 	if err != nil {
 		logger.Sugar().Errorw(
-			"UpdateNAppGood",
+			"UpdateNGood",
 			"In", in,
 			"Error", err,
 		)
-		return &npool.UpdateNAppGoodResponse{}, status.Error(codes.Aborted, err.Error())
+		return &npool.UpdateNGoodResponse{}, status.Error(codes.Aborted, err.Error())
 	}
 
 	info, err := handler.UpdateGood(ctx)
 	if err != nil {
 		logger.Sugar().Errorw(
-			"UpdateNAppGood",
+			"UpdateNGood",
 			"In", in,
 			"Error", err,
 		)
-		return &npool.UpdateNAppGoodResponse{}, status.Error(codes.Aborted, err.Error())
+		return &npool.UpdateNGoodResponse{}, status.Error(codes.Aborted, err.Error())
 	}
 
-	return &npool.UpdateNAppGoodResponse{
+	return &npool.UpdateNGoodResponse{
 		Info: info,
 	}, nil
 }
