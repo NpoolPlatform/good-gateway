@@ -33,6 +33,7 @@ func Register(server grpc.ServiceRegistrar) {
 	brand.Register(server)
 	location.Register(server)
 	good.Register(server)
+	comment.Register(server)
 	like.Register(server)
 	recommend.Register(server)
 	required.Register(server)
