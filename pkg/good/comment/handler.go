@@ -6,7 +6,7 @@ import (
 
 	appmwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/app"
 	constant "github.com/NpoolPlatform/good-middleware/pkg/const"
-	// ordermwcli "github.com/NpoolPlatform/order-middleware/pkg/client/order"
+	ordermwcli "github.com/NpoolPlatform/order-middleware/pkg/client/order"
 
 	"github.com/google/uuid"
 )
@@ -109,15 +109,13 @@ func WithOrderID(id *string, must bool) func(context.Context, *Handler) error {
 			}
 			return nil
 		}
-		/*
-			exist, err := ordermwcli.ExistOrder(ctx, *id)
-			if err != nil {
-				return err
-			}
-			if !exist {
-				return fmt.Errorf("invalid order")
-			}
-		*/
+		exist, err := ordermwcli.ExistOrder(ctx, *id)
+		if err != nil {
+			return err
+		}
+		if !exist {
+			return fmt.Errorf("invalid order")
+		}
 		h.OrderID = id
 		return nil
 	}
