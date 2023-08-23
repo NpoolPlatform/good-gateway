@@ -2,7 +2,6 @@ package good
 
 import (
 	"context"
-	"fmt"
 
 	coinmwcli "github.com/NpoolPlatform/chain-middleware/pkg/client/coin"
 	appgoodmwcli "github.com/NpoolPlatform/good-middleware/pkg/client/app/good"
@@ -136,10 +135,6 @@ func (h *queryHandler) formalize() {
 }
 
 func (h *Handler) GetGood(ctx context.Context) (*npool.Good, error) {
-	if h.ID == nil {
-		return nil, fmt.Errorf("invalid id")
-	}
-
 	good, err := appgoodmwcli.GetGood(ctx, *h.ID)
 	if err != nil {
 		return nil, err
@@ -164,7 +159,10 @@ func (h *Handler) GetGood(ctx context.Context) (*npool.Good, error) {
 }
 
 func (h *Handler) GetGoods(ctx context.Context) ([]*npool.Good, uint32, error) {
-	goods, total, err := appgoodmwcli.GetGoods(ctx, &appgoodmwpb.Conds{}, h.Offset, h.Limit)
+	conds := &appgoodmwpb.Conds{
+		AppID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID},
+	}
+	goods, total, err := appgoodmwcli.GetGoods(ctx, conds, h.Offset, h.Limit)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -188,4 +186,39 @@ func (h *Handler) GetGoods(ctx context.Context) ([]*npool.Good, uint32, error) {
 	}
 
 	return handler.infos, total, nil
+}
+
+func (h *Handler) GetGoodOnly(ctx context.Context) (*npool.Good, error) {
+	conds := &appgoodmwpb.Conds{}
+	if h.ID != nil {
+		conds.ID = &basetypes.StringVal{Op: cruder.EQ, Value: *h.ID}
+	}
+	if h.AppID != nil {
+		conds.AppID = &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID}
+	}
+
+	good, err := appgoodmwcli.GetGoodOnly(ctx, conds)
+	if err != nil {
+		return nil, err
+	}
+	if good == nil {
+		return nil, nil
+	}
+
+	handler := &queryHandler{
+		Handler: h,
+		goods:   []*appgoodmwpb.Good{good},
+		coins:   map[string]*coinmwpb.Coin{},
+	}
+
+	if err := handler.getCoins(ctx); err != nil {
+		return nil, err
+	}
+
+	handler.formalize()
+	if len(handler.infos) == 0 {
+		return nil, nil
+	}
+
+	return handler.infos[0], nil
 }

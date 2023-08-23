@@ -4,6 +4,13 @@ import (
 	"context"
 
 	"github.com/NpoolPlatform/good-gateway/api/deviceinfo"
+	"github.com/NpoolPlatform/good-gateway/api/good"
+	"github.com/NpoolPlatform/good-gateway/api/good/comment"
+	"github.com/NpoolPlatform/good-gateway/api/good/like"
+	"github.com/NpoolPlatform/good-gateway/api/good/recommend"
+	"github.com/NpoolPlatform/good-gateway/api/good/required"
+	"github.com/NpoolPlatform/good-gateway/api/good/reward/history"
+	"github.com/NpoolPlatform/good-gateway/api/good/score"
 	"github.com/NpoolPlatform/good-gateway/api/vender/brand"
 	"github.com/NpoolPlatform/good-gateway/api/vender/location"
 
@@ -21,6 +28,12 @@ func Register(server grpc.ServiceRegistrar) {
 	deviceinfo.Register(server)
 	brand.Register(server)
 	location.Register(server)
+	good.Register(server)
+	like.Register(server)
+	recommend.Register(server)
+	required.Register(server)
+	history.Register(server)
+	score.Register(server)
 }
 
 func RegisterGateway(mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) error {
@@ -34,6 +47,27 @@ func RegisterGateway(mux *runtime.ServeMux, endpoint string, opts []grpc.DialOpt
 		return err
 	}
 	if err := location.RegisterGateway(mux, endpoint, opts); err != nil {
+		return err
+	}
+	if err := good.RegisterGateway(mux, endpoint, opts); err != nil {
+		return err
+	}
+	if err := comment.RegisterGateway(mux, endpoint, opts); err != nil {
+		return err
+	}
+	if err := like.RegisterGateway(mux, endpoint, opts); err != nil {
+		return err
+	}
+	if err := recommend.RegisterGateway(mux, endpoint, opts); err != nil {
+		return err
+	}
+	if err := required.RegisterGateway(mux, endpoint, opts); err != nil {
+		return err
+	}
+	if err := history.RegisterGateway(mux, endpoint, opts); err != nil {
+		return err
+	}
+	if err := score.RegisterGateway(mux, endpoint, opts); err != nil {
 		return err
 	}
 	return nil

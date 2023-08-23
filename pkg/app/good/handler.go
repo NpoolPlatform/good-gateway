@@ -185,7 +185,7 @@ func WithServiceStartAt(n *uint32, must bool) func(context.Context, *Handler) er
 	}
 }
 
-func WithTechnicalFeeRatio(n *uint32, must bool) func(context.Context, *Handler) error {
+func WithTechniqueFeeRatio(n *uint32, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		h.TechniqueFeeRatio = n
 		return nil
@@ -281,12 +281,19 @@ func WithUserPurchaseLimit(s *string, must bool) func(context.Context, *Handler)
 
 func WithDisplayColors(ss []string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
+		h.DisplayColors = ss
+		return nil
+	}
+}
+
+func WithPosters(ss []string, must bool) func(context.Context, *Handler) error {
+	return func(ctx context.Context, h *Handler) error {
 		h.Posters = ss
 		return nil
 	}
 }
 
-func WithCancellableBeforeStart(n *uint32) func(context.Context, *Handler) error {
+func WithCancellableBeforeStart(n *uint32, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		h.CancellableBeforeStart = n
 		return nil
