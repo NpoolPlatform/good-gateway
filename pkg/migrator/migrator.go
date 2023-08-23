@@ -6,19 +6,19 @@ import (
 	"fmt"
 
 	"github.com/NpoolPlatform/go-service-framework/pkg/config"
-	constant "github.com/NpoolPlatform/good-gateway/pkg/message/const"
+	servicename "github.com/NpoolPlatform/good-gateway/pkg/servicename"
 
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
 
 	redis2 "github.com/NpoolPlatform/go-service-framework/pkg/redis"
-	"github.com/NpoolPlatform/good-manager/pkg/db"
-	"github.com/NpoolPlatform/good-manager/pkg/db/ent"
+	"github.com/NpoolPlatform/good-middleware/pkg/db"
+	"github.com/NpoolPlatform/good-middleware/pkg/db/ent"
 )
 
 const keyServiceID = "serviceid"
 
 func lockKey() string {
-	serviceID := config.GetStringValueWithNameSpace(constant.ServiceName, keyServiceID)
+	serviceID := config.GetStringValueWithNameSpace(servicename.ServiceName, keyServiceID)
 	return fmt.Sprintf("migrator:%v", serviceID)
 }
 

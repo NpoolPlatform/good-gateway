@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/NpoolPlatform/good-gateway/api"
 	"github.com/NpoolPlatform/good-gateway/pkg/migrator"
-	"github.com/NpoolPlatform/good-manager/pkg/db"
+	"github.com/NpoolPlatform/good-middleware/pkg/db"
 
 	grpc2 "github.com/NpoolPlatform/go-service-framework/pkg/grpc"
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
