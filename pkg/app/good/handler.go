@@ -25,8 +25,8 @@ type Handler struct {
 	SaleStartAt            *uint32
 	SaleEndAt              *uint32
 	ServiceStartAt         *uint32
-	TechniqueFeeRatio      *uint32
-	ElectricityFeeRatio    *uint32
+	TechniqueFeeRatio      *string
+	ElectricityFeeRatio    *string
 	Descriptions           []string
 	GoodBanner             *string
 	DisplayNames           []string
@@ -185,16 +185,34 @@ func WithServiceStartAt(n *uint32, must bool) func(context.Context, *Handler) er
 	}
 }
 
-func WithTechniqueFeeRatio(n *uint32, must bool) func(context.Context, *Handler) error {
+func WithTechniqueFeeRatio(s *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
-		h.TechniqueFeeRatio = n
+		if s == nil {
+			if must {
+				return fmt.Errorf("invalid techniquefeeratio")
+			}
+			return nil
+		}
+		if _, err := decimal.NewFromString(*s); err != nil {
+			return err
+		}
+		h.TechniqueFeeRatio = s
 		return nil
 	}
 }
 
-func WithElectricityFeeRatio(n *uint32, must bool) func(context.Context, *Handler) error {
+func WithElectricityFeeRatio(s *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
-		h.ElectricityFeeRatio = n
+		if s == nil {
+			if must {
+				return fmt.Errorf("invalid electricityfeeratio")
+			}
+			return nil
+		}
+		if _, err := decimal.NewFromString(*s); err != nil {
+			return err
+		}
+		h.ElectricityFeeRatio = s
 		return nil
 	}
 }
