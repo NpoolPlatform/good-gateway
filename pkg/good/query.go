@@ -75,6 +75,7 @@ func (h *queryHandler) formalize() {
 			AppReserved:            good.GoodAppReserved,
 			DeliveryAt:             good.DeliveryAt,
 			StartAt:                good.StartAt,
+			StartMode:              good.StartMode,
 			CreatedAt:              good.CreatedAt,
 			UpdatedAt:              good.UpdatedAt,
 			BenefitIntervalHours:   good.BenefitIntervalHours,

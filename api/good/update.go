@@ -29,6 +29,7 @@ func (s *Server) UpdateGood(ctx context.Context, in *npool.UpdateGoodRequest) (*
 		good1.WithSupportCoinTypeIDs(in.SupportCoinTypeIDs, false),
 		good1.WithDeliveryAt(in.DeliveryAt, false),
 		good1.WithStartAt(in.StartAt, false),
+		good1.WithStartMode(in.StartMode, false),
 		good1.WithTestOnly(in.TestOnly, false),
 		good1.WithTotal(in.Total, false),
 		good1.WithPosters(in.Posters, false),

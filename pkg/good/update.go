@@ -15,6 +15,8 @@ func (h *Handler) UpdateGood(ctx context.Context) (*npool.Good, error) {
 		return nil, fmt.Errorf("invalid id")
 	}
 
+	// TODO: if start mode is set from TBD to confirmed, we should update all order's start at and start mode
+
 	if _, err := goodmwcli.UpdateGood(ctx, &goodmwpb.GoodReq{
 		ID:                   h.ID,
 		DeviceInfoID:         h.DeviceInfoID,
@@ -30,6 +32,7 @@ func (h *Handler) UpdateGood(ctx context.Context) (*npool.Good, error) {
 		SupportCoinTypeIDs:   h.SupportCoinTypeIDs,
 		DeliveryAt:           h.DeliveryAt,
 		StartAt:              h.StartAt,
+		StartMode:            h.StartMode,
 		TestOnly:             h.TestOnly,
 		Total:                h.Total,
 		Posters:              h.Posters,

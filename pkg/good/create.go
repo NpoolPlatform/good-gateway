@@ -32,6 +32,7 @@ func (h *Handler) CreateGood(ctx context.Context) (*npool.Good, error) {
 		SupportCoinTypeIDs:   h.SupportCoinTypeIDs,
 		DeliveryAt:           h.DeliveryAt,
 		StartAt:              h.StartAt,
+		StartMode:            h.StartMode,
 		TestOnly:             h.TestOnly,
 		Total:                h.Total,
 		Posters:              h.Posters,

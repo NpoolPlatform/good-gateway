@@ -70,6 +70,7 @@ func (h *queryHandler) formalize() {
 			GoodTotal:              good.GoodTotal,
 			GoodSpotQuantity:       good.GoodSpotQuantity,
 			StartAt:                good.StartAt,
+			StartMode:              good.StartMode,
 			CreatedAt:              good.CreatedAt,
 			SaleStartAt:            good.SaleStartAt,
 			SaleEndAt:              good.SaleEndAt,

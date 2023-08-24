@@ -28,6 +28,7 @@ func (s *Server) CreateGood(ctx context.Context, in *npool.CreateGoodRequest) (*
 		good1.WithSupportCoinTypeIDs(in.SupportCoinTypeIDs, true),
 		good1.WithDeliveryAt(&in.DeliveryAt, true),
 		good1.WithStartAt(&in.StartAt, true),
+		good1.WithStartMode(&in.StartMode, true),
 		good1.WithTestOnly(&in.TestOnly, true),
 		good1.WithTotal(&in.Total, true),
 		good1.WithPosters(in.Posters, true),
