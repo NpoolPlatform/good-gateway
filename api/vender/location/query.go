@@ -15,6 +15,7 @@ import (
 func (s *Server) GetLocations(ctx context.Context, in *npool.GetLocationsRequest) (*npool.GetLocationsResponse, error) {
 	handler, err := location1.NewHandler(
 		ctx,
+		location1.WithBrandID(in.BrandID, false),
 		location1.WithOffset(in.Offset),
 		location1.WithLimit(in.Limit),
 	)
