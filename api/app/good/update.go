@@ -36,7 +36,10 @@ func (s *Server) UpdateGood(ctx context.Context, in *npool.UpdateGoodRequest) (*
 		good1.WithCancellableBeforeStart(in.CancellableBeforeStart, false),
 		good1.WithProductPage(in.ProductPage, false),
 		good1.WithEnableSetCommission(in.EnableSetCommission, false),
-		good1.WithPosters(in.Posters, true),
+		good1.WithPosters(in.Posters, false),
+		good1.WithDescriptions(in.Descriptions, false),
+		good1.WithGoodBanner(in.GoodBanner, false),
+		good1.WithDisplayNames(in.DisplayNames, false),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(
@@ -84,7 +87,10 @@ func (s *Server) UpdateNGood(ctx context.Context, in *npool.UpdateNGoodRequest) 
 		good1.WithCancellableBeforeStart(in.CancellableBeforeStart, false),
 		good1.WithProductPage(in.ProductPage, false),
 		good1.WithEnableSetCommission(in.EnableSetCommission, false),
-		good1.WithPosters(in.Posters, true),
+		good1.WithPosters(in.Posters, false),
+		good1.WithDescriptions(in.Descriptions, false),
+		good1.WithGoodBanner(in.GoodBanner, false),
+		good1.WithDisplayNames(in.DisplayNames, false),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(
