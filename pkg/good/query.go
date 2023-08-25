@@ -68,6 +68,7 @@ func (h *queryHandler) formalize() {
 			Labels:                 good.Labels,
 			StockID:                good.GoodStockID,
 			Total:                  good.GoodTotal,
+			SpotQuantity:           good.GoodSpotQuantity,
 			Locked:                 good.GoodLocked,
 			InService:              good.GoodInService,
 			WaitStart:              good.GoodWaitStart,
