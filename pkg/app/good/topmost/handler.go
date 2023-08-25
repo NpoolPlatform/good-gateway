@@ -59,7 +59,7 @@ func WithAppID(id *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if id == nil {
 			if must {
-				return fmt.Errorf("invalid id")
+				return fmt.Errorf("invalid appid")
 			}
 			return nil
 		}

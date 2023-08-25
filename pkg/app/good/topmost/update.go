@@ -11,6 +11,7 @@ import (
 func (h *Handler) UpdateTopMost(ctx context.Context) (*npool.TopMost, error) {
 	if _, err := topmostmwcli.UpdateTopMost(ctx, &topmostmwpb.TopMostReq{
 		ID:                     h.ID,
+		AppID:                  h.AppID,
 		Title:                  h.Title,
 		Message:                h.Message,
 		Posters:                h.Posters,
