@@ -140,6 +140,9 @@ func (h *Handler) GetGood(ctx context.Context) (*npool.Good, error) {
 	if err != nil {
 		return nil, err
 	}
+	if good == nil {
+		return nil, nil
+	}
 
 	handler := &queryHandler{
 		Handler: h,
