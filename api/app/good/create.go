@@ -37,6 +37,9 @@ func (s *Server) CreateGood(ctx context.Context, in *npool.CreateGoodRequest) (*
 		good1.WithProductPage(in.ProductPage, false),
 		good1.WithEnableSetCommission(in.EnableSetCommission, false),
 		good1.WithPosters(in.Posters, true),
+		good1.WithDescriptions(in.Descriptions, false),
+		good1.WithGoodBanner(in.GoodBanner, false),
+		good1.WithDisplayNames(in.DisplayNames, false),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(
