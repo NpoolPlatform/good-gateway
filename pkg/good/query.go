@@ -118,13 +118,12 @@ func (h *queryHandler) formalize() {
 }
 
 func (h *Handler) GetGood(ctx context.Context) (*npool.Good, error) {
-	if h.ID == nil {
-		return nil, fmt.Errorf("invalid id")
-	}
-
 	good, err := goodmwcli.GetGood(ctx, *h.ID)
 	if err != nil {
 		return nil, err
+	}
+	if good == nil {
+		return nil, nil
 	}
 
 	handler := &queryHandler{
