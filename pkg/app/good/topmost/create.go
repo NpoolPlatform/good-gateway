@@ -26,6 +26,7 @@ func (h *Handler) CreateTopMost(ctx context.Context) (*npool.TopMost, error) {
 		StartAt:                h.StartAt,
 		EndAt:                  h.EndAt,
 		ThresholdCredits:       h.ThresholdCredits,
+		ThresholdPurchases:     h.ThresholdPurchases,
 		RegisterElapsedSeconds: h.RegisterElapsedSeconds,
 		ThresholdPaymentAmount: h.ThresholdPaymentAmount,
 		KycMust:                h.KycMust,
