@@ -24,8 +24,8 @@ type queryHandler struct {
 
 func (h *queryHandler) getApps(ctx context.Context) error {
 	appIDs := []string{}
-	for _, def := range h.goods {
-		appIDs = append(appIDs, def.AppID)
+	for _, good := range h.goods {
+		appIDs = append(appIDs, good.AppID)
 	}
 	apps, _, err := appmwcli.GetApps(ctx, &appmwpb.Conds{
 		IDs: &basetypes.StringSliceVal{Op: cruder.IN, Value: appIDs},
@@ -41,8 +41,8 @@ func (h *queryHandler) getApps(ctx context.Context) error {
 
 func (h *queryHandler) getCoins(ctx context.Context) error {
 	coinTypeIDs := []string{}
-	for _, def := range h.goods {
-		coinTypeIDs = append(coinTypeIDs, def.CoinTypeID)
+	for _, good := range h.goods {
+		coinTypeIDs = append(coinTypeIDs, good.CoinTypeID)
 	}
 	coins, _, err := coinmwcli.GetCoins(ctx, &coinmwpb.Conds{
 		IDs: &basetypes.StringSliceVal{Op: cruder.IN, Value: coinTypeIDs},
@@ -57,28 +57,30 @@ func (h *queryHandler) getCoins(ctx context.Context) error {
 }
 
 func (h *queryHandler) formalize() {
-	for _, def := range h.goods {
+	for _, good := range h.goods {
 		info := &npool.TopMostGood{
-			ID:             def.ID,
-			AppID:          def.AppID,
-			GoodID:         def.GoodID,
-			GoodName:       def.GoodName,
-			AppGoodID:      def.AppGoodID,
-			AppGoodName:    def.AppGoodName,
-			CoinTypeID:     def.CoinTypeID,
-			TopMostID:      def.TopMostID,
-			TopMostType:    def.TopMostType,
-			TopMostTitle:   def.TopMostTitle,
-			TopMostMessage: def.TopMostMessage,
-			CreatedAt:      def.CreatedAt,
-			UpdatedAt:      def.UpdatedAt,
+			ID:             good.ID,
+			AppID:          good.AppID,
+			GoodID:         good.GoodID,
+			GoodName:       good.GoodName,
+			AppGoodID:      good.AppGoodID,
+			AppGoodName:    good.AppGoodName,
+			CoinTypeID:     good.CoinTypeID,
+			TopMostID:      good.TopMostID,
+			TopMostType:    good.TopMostType,
+			TopMostTitle:   good.TopMostTitle,
+			TopMostMessage: good.TopMostMessage,
+			Price:          good.Price,
+			Posters:        good.Posters,
+			CreatedAt:      good.CreatedAt,
+			UpdatedAt:      good.UpdatedAt,
 		}
 
-		app, ok := h.apps[def.AppID]
+		app, ok := h.apps[good.AppID]
 		if ok {
 			info.AppName = app.Name
 		}
-		coin, ok := h.coins[def.CoinTypeID]
+		coin, ok := h.coins[good.CoinTypeID]
 		if ok {
 			info.CoinName = coin.Name
 			info.CoinLogo = coin.Logo
