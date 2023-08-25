@@ -10,6 +10,7 @@ import (
 	scoremwpb "github.com/NpoolPlatform/message/npool/good/mw/v1/good/score"
 
 	"github.com/google/uuid"
+	"github.com/shopspring/decimal"
 )
 
 func (h *Handler) CreateScore(ctx context.Context) (*npool.Score, error) {
@@ -24,6 +25,17 @@ func (h *Handler) CreateScore(ctx context.Context) (*npool.Score, error) {
 	id := uuid.NewString()
 	if h.ID == nil {
 		h.ID = &id
+	}
+
+	if h.Score != nil {
+		maxScore := decimal.RequireFromString("10.0")
+		score, err := decimal.NewFromString(*h.Score)
+		if err != nil {
+			return nil, err
+		}
+		if score.Cmp(maxScore) > 0 {
+			return nil, fmt.Errorf("invalid score")
+		}
 	}
 
 	if _, err := scoremwcli.CreateScore(ctx, &scoremwpb.ScoreReq{
