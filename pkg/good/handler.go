@@ -106,8 +106,12 @@ func WithCoinTypeID(id *string, must bool) func(context.Context, *Handler) error
 			}
 			return nil
 		}
-		if _, err := uuid.Parse(*id); err != nil {
+		exist, err := coinmwcli.ExistCoin(ctx, *id)
+		if err != nil {
 			return err
+		}
+		if !exist {
+			return fmt.Errorf("invalid coin")
 		}
 		h.CoinTypeID = id
 		return nil
