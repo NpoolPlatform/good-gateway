@@ -8,9 +8,14 @@ import (
 )
 
 func (h *Handler) DeleteTopMost(ctx context.Context) (*npool.TopMost, error) {
+	info, err := h.GetTopMost(ctx)
+	if err != nil {
+		return nil, err
+	}
+
 	if _, err := topmostmwcli.DeleteTopMost(ctx, *h.ID); err != nil {
 		return nil, err
 	}
 
-	return h.GetTopMost(ctx)
+	return info, nil
 }
