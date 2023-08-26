@@ -113,6 +113,14 @@ func Migrate(ctx context.Context) error {
 		if err != nil {
 			return err
 		}
+		_, err = tx.
+			ExecContext(
+				ctx,
+				"alter table recommends modify column recommend_index decimal(37,18)",
+			)
+		if err != nil {
+			return err
+		}
 		return nil
 	})
 }
