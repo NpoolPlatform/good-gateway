@@ -60,6 +60,14 @@ func Migrate(ctx context.Context) error {
 		_, err = tx.
 			ExecContext(
 				ctx,
+				"update goods set good_type='PowerRenting' where good_type not in ('PowerRenting','MachineRenting','MachineHosting','TechniqueServiceFee','ElectricityFee')",
+			)
+		if err != nil {
+			return err
+		}
+		_, err = tx.
+			ExecContext(
+				ctx,
 				"update app_goods set user_purchase_limit='100000' where user_purchase_limit is NULL",
 			)
 		if err != nil {
@@ -69,6 +77,38 @@ func Migrate(ctx context.Context) error {
 			ExecContext(
 				ctx,
 				"update app_goods set display_colors='[]' where display_colors is NULL",
+			)
+		if err != nil {
+			return err
+		}
+		_, err = tx.
+			ExecContext(
+				ctx,
+				"alter table app_goods modify column technical_fee_ratio decimal(37,18)",
+			)
+		if err != nil {
+			return err
+		}
+		_, err = tx.
+			ExecContext(
+				ctx,
+				"alter table app_goods modify column electricity_fee_ratio decimal(37,18)",
+			)
+		if err != nil {
+			return err
+		}
+		_, err = tx.
+			ExecContext(
+				ctx,
+				"update stocks_v1 set app_reserved='0' where app_reserved is NULL",
+			)
+		if err != nil {
+			return err
+		}
+		_, err = tx.
+			ExecContext(
+				ctx,
+				"update stocks_v1 set spot_quantity='0' where spot_quantity is NULL",
 			)
 		if err != nil {
 			return err
