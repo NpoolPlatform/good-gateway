@@ -44,6 +44,14 @@ func Migrate(ctx context.Context) error {
 		_, err := tx.
 			ExecContext(
 				ctx,
+				"update extra_infos set score='0' where score is NULL",
+			)
+		if err != nil {
+			return err
+		}
+		_, err := tx.
+			ExecContext(
+				ctx,
 				"update goods set unit_lock_deposit='0' where unit_lock_deposit is NULL",
 			)
 		if err != nil {
