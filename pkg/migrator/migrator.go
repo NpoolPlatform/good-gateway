@@ -39,6 +39,7 @@ func migrateGoodReward(ctx context.Context, tx *ent.Tx) error {
 		LastBenefitAt          uint32
 		NextBenefitStartAmount decimal.Decimal
 		LastBenefitAmount      decimal.Decimal
+		TotalRewardAmount      decimal.Decimal
 	}
 	goods := []*g{}
 	for r.Next() {
@@ -47,6 +48,26 @@ func migrateGoodReward(ctx context.Context, tx *ent.Tx) error {
 			return err
 		}
 		goods = append(goods, good)
+	}
+
+	r, err = tx.QueryContext(ctx, "select good_id,amount from ledger_manager.mining_generals")
+	if err != nil {
+		return err
+	}
+	type m struct {
+		GoodID uuid.UUID
+		Amount decimal.Decimal
+	}
+	for r.Next() {
+		_m := &m{}
+		if err := r.Scan(&_m.GoodID, &_m.Amount); err != nil {
+			return err
+		}
+		for _, g := range goods {
+			if g.ID == _m.GoodID && g.TotalRewardAmount.Cmp(decimal.NewFromInt(0)) == 0 {
+				g.TotalRewardAmount = _m.Amount
+			}
+		}
 	}
 
 	for _, good := range goods {
@@ -74,6 +95,7 @@ func migrateGoodReward(ctx context.Context, tx *ent.Tx) error {
 			SetLastRewardAt(good.LastBenefitAt).
 			SetNextRewardStartAmount(good.NextBenefitStartAmount).
 			SetLastRewardAmount(good.LastBenefitAmount).
+			SetTotalRewardAmount(good.TotalRewardAmount).
 			Save(ctx); err != nil {
 			return err
 		}
