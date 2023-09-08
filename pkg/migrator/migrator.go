@@ -195,6 +195,54 @@ func Migrate(ctx context.Context) error {
 		_, err = tx.
 			ExecContext(
 				ctx,
+				"update good_rewards set total_reward_amount='0' where total_reward_amount is NULL",
+			)
+		if err != nil {
+			return err
+		}
+		_, err = tx.
+			ExecContext(
+				ctx,
+				"update good_rewards set last_reward_amount='0' where last_reward_amount is NULL",
+			)
+		if err != nil {
+			return err
+		}
+		_, err = tx.
+			ExecContext(
+				ctx,
+				"update good_rewards set last_unit_reward_amount='0' where last_unit_reward_amount is NULL",
+			)
+		if err != nil {
+			return err
+		}
+		_, err = tx.
+			ExecContext(
+				ctx,
+				"update good_rewards set next_reward_start_amount='0' where next_reward_start_amount is NULL",
+			)
+		if err != nil {
+			return err
+		}
+		_, err = tx.
+			ExecContext(
+				ctx,
+				"update goods set last_benefit_amount='0' where last_benefit_amount is NULL",
+			)
+		if err != nil {
+			return err
+		}
+		_, err = tx.
+			ExecContext(
+				ctx,
+				"update goods set next_benefit_start_amount='0' where next_benefit_start_amount is NULL",
+			)
+		if err != nil {
+			return err
+		}
+		_, err = tx.
+			ExecContext(
+				ctx,
 				"update goods set unit_lock_deposit='0' where unit_lock_deposit is NULL",
 			)
 		if err != nil {
