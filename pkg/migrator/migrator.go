@@ -125,6 +125,15 @@ func migrateAppGoodStock(ctx context.Context, tx *ent.Tx) error {
 	if err != nil {
 		return err
 	}
+	for _, stock := range stocks {
+		if _, err := tx.
+			Stock.
+			UpdateOneID(stock.ID).
+			SetSpotQuantity(stock.Total.Sub(stock.InService).Sub(stock.WaitStart).Sub(stock.Locked)).
+			Save(ctx); err != nil {
+			return err
+		}
+	}
 
 	for _, appGood := range appGoods {
 		exist, err := tx.
