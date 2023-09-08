@@ -14,6 +14,7 @@ import (
 	redis2 "github.com/NpoolPlatform/go-service-framework/pkg/redis"
 	"github.com/NpoolPlatform/good-middleware/pkg/db"
 	"github.com/NpoolPlatform/good-middleware/pkg/db/ent"
+	entappstock "github.com/NpoolPlatform/good-middleware/pkg/db/ent/appstock"
 	entgoodreward "github.com/NpoolPlatform/good-middleware/pkg/db/ent/goodreward"
 
 	"github.com/google/uuid"
@@ -99,6 +100,67 @@ func migrateGoodReward(ctx context.Context, tx *ent.Tx) error {
 			Save(ctx); err != nil {
 			return err
 		}
+	}
+	return nil
+}
+
+func migrateAppGoodStock(ctx context.Context, tx *ent.Tx) error {
+	stocks, err := tx.
+		Stock.
+		Query().
+		All(ctx)
+	if err != nil {
+		return err
+	}
+
+	stockMap := map[uuid.UUID]*ent.Stock{}
+	for _, stock := range stocks {
+		stockMap[stock.GoodID] = stock
+	}
+
+	appGoods, err := tx.
+		AppGood.
+		Query().
+		All(ctx)
+	if err != nil {
+		return err
+	}
+
+	for _, appGood := range appGoods {
+		exist, err := tx.
+			AppStock.
+			Query().
+			Where(
+				entappstock.GoodID(appGood.GoodID),
+				entappstock.DeletedAt(0),
+			).
+			Exist(ctx)
+		if err != nil {
+			return err
+		}
+		if exist {
+			continue
+		}
+		stock, ok := stockMap[appGood.GoodID]
+		if !ok {
+			continue
+		}
+		if _, err := tx.
+			AppStock.
+			Create().
+			SetAppID(appGood.AppID).
+			SetGoodID(appGood.GoodID).
+			SetAppGoodID(appGood.ID).
+			SetReserved(decimal.NewFromInt(0)).
+			SetSpotQuantity(decimal.NewFromInt(0)).
+			SetLocked(stock.Locked).
+			SetInService(stock.InService).
+			SetWaitStart(stock.WaitStart).
+			SetSold(stock.Sold).
+			Save(ctx); err != nil {
+			return err
+		}
+		return nil
 	}
 	return nil
 }
@@ -203,6 +265,9 @@ func Migrate(ctx context.Context) error {
 			return err
 		}
 		if err := migrateGoodReward(_ctx, tx); err != nil {
+			return err
+		}
+		if err := migrateAppGoodStock(_ctx, tx); err != nil {
 			return err
 		}
 		return nil
