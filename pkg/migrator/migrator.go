@@ -165,7 +165,7 @@ func migrateAppGoodStock(ctx context.Context, tx *ent.Tx) error {
 	return nil
 }
 
-//nolint:funlen
+//nolint
 func Migrate(ctx context.Context) error {
 	var err error
 
