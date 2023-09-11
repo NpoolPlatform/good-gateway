@@ -117,15 +117,10 @@ func migrateAppGoodStock(ctx context.Context, tx *ent.Tx) error {
 	for _, stock := range stocks {
 		stockMap[stock.GoodID] = stock
 	}
-
-	appGoods, err := tx.
-		AppGood.
-		Query().
-		All(ctx)
-	if err != nil {
-		return err
-	}
 	for _, stock := range stocks {
+		if stock.SpotQuantity.Cmp(decimal.NewFromInt(0)) > 0 {
+			continue
+		}
 		if _, err := tx.
 			Stock.
 			UpdateOneID(stock.ID).
@@ -133,6 +128,14 @@ func migrateAppGoodStock(ctx context.Context, tx *ent.Tx) error {
 			Save(ctx); err != nil {
 			return err
 		}
+	}
+
+	appGoods, err := tx.
+		AppGood.
+		Query().
+		All(ctx)
+	if err != nil {
+		return err
 	}
 
 	for _, appGood := range appGoods {
