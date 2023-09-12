@@ -195,7 +195,7 @@ func Migrate(ctx context.Context) error {
 		return err
 	}
 
-	return db.WithTx(ctx, func(_ctx context.Context, tx *ent.Tx) error {
+	err = db.WithTx(ctx, func(_ctx context.Context, tx *ent.Tx) error {
 		_, err := tx.
 			ExecContext(
 				ctx,
@@ -332,4 +332,5 @@ func Migrate(ctx context.Context) error {
 		}
 		return nil
 	})
+	return err
 }
