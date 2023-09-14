@@ -14,6 +14,7 @@ import (
 	redis2 "github.com/NpoolPlatform/go-service-framework/pkg/redis"
 	"github.com/NpoolPlatform/good-middleware/pkg/db"
 	"github.com/NpoolPlatform/good-middleware/pkg/db/ent"
+	entappgood "github.com/NpoolPlatform/good-middleware/pkg/db/ent/appgood"
 	entappstock "github.com/NpoolPlatform/good-middleware/pkg/db/ent/appstock"
 	entgoodreward "github.com/NpoolPlatform/good-middleware/pkg/db/ent/goodreward"
 
@@ -177,6 +178,43 @@ func migrateAppGoodStock(ctx context.Context, tx *ent.Tx) error {
 	return nil
 }
 
+func migrateAppDefaultGood(ctx context.Context, tx *ent.Tx) error {
+	defs, err := tx.
+		AppDefaultGood.
+		Query().
+		All(ctx)
+	if err != nil {
+		return err
+	}
+
+	for _, def := range defs {
+		if def.AppGoodID != uuid.Nil {
+			continue
+		}
+		good, err := tx.
+			AppGood.
+			Query().
+			Where(
+				entappgood.AppID(def.AppID),
+				entappgood.GoodID(def.GoodID),
+				entappgood.DeletedAt(0),
+			).
+			Only(ctx)
+		if err != nil {
+			continue
+		}
+		if _, err := tx.
+			AppDefaultGood.
+			UpdateOneID(def.ID).
+			SetAppGoodID(good.ID).
+			Save(ctx); err != nil {
+			return err
+		}
+		return nil
+	}
+	return nil
+}
+
 //nolint
 func Migrate(ctx context.Context) error {
 	var err error
@@ -328,6 +366,9 @@ func Migrate(ctx context.Context) error {
 			return err
 		}
 		if err := migrateAppGoodStock(_ctx, tx); err != nil {
+			return err
+		}
+		if err := migrateAppDefaultGood(_ctx, tx); err != nil {
 			return err
 		}
 		return nil
