@@ -173,7 +173,6 @@ func migrateAppGoodStock(ctx context.Context, tx *ent.Tx) error {
 			Save(ctx); err != nil {
 			return err
 		}
-		return nil
 	}
 	return nil
 }
@@ -210,7 +209,6 @@ func migrateAppDefaultGood(ctx context.Context, tx *ent.Tx) error {
 			Save(ctx); err != nil {
 			return err
 		}
-		return nil
 	}
 	return nil
 }
