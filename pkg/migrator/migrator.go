@@ -144,6 +144,7 @@ func migrateAppGoodStock(ctx context.Context, tx *ent.Tx) error {
 			AppStock.
 			Query().
 			Where(
+				entappstock.GoodID(appGood.AppID),
 				entappstock.GoodID(appGood.GoodID),
 				entappstock.DeletedAt(0),
 			).
