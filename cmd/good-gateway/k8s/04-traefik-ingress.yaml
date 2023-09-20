@@ -91,7 +91,7 @@ spec:
     - host: api.npool.top
       http: &http_rules
         paths:
-          - path: /api/good/v1/create/n/appgood
+          - path: /api/good/v1/create/appgood
             backend:
               serviceName: good-gateway
               servicePort: 50550
@@ -232,31 +232,31 @@ spec:
               serviceName: good-gateway
               servicePort: 50550
 
-          - path: /api/good/v1/create/appdefaultgood
+          - path: /api/good/v1/create/defaultgood
             backend:
               serviceName: good-gateway
               servicePort: 50550
-          - path: /api/good/v1/create/n/appdefaultgood
+          - path: /api/good/v1/create/n/defaultgood
             backend:
               serviceName: good-gateway
               servicePort: 50550
-          - path: /api/good/v1/get/appdefaultgoods
+          - path: /api/good/v1/get/defaultgoods
             backend:
               serviceName: good-gateway
               servicePort: 50550
-          - path: /api/good/v1/get/n/appdefaultgoods
+          - path: /api/good/v1/get/n/defaultgoods
             backend:
               serviceName: good-gateway
               servicePort: 50550
-          - path: /api/good/v1/delete/appdefaultgood
+          - path: /api/good/v1/delete/defaultgood
             backend:
               serviceName: good-gateway
               servicePort: 50550
-          - path: /api/good/v1/update/appdefaultgood
+          - path: /api/good/v1/update/defaultgood
             backend:
               serviceName: good-gateway
               servicePort: 50550
-          - path: /api/good/v1/update/n/appdefaultgood
+          - path: /api/good/v1/update/n/defaultgood
             backend:
               serviceName: good-gateway
               servicePort: 50550
