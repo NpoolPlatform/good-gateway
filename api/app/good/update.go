@@ -76,7 +76,6 @@ func (s *Server) UpdateNGood(ctx context.Context, in *npool.UpdateNGoodRequest) 
 		good1.WithPrice(in.Price, false),
 		good1.WithDisplayIndex(in.DisplayIndex, false),
 		good1.WithPurchaseLimit(in.PurchaseLimit, false),
-		good1.WithServiceStartAt(in.ServiceStartAt, false),
 		good1.WithTechniqueFeeRatio(in.TechnicalFeeRatio, false),
 		good1.WithElectricityFeeRatio(in.ElectricityFeeRatio, false),
 		good1.WithEnablePurchase(in.EnablePurchase, false),
@@ -91,6 +90,9 @@ func (s *Server) UpdateNGood(ctx context.Context, in *npool.UpdateNGoodRequest) 
 		good1.WithDescriptions(in.Descriptions, false),
 		good1.WithGoodBanner(in.GoodBanner, false),
 		good1.WithDisplayNames(in.DisplayNames, false),
+		good1.WithSaleStartAt(in.SaleStartAt, false),
+		good1.WithSaleEndAt(in.SaleEndAt, false),
+		good1.WithServiceStartAt(in.ServiceStartAt, false),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(
