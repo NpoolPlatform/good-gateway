@@ -74,6 +74,7 @@ func (h *queryHandler) formalize() {
 			CreatedAt:              good.CreatedAt,
 			SaleStartAt:            good.SaleStartAt,
 			SaleEndAt:              good.SaleEndAt,
+			ServiceStartAt:         good.ServiceStartAt,
 			TechnicalFeeRatio:      good.TechnicalFeeRatio,
 			ElectricityFeeRatio:    good.ElectricityFeeRatio,
 			Descriptions:           good.Descriptions,
