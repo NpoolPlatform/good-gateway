@@ -113,6 +113,7 @@ func (h *queryHandler) formalize() {
 			info.CoinName = coin.Name
 			info.CoinUnit = coin.Unit
 			info.CoinPreSale = coin.Presale
+			info.CoinEnv = coin.ENV
 		}
 
 		supportCoins := []*npool.Good_CoinInfo{}
