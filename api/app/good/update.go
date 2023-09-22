@@ -90,8 +90,6 @@ func (s *Server) UpdateNGood(ctx context.Context, in *npool.UpdateNGoodRequest) 
 		good1.WithDescriptions(in.Descriptions, false),
 		good1.WithGoodBanner(in.GoodBanner, false),
 		good1.WithDisplayNames(in.DisplayNames, false),
-		good1.WithSaleStartAt(in.SaleStartAt, false),
-		good1.WithSaleEndAt(in.SaleEndAt, false),
 		good1.WithServiceStartAt(in.ServiceStartAt, false),
 	)
 	if err != nil {
