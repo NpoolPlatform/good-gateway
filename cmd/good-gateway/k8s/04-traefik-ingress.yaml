@@ -108,7 +108,6 @@ spec:
               serviceName: good-gateway
               servicePort: 50550
 
-
           - path: /api/good/v1/create/deviceinfo
             backend:
               serviceName: good-gateway
@@ -126,7 +125,6 @@ spec:
               serviceName: good-gateway
               servicePort: 50550
 
-
           - path: /api/good/v1/create/good
             backend:
               serviceName: good-gateway
@@ -143,7 +141,6 @@ spec:
             backend:
               serviceName: good-gateway
               servicePort: 50550
-
 
           - path: /api/good/v1/create/subgood
             backend:
@@ -170,7 +167,6 @@ spec:
               serviceName: good-gateway
               servicePort: 50550
 
-
           - path: /api/good/v1/create/vendorlocation
             backend:
               serviceName: good-gateway
@@ -188,6 +184,26 @@ spec:
               serviceName: good-gateway
               servicePort: 50550
 
+          - path: /api/good/v1/create/vendorbrand
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/update/vendorbrand
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/delete/vendorbrand
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/get/vendorbrand
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/get/vendorbrands
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
 
           - path: /api/good/v1/create/promotion
             backend:
@@ -209,7 +225,6 @@ spec:
             backend:
               serviceName: good-gateway
               servicePort: 50550
-
 
           - path: /api/good/v1/create/recommend
             backend:
