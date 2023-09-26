@@ -275,6 +275,64 @@ spec:
             backend:
               serviceName: good-gateway
               servicePort: 50550
+
+          - path: /api/good/v1/create/topmost
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/create/n/topmost
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/get/topmosts
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/get/n/topmosts
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/delete/topmost
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/update/topmost
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/update/n/topmost
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+
+          - path: /api/good/v1/create/topmostgood
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/create/n/topmostgood
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/get/topmostgoods
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/get/n/topmostgoods
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/delete/topmostgood
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/update/topmostgood
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/update/n/topmostgood
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
     - host: api.procyon.vip
       http: *http_rules
     - host: api.xpool.top
