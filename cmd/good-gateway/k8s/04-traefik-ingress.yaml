@@ -291,6 +291,27 @@ spec:
             backend:
               serviceName: good-gateway
               servicePort: 50550
+
+          - path: /api/good/v1/get/goodcomments
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/get/mygoodcomments
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/create/goodcomment
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/delete/goodcomment
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/update/goodcomment
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
     - host: api.procyon.vip
       http: *http_rules
     - host: api.xpool.top
