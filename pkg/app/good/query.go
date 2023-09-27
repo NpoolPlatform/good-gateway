@@ -3,20 +3,20 @@ package good
 import (
 	"context"
 
-	coinmwcli "github.com/NpoolPlatform/chain-middleware/pkg/client/coin"
+	appcoinmwcli "github.com/NpoolPlatform/chain-middleware/pkg/client/app/coin"
 	appgoodmwcli "github.com/NpoolPlatform/good-middleware/pkg/client/app/good"
 	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
-	coinmwpb "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin"
+	appcoinmwpb "github.com/NpoolPlatform/message/npool/chain/mw/v1/app/coin"
 	npool "github.com/NpoolPlatform/message/npool/good/gw/v1/app/good"
 	appgoodmwpb "github.com/NpoolPlatform/message/npool/good/mw/v1/app/good"
 )
 
 type queryHandler struct {
 	*Handler
-	goods []*appgoodmwpb.Good
-	infos []*npool.Good
-	coins map[string]*coinmwpb.Coin
+	goods    []*appgoodmwpb.Good
+	infos    []*npool.Good
+	appCoins map[string]*appcoinmwpb.Coin
 }
 
 func (h *queryHandler) getCoins(ctx context.Context) error {
@@ -25,14 +25,15 @@ func (h *queryHandler) getCoins(ctx context.Context) error {
 		coinTypeIDs = append(coinTypeIDs, good.CoinTypeID)
 		coinTypeIDs = append(coinTypeIDs, good.SupportCoinTypeIDs...)
 	}
-	coins, _, err := coinmwcli.GetCoins(ctx, &coinmwpb.Conds{
-		IDs: &basetypes.StringSliceVal{Op: cruder.IN, Value: coinTypeIDs},
+	coins, _, err := appcoinmwcli.GetCoins(ctx, &appcoinmwpb.Conds{
+		AppID:       &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID},
+		CoinTypeIDs: &basetypes.StringSliceVal{Op: cruder.IN, Value: coinTypeIDs},
 	}, int32(0), int32(len(coinTypeIDs)))
 	if err != nil {
 		return err
 	}
 	for _, coin := range coins {
-		h.coins[coin.ID] = coin
+		h.appCoins[coin.CoinTypeID] = coin
 	}
 	return nil
 }
@@ -108,7 +109,7 @@ func (h *queryHandler) formalize() {
 			AppGoodPosters:         good.AppGoodPosters,
 		}
 
-		coin, ok := h.coins[good.CoinTypeID]
+		coin, ok := h.appCoins[good.CoinTypeID]
 		if ok {
 			info.CoinLogo = coin.Logo
 			info.CoinName = coin.Name
@@ -119,7 +120,7 @@ func (h *queryHandler) formalize() {
 
 		supportCoins := []*npool.Good_CoinInfo{}
 		for _, coinTypeID := range good.SupportCoinTypeIDs {
-			coin, ok := h.coins[coinTypeID]
+			coin, ok := h.appCoins[coinTypeID]
 			if !ok {
 				continue
 			}
@@ -147,9 +148,9 @@ func (h *Handler) GetGood(ctx context.Context) (*npool.Good, error) {
 	}
 
 	handler := &queryHandler{
-		Handler: h,
-		goods:   []*appgoodmwpb.Good{good},
-		coins:   map[string]*coinmwpb.Coin{},
+		Handler:  h,
+		goods:    []*appgoodmwpb.Good{good},
+		appCoins: map[string]*appcoinmwpb.Coin{},
 	}
 
 	if err := handler.getCoins(ctx); err != nil {
@@ -177,9 +178,9 @@ func (h *Handler) GetGoods(ctx context.Context) ([]*npool.Good, uint32, error) {
 	}
 
 	handler := &queryHandler{
-		Handler: h,
-		goods:   goods,
-		coins:   map[string]*coinmwpb.Coin{},
+		Handler:  h,
+		goods:    goods,
+		appCoins: map[string]*appcoinmwpb.Coin{},
 	}
 
 	if err := handler.getCoins(ctx); err != nil {
@@ -212,9 +213,9 @@ func (h *Handler) GetGoodOnly(ctx context.Context) (*npool.Good, error) {
 	}
 
 	handler := &queryHandler{
-		Handler: h,
-		goods:   []*appgoodmwpb.Good{good},
-		coins:   map[string]*coinmwpb.Coin{},
+		Handler:  h,
+		goods:    []*appgoodmwpb.Good{good},
+		appCoins: map[string]*appcoinmwpb.Coin{},
 	}
 
 	if err := handler.getCoins(ctx); err != nil {
