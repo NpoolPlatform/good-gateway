@@ -39,11 +39,11 @@ func (h *Handler) CreateScore(ctx context.Context) (*npool.Score, error) {
 	}
 
 	if _, err := scoremwcli.CreateScore(ctx, &scoremwpb.ScoreReq{
-		ID:     h.ID,
-		AppID:  h.AppID,
-		UserID: h.UserID,
-		GoodID: h.GoodID,
-		Score:  h.Score,
+		ID:        h.ID,
+		AppID:     h.AppID,
+		UserID:    h.UserID,
+		AppGoodID: h.AppGoodID,
+		Score:     h.Score,
 	}); err != nil {
 		return nil, err
 	}

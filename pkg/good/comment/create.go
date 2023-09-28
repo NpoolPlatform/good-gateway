@@ -30,7 +30,7 @@ func (h *Handler) CreateComment(ctx context.Context) (*npool.Comment, error) {
 		ID:        h.ID,
 		AppID:     h.AppID,
 		UserID:    h.UserID,
-		GoodID:    h.GoodID,
+		AppGoodID: h.AppGoodID,
 		OrderID:   h.OrderID,
 		Content:   h.Content,
 		ReplyToID: h.ReplyToID,

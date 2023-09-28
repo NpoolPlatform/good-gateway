@@ -30,7 +30,7 @@ func (h *Handler) CreateLike(ctx context.Context) (*npool.Like, error) {
 		ID:     h.ID,
 		AppID:  h.AppID,
 		UserID: h.UserID,
-		GoodID: h.GoodID,
+		AppGoodID: h.AppGoodID,
 		Like:   h.Like,
 	}); err != nil {
 		return nil, err

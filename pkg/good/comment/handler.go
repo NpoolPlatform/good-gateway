@@ -15,7 +15,7 @@ type Handler struct {
 	ID        *string
 	AppID     *string
 	UserID    *string
-	GoodID    *string
+	AppGoodID *string
 	OrderID   *string
 	Content   *string
 	ReplyToID *string
@@ -85,18 +85,18 @@ func WithUserID(id *string, must bool) func(context.Context, *Handler) error {
 	}
 }
 
-func WithGoodID(id *string, must bool) func(context.Context, *Handler) error {
+func WithAppGoodID(id *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if id == nil {
 			if must {
-				return fmt.Errorf("invalid goodid")
+				return fmt.Errorf("invalid appgoodid")
 			}
 			return nil
 		}
 		if _, err := uuid.Parse(*id); err != nil {
 			return err
 		}
-		h.GoodID = id
+		h.AppGoodID = id
 		return nil
 	}
 }

@@ -65,7 +65,7 @@ func (h *queryHandler) formalize() {
 			ID:        comment.ID,
 			AppID:     comment.AppID,
 			UserID:    comment.UserID,
-			GoodID:    comment.GoodID,
+			AppGoodID: comment.AppGoodID,
 			GoodName:  comment.GoodName,
 			Content:   comment.Content,
 			CreatedAt: comment.CreatedAt,
@@ -135,8 +135,8 @@ func (h *Handler) GetComment(ctx context.Context) (*npool.Comment, error) {
 
 func (h *Handler) GetComments(ctx context.Context) ([]*npool.Comment, uint32, error) {
 	conds := &commentmwpb.Conds{}
-	if h.GoodID != nil {
-		conds.GoodID = &basetypes.StringVal{Op: cruder.EQ, Value: *h.GoodID}
+	if h.AppGoodID != nil {
+		conds.AppGoodID = &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppGoodID}
 	}
 	if h.AppID != nil {
 		conds.AppID = &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID}

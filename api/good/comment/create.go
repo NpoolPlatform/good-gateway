@@ -17,7 +17,7 @@ func (s *Server) CreateComment(ctx context.Context, in *npool.CreateCommentReque
 		ctx,
 		comment1.WithAppID(&in.AppID, true),
 		comment1.WithUserID(&in.UserID, true),
-		comment1.WithGoodID(&in.GoodID, true),
+		comment1.WithAppGoodID(&in.AppGoodID, true),
 		comment1.WithOrderID(in.OrderID, false),
 		comment1.WithContent(&in.Content, true),
 		comment1.WithReplyToID(in.ReplyToID, false),
