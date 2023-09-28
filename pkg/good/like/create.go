@@ -27,11 +27,11 @@ func (h *Handler) CreateLike(ctx context.Context) (*npool.Like, error) {
 	}
 
 	if _, err := likemwcli.CreateLike(ctx, &likemwpb.LikeReq{
-		ID:     h.ID,
-		AppID:  h.AppID,
-		UserID: h.UserID,
+		ID:        h.ID,
+		AppID:     h.AppID,
+		UserID:    h.UserID,
 		AppGoodID: h.AppGoodID,
-		Like:   h.Like,
+		Like:      h.Like,
 	}); err != nil {
 		return nil, err
 	}
