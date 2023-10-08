@@ -3,14 +3,14 @@ module github.com/NpoolPlatform/good-gateway
 go 1.17
 
 require (
-	github.com/NpoolPlatform/appuser-middleware v0.0.0-20230924060533-3e21b24a2113
-	github.com/NpoolPlatform/basal-middleware v0.0.0-20230924051732-306a71d294ed
-	github.com/NpoolPlatform/chain-middleware v0.0.0-20230924052457-76b2482b116b
-	github.com/NpoolPlatform/go-service-framework v0.0.0-20230922114506-a65341cfbf48
-	github.com/NpoolPlatform/good-middleware v0.0.0-20230927070941-fd8184d7cebb
-	github.com/NpoolPlatform/libent-cruder v0.0.0-20230825073905-d23e4d838f99
-	github.com/NpoolPlatform/message v0.0.0-20230927070400-c507e1c30f94
-	github.com/NpoolPlatform/order-middleware v0.0.0-20230924055637-0cfe6550171b
+	github.com/NpoolPlatform/appuser-middleware v0.0.0-20231008071345-5f5d687710d1
+	github.com/NpoolPlatform/basal-middleware v0.0.0-20231008034340-a1d6a899ef37
+	github.com/NpoolPlatform/chain-middleware v0.0.0-20231008090947-e534ba41d758
+	github.com/NpoolPlatform/go-service-framework v0.0.0-20230930023319-e48074d9472e
+	github.com/NpoolPlatform/good-middleware v0.0.0-20231008035243-d786b745cc99
+	github.com/NpoolPlatform/libent-cruder v0.0.0-20231008034140-808c78a650ca
+	github.com/NpoolPlatform/message v0.0.0-20231008030256-5d1912e2f3c7
+	github.com/NpoolPlatform/order-middleware v0.0.0-20231008070232-ffa976c5d6da
 	github.com/go-resty/resty/v2 v2.7.0
 	github.com/google/uuid v1.3.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.15.2
