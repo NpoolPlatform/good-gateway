@@ -7,7 +7,7 @@ import (
 	"github.com/NpoolPlatform/go-service-framework/pkg/action"
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
 	"github.com/NpoolPlatform/good-gateway/api"
-
+	"github.com/NpoolPlatform/good-gateway/pkg/migrator"
 	"github.com/NpoolPlatform/good-middleware/pkg/db"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	cli "github.com/urfave/cli/v2"
@@ -31,6 +31,9 @@ var runCmd = &cli.Command{
 
 func run(ctx context.Context) error {
 	if err := db.Init(); err != nil {
+		return err
+	}
+	if err := migrator.Migrate(ctx); err != nil {
 		return err
 	}
 	return nil
