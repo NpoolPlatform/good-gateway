@@ -5,8 +5,12 @@ import (
 	"fmt"
 
 	usermwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/user"
+	appgooodmwcli "github.com/NpoolPlatform/good-middleware/pkg/client/app/good"
 	scoremwcli "github.com/NpoolPlatform/good-middleware/pkg/client/good/score"
+	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
+	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 	npool "github.com/NpoolPlatform/message/npool/good/gw/v1/good/score"
+	appgoodmwpb "github.com/NpoolPlatform/message/npool/good/mw/v1/app/good"
 	scoremwpb "github.com/NpoolPlatform/message/npool/good/mw/v1/good/score"
 
 	"github.com/google/uuid"
@@ -20,6 +24,17 @@ func (h *Handler) CreateScore(ctx context.Context) (*npool.Score, error) {
 	}
 	if !exist {
 		return nil, fmt.Errorf("invalid user")
+	}
+
+	exist, err = appgooodmwcli.ExistGoodConds(ctx, &appgoodmwpb.Conds{
+		ID:    &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppGoodID},
+		AppID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID},
+	})
+	if err != nil {
+		return nil, err
+	}
+	if !exist {
+		return nil, fmt.Errorf("invalid appgood")
 	}
 
 	id := uuid.NewString()

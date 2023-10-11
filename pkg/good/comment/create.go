@@ -35,7 +35,7 @@ func (h *Handler) CreateComment(ctx context.Context) (*npool.Comment, error) {
 		return nil, err
 	}
 	if !exist {
-		return nil, fmt.Errorf("invalid user")
+		return nil, fmt.Errorf("invalid appgood")
 	}
 
 	if h.OrderID != nil {
