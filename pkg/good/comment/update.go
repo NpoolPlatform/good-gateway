@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	usermwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/user"
 	commentmwcli "github.com/NpoolPlatform/good-middleware/pkg/client/good/comment"
 	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
@@ -12,7 +13,15 @@ import (
 )
 
 func (h *Handler) UpdateComment(ctx context.Context) (*npool.Comment, error) {
-	exist, err := commentmwcli.ExistCommentConds(ctx, &commentmwpb.Conds{
+	exist, err := usermwcli.ExistUser(ctx, *h.AppID, *h.UserID)
+	if err != nil {
+		return nil, err
+	}
+	if !exist {
+		return nil, fmt.Errorf("invalid user")
+	}
+
+	exist, err = commentmwcli.ExistCommentConds(ctx, &commentmwpb.Conds{
 		ID:     &basetypes.StringVal{Op: cruder.EQ, Value: *h.ID},
 		AppID:  &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID},
 		UserID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.UserID},
