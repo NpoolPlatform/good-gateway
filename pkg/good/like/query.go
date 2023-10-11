@@ -120,13 +120,21 @@ func (h *Handler) GetLike(ctx context.Context) (*npool.Like, error) {
 }
 
 func (h *Handler) GetLikes(ctx context.Context) ([]*npool.Like, uint32, error) {
+	if h.UserID != nil {
+		exist, err := usermwcli.ExistUser(ctx, *h.AppID, *h.UserID)
+		if err != nil {
+			return nil, 0, err
+		}
+		if !exist {
+			return nil, 0, fmt.Errorf("invalid user")
+		}
+	}
+
 	conds := &likemwpb.Conds{}
 	if h.AppGoodID != nil {
 		conds.AppGoodID = &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppGoodID}
 	}
-	if h.AppID != nil {
-		conds.AppID = &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID}
-	}
+	conds.AppID = &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID}
 	if h.UserID != nil {
 		conds.UserID = &basetypes.StringVal{Op: cruder.EQ, Value: *h.UserID}
 	}

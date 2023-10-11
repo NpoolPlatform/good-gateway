@@ -115,18 +115,25 @@ func (h *Handler) GetScore(ctx context.Context) (*npool.Score, error) {
 	if len(handler.infos) == 0 {
 		return nil, nil
 	}
-
 	return handler.infos[0], nil
 }
 
 func (h *Handler) GetScores(ctx context.Context) ([]*npool.Score, uint32, error) {
+	if h.UserID != nil {
+		exist, err := usermwcli.ExistUser(ctx, *h.AppID, *h.UserID)
+		if err != nil {
+			return nil, 0, err
+		}
+		if !exist {
+			return nil, 0, fmt.Errorf("invalid user")
+		}
+	}
+
 	conds := &scoremwpb.Conds{}
 	if h.AppGoodID != nil {
 		conds.AppGoodID = &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppGoodID}
 	}
-	if h.AppID != nil {
-		conds.AppID = &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID}
-	}
+	conds.AppID = &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID}
 	if h.UserID != nil {
 		conds.UserID = &basetypes.StringVal{Op: cruder.EQ, Value: *h.UserID}
 	}
