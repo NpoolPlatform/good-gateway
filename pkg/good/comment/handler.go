@@ -5,9 +5,9 @@ import (
 	"fmt"
 
 	appmwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/app"
+	goodmwcli "github.com/NpoolPlatform/good-middleware/pkg/client/good"
 	constant "github.com/NpoolPlatform/good-middleware/pkg/const"
 	ordermwcli "github.com/NpoolPlatform/order-middleware/pkg/client/order"
-	goodmwcli "github.com/NpoolPlatform/good-middleware/pkg/client/good"
 	"github.com/google/uuid"
 )
 
