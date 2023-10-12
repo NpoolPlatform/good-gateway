@@ -13,16 +13,30 @@ import (
 	commentmwpb "github.com/NpoolPlatform/message/npool/good/mw/v1/good/comment"
 )
 
-func (h *Handler) DeleteComment(ctx context.Context) (*npool.Comment, error) {
+type deleteHandler struct {
+	*Handler
+}
+
+func (h *deleteHandler) checkUser(ctx context.Context) error {
 	exist, err := usermwcli.ExistUser(ctx, *h.AppID, *h.UserID)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	if !exist {
-		return nil, fmt.Errorf("invalid user")
+		return fmt.Errorf("invalid user")
+	}
+	return nil
+}
+
+func (h *Handler) DeleteComment(ctx context.Context) (*npool.Comment, error) {
+	handler := &deleteHandler{
+		Handler: h,
+	}
+	if err := handler.checkUser(ctx); err != nil {
+		return nil, err
 	}
 
-	exist, err = commentmwcli.ExistCommentConds(ctx, &commentmwpb.Conds{
+	exist, err := commentmwcli.ExistCommentConds(ctx, &commentmwpb.Conds{
 		ID:     &basetypes.StringVal{Op: cruder.EQ, Value: *h.ID},
 		AppID:  &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID},
 		UserID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.UserID},
@@ -38,10 +52,27 @@ func (h *Handler) DeleteComment(ctx context.Context) (*npool.Comment, error) {
 	if err != nil {
 		return nil, err
 	}
+	if _, err := commentmwcli.DeleteComment(ctx, *h.ID); err != nil {
+		return nil, err
+	}
+	return info, nil
+}
+
+func (h *Handler) DeleteAppComment(ctx context.Context) (*npool.Comment, error) {
+	handler := &deleteHandler{
+		Handler: h,
+	}
+	if err := handler.checkUser(ctx); err != nil {
+		return nil, err
+	}
+
+	info, err := h.GetComment(ctx)
+	if err != nil {
+		return nil, err
+	}
 
 	if _, err := commentmwcli.DeleteComment(ctx, *h.ID); err != nil {
 		return nil, err
 	}
-
 	return info, nil
 }

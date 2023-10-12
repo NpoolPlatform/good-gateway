@@ -42,3 +42,34 @@ func (s *Server) DeleteComment(ctx context.Context, in *npool.DeleteCommentReque
 		Info: info,
 	}, nil
 }
+
+func (s *Server) DeleteAppComment(ctx context.Context, in *npool.DeleteAppCommentRequest) (*npool.DeleteAppCommentResponse, error) {
+	handler, err := comment1.NewHandler(
+		ctx,
+		comment1.WithID(&in.ID, true),
+		comment1.WithAppID(&in.AppID, true),
+		comment1.WithUserID(&in.UserID, true),
+	)
+	if err != nil {
+		logger.Sugar().Errorw(
+			"DeleteAppComment",
+			"In", in,
+			"Error", err,
+		)
+		return &npool.DeleteAppCommentResponse{}, status.Error(codes.Aborted, err.Error())
+	}
+
+	info, err := handler.DeleteComment(ctx)
+	if err != nil {
+		logger.Sugar().Errorw(
+			"DeleteAppComment",
+			"In", in,
+			"Error", err,
+		)
+		return &npool.DeleteAppCommentResponse{}, status.Error(codes.Aborted, err.Error())
+	}
+
+	return &npool.DeleteAppCommentResponse{
+		Info: info,
+	}, nil
+}
