@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	appmwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/app"
+	goodmwcli "github.com/NpoolPlatform/good-middleware/pkg/client/good"
 	constant "github.com/NpoolPlatform/good-middleware/pkg/const"
 
 	"github.com/google/uuid"
@@ -94,6 +95,13 @@ func WithGoodID(id *string, must bool) func(context.Context, *Handler) error {
 		}
 		if _, err := uuid.Parse(*id); err != nil {
 			return err
+		}
+		good, err := goodmwcli.GetGood(ctx, *id)
+		if err != nil {
+			return err
+		}
+		if good == nil {
+			return fmt.Errorf("good not found")
 		}
 		h.GoodID = id
 		return nil
