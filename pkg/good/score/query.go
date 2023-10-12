@@ -63,6 +63,7 @@ func (h *queryHandler) formalize() {
 			ID:        score.ID,
 			AppID:     score.AppID,
 			UserID:    score.UserID,
+			GoodID:    score.GoodID,
 			AppGoodID: score.AppGoodID,
 			GoodName:  score.GoodName,
 			Score:     score.Score,
@@ -136,6 +137,9 @@ func (h *Handler) GetScores(ctx context.Context) ([]*npool.Score, uint32, error)
 	}
 	if h.UserID != nil {
 		conds.UserID = &basetypes.StringVal{Op: cruder.EQ, Value: *h.UserID}
+	}
+	if h.GoodID != nil {
+		conds.GoodID = &basetypes.StringVal{Op: cruder.EQ, Value: *h.GoodID}
 	}
 	scores, total, err := scoremwcli.GetScores(ctx, conds, h.Offset, h.Limit)
 	if err != nil {

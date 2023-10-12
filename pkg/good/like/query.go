@@ -63,6 +63,7 @@ func (h *queryHandler) formalize() {
 			ID:        like.ID,
 			AppID:     like.AppID,
 			UserID:    like.UserID,
+			GoodID:    like.GoodID,
 			AppGoodID: like.AppGoodID,
 			GoodName:  like.GoodName,
 			Like:      like.Like,
@@ -137,6 +138,9 @@ func (h *Handler) GetLikes(ctx context.Context) ([]*npool.Like, uint32, error) {
 	}
 	if h.UserID != nil {
 		conds.UserID = &basetypes.StringVal{Op: cruder.EQ, Value: *h.UserID}
+	}
+	if h.GoodID != nil {
+		conds.GoodID = &basetypes.StringVal{Op: cruder.EQ, Value: *h.GoodID}
 	}
 	likes, total, err := likemwcli.GetLikes(ctx, conds, h.Offset, h.Limit)
 	if err != nil {
