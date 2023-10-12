@@ -12,6 +12,7 @@ import (
 	npool "github.com/NpoolPlatform/message/npool/good/gw/v1/good/comment"
 )
 
+///nolint
 func (s *Server) DeleteComment(ctx context.Context, in *npool.DeleteCommentRequest) (*npool.DeleteCommentResponse, error) {
 	handler, err := comment1.NewHandler(
 		ctx,
@@ -43,6 +44,7 @@ func (s *Server) DeleteComment(ctx context.Context, in *npool.DeleteCommentReque
 	}, nil
 }
 
+//nolint
 func (s *Server) DeleteAppComment(ctx context.Context, in *npool.DeleteAppCommentRequest) (*npool.DeleteAppCommentResponse, error) {
 	handler, err := comment1.NewHandler(
 		ctx,
