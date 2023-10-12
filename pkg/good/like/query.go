@@ -131,14 +131,13 @@ func (h *Handler) GetLikes(ctx context.Context) ([]*npool.Like, uint32, error) {
 	}
 
 	conds := &likemwpb.Conds{}
+	conds.AppID = &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID}
 	if h.AppGoodID != nil {
 		conds.AppGoodID = &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppGoodID}
 	}
-	conds.AppID = &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID}
 	if h.UserID != nil {
 		conds.UserID = &basetypes.StringVal{Op: cruder.EQ, Value: *h.UserID}
 	}
-
 	likes, total, err := likemwcli.GetLikes(ctx, conds, h.Offset, h.Limit)
 	if err != nil {
 		return nil, 0, err
