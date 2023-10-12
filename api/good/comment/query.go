@@ -16,6 +16,7 @@ func (s *Server) GetComments(ctx context.Context, in *npool.GetCommentsRequest) 
 	handler, err := comment1.NewHandler(
 		ctx,
 		comment1.WithAppID(&in.AppID, true),
+		comment1.WithGoodID(in.GoodID, false),
 		comment1.WithAppGoodID(in.AppGoodID, false),
 		comment1.WithOffset(in.Offset),
 		comment1.WithLimit(in.Limit),

@@ -16,6 +16,7 @@ func (s *Server) GetLikes(ctx context.Context, in *npool.GetLikesRequest) (*npoo
 	handler, err := like1.NewHandler(
 		ctx,
 		like1.WithAppID(&in.AppID, true),
+		like1.WithGoodID(in.GoodID, false),
 		like1.WithAppGoodID(in.AppGoodID, false),
 		like1.WithOffset(in.Offset),
 		like1.WithLimit(in.Limit),

@@ -14,6 +14,7 @@ type Handler struct {
 	ID        *string
 	AppID     *string
 	UserID    *string
+	GoodID    *string
 	AppGoodID *string
 	Like      *bool
 	Offset    int32
@@ -78,6 +79,22 @@ func WithUserID(id *string, must bool) func(context.Context, *Handler) error {
 			return err
 		}
 		h.UserID = id
+		return nil
+	}
+}
+
+func WithGoodID(id *string, must bool) func(context.Context, *Handler) error {
+	return func(ctx context.Context, h *Handler) error {
+		if id == nil {
+			if must {
+				return fmt.Errorf("invalid goodid")
+			}
+			return nil
+		}
+		if _, err := uuid.Parse(*id); err != nil {
+			return err
+		}
+		h.GoodID = id
 		return nil
 	}
 }
