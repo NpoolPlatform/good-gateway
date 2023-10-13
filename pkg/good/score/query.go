@@ -64,6 +64,7 @@ func (h *queryHandler) formalize() {
 			AppID:     score.AppID,
 			UserID:    score.UserID,
 			GoodID:    score.GoodID,
+			AppGoodID: score.AppGoodID,
 			GoodName:  score.GoodName,
 			Score:     score.Score,
 			CreatedAt: score.CreatedAt,
@@ -115,22 +116,31 @@ func (h *Handler) GetScore(ctx context.Context) (*npool.Score, error) {
 	if len(handler.infos) == 0 {
 		return nil, nil
 	}
-
 	return handler.infos[0], nil
 }
 
 func (h *Handler) GetScores(ctx context.Context) ([]*npool.Score, uint32, error) {
-	conds := &scoremwpb.Conds{}
-	if h.GoodID != nil {
-		conds.GoodID = &basetypes.StringVal{Op: cruder.EQ, Value: *h.GoodID}
+	if h.UserID != nil {
+		exist, err := usermwcli.ExistUser(ctx, *h.AppID, *h.UserID)
+		if err != nil {
+			return nil, 0, err
+		}
+		if !exist {
+			return nil, 0, fmt.Errorf("invalid user")
+		}
 	}
-	if h.AppID != nil {
-		conds.AppID = &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID}
+
+	conds := &scoremwpb.Conds{}
+	conds.AppID = &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID}
+	if h.AppGoodID != nil {
+		conds.AppGoodID = &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppGoodID}
 	}
 	if h.UserID != nil {
 		conds.UserID = &basetypes.StringVal{Op: cruder.EQ, Value: *h.UserID}
 	}
-
+	if h.GoodID != nil {
+		conds.GoodID = &basetypes.StringVal{Op: cruder.EQ, Value: *h.GoodID}
+	}
 	scores, total, err := scoremwcli.GetScores(ctx, conds, h.Offset, h.Limit)
 	if err != nil {
 		return nil, 0, err

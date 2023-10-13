@@ -5,8 +5,12 @@ import (
 	"fmt"
 
 	usermwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/user"
+	appgooodmwcli "github.com/NpoolPlatform/good-middleware/pkg/client/app/good"
 	likemwcli "github.com/NpoolPlatform/good-middleware/pkg/client/good/like"
+	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
+	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 	npool "github.com/NpoolPlatform/message/npool/good/gw/v1/good/like"
+	appgoodmwpb "github.com/NpoolPlatform/message/npool/good/mw/v1/app/good"
 	likemwpb "github.com/NpoolPlatform/message/npool/good/mw/v1/good/like"
 
 	"github.com/google/uuid"
@@ -21,17 +25,28 @@ func (h *Handler) CreateLike(ctx context.Context) (*npool.Like, error) {
 		return nil, fmt.Errorf("invalid user")
 	}
 
+	exist, err = appgooodmwcli.ExistGoodConds(ctx, &appgoodmwpb.Conds{
+		ID:    &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppGoodID},
+		AppID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID},
+	})
+	if err != nil {
+		return nil, err
+	}
+	if !exist {
+		return nil, fmt.Errorf("invalid appgood")
+	}
+
 	id := uuid.NewString()
 	if h.ID == nil {
 		h.ID = &id
 	}
 
 	if _, err := likemwcli.CreateLike(ctx, &likemwpb.LikeReq{
-		ID:     h.ID,
-		AppID:  h.AppID,
-		UserID: h.UserID,
-		GoodID: h.GoodID,
-		Like:   h.Like,
+		ID:        h.ID,
+		AppID:     h.AppID,
+		UserID:    h.UserID,
+		AppGoodID: h.AppGoodID,
+		Like:      h.Like,
 	}); err != nil {
 		return nil, err
 	}

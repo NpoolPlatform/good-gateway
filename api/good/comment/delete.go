@@ -17,7 +17,7 @@ func (s *Server) DeleteComment(ctx context.Context, in *npool.DeleteCommentReque
 		ctx,
 		comment1.WithID(&in.ID, true),
 		comment1.WithAppID(&in.AppID, true),
-		comment1.WithUserID(&in.UserID, true),
+		comment1.WithTargetUserID(&in.UserID, true),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(
@@ -39,6 +39,39 @@ func (s *Server) DeleteComment(ctx context.Context, in *npool.DeleteCommentReque
 	}
 
 	return &npool.DeleteCommentResponse{
+		Info: info,
+	}, nil
+}
+
+//nolint
+func (s *Server) DeleteAppComment(ctx context.Context, in *npool.DeleteAppCommentRequest) (*npool.DeleteAppCommentResponse, error) {
+	handler, err := comment1.NewHandler(
+		ctx,
+		comment1.WithID(&in.ID, true),
+		comment1.WithAppID(&in.AppID, true),
+		comment1.WithUserID(&in.UserID, true),
+		comment1.WithTargetUserID(&in.TargetUserID, true),
+	)
+	if err != nil {
+		logger.Sugar().Errorw(
+			"DeleteAppComment",
+			"In", in,
+			"Error", err,
+		)
+		return &npool.DeleteAppCommentResponse{}, status.Error(codes.Aborted, err.Error())
+	}
+
+	info, err := handler.DeleteComment(ctx)
+	if err != nil {
+		logger.Sugar().Errorw(
+			"DeleteAppComment",
+			"In", in,
+			"Error", err,
+		)
+		return &npool.DeleteAppCommentResponse{}, status.Error(codes.Aborted, err.Error())
+	}
+
+	return &npool.DeleteAppCommentResponse{
 		Info: info,
 	}, nil
 }

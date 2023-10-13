@@ -17,7 +17,7 @@ func (s *Server) CreateLike(ctx context.Context, in *npool.CreateLikeRequest) (*
 		ctx,
 		like1.WithAppID(&in.AppID, true),
 		like1.WithUserID(&in.UserID, true),
-		like1.WithGoodID(&in.GoodID, true),
+		like1.WithAppGoodID(&in.AppGoodID, true),
 		like1.WithLike(&in.Like, true),
 	)
 	if err != nil {

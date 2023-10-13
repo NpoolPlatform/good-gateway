@@ -43,6 +43,14 @@ spec:
             backend:
               serviceName: good-gateway
               servicePort: 50550
+          - path: /api/good/v1/get/topmosts
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/get/topmostgoods
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
     - host: api.procyon.vip
       http: *http_rules
     - host: api.xpool.top
@@ -242,10 +250,6 @@ spec:
             backend:
               serviceName: good-gateway
               servicePort: 50550
-          - path: /api/good/v1/get/topmosts
-            backend:
-              serviceName: good-gateway
-              servicePort: 50550
           - path: /api/good/v1/get/n/topmosts
             backend:
               serviceName: good-gateway
@@ -268,10 +272,6 @@ spec:
               serviceName: good-gateway
               servicePort: 50550
           - path: /api/good/v1/create/n/topmostgood
-            backend:
-              serviceName: good-gateway
-              servicePort: 50550
-          - path: /api/good/v1/get/topmostgoods
             backend:
               serviceName: good-gateway
               servicePort: 50550
@@ -309,6 +309,10 @@ spec:
               serviceName: good-gateway
               servicePort: 50550
           - path: /api/good/v1/update/goodcomment
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/delete/app/goodcomment
             backend:
               serviceName: good-gateway
               servicePort: 50550

@@ -66,6 +66,7 @@ func (h *queryHandler) formalize() {
 			AppID:     comment.AppID,
 			UserID:    comment.UserID,
 			GoodID:    comment.GoodID,
+			AppGoodID: comment.AppGoodID,
 			GoodName:  comment.GoodName,
 			Content:   comment.Content,
 			CreatedAt: comment.CreatedAt,
@@ -134,17 +135,27 @@ func (h *Handler) GetComment(ctx context.Context) (*npool.Comment, error) {
 }
 
 func (h *Handler) GetComments(ctx context.Context) ([]*npool.Comment, uint32, error) {
-	conds := &commentmwpb.Conds{}
-	if h.GoodID != nil {
-		conds.GoodID = &basetypes.StringVal{Op: cruder.EQ, Value: *h.GoodID}
+	if h.UserID != nil {
+		exist, err := usermwcli.ExistUser(ctx, *h.AppID, *h.UserID)
+		if err != nil {
+			return nil, 0, err
+		}
+		if !exist {
+			return nil, 0, fmt.Errorf("invalid user")
+		}
 	}
-	if h.AppID != nil {
-		conds.AppID = &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID}
+
+	conds := &commentmwpb.Conds{}
+	conds.AppID = &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID}
+	if h.AppGoodID != nil {
+		conds.AppGoodID = &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppGoodID}
 	}
 	if h.UserID != nil {
 		conds.UserID = &basetypes.StringVal{Op: cruder.EQ, Value: *h.UserID}
 	}
-
+	if h.GoodID != nil {
+		conds.GoodID = &basetypes.StringVal{Op: cruder.EQ, Value: *h.GoodID}
+	}
 	comments, total, err := commentmwcli.GetComments(ctx, conds, h.Offset, h.Limit)
 	if err != nil {
 		return nil, 0, err
