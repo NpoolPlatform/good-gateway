@@ -18,12 +18,21 @@ type deleteHandler struct {
 }
 
 func (h *deleteHandler) checkUser(ctx context.Context) error {
-	exist, err := usermwcli.ExistUser(ctx, *h.AppID, *h.UserID)
+	exist, err := usermwcli.ExistUser(ctx, *h.AppID, *h.TargetUserID)
 	if err != nil {
 		return err
 	}
 	if !exist {
 		return fmt.Errorf("invalid user")
+	}
+	if h.UserID != nil {
+		exist, err := usermwcli.ExistUser(ctx, *h.AppID, *h.UserID)
+		if err != nil {
+			return err
+		}
+		if !exist {
+			return fmt.Errorf("invalid user")
+		}
 	}
 	return nil
 }
