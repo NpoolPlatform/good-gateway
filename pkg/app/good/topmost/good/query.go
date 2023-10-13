@@ -45,13 +45,13 @@ func (h *queryHandler) getCoins(ctx context.Context) error {
 		coinTypeIDs = append(coinTypeIDs, good.CoinTypeID)
 	}
 	coins, _, err := coinmwcli.GetCoins(ctx, &coinmwpb.Conds{
-		IDs: &basetypes.StringSliceVal{Op: cruder.IN, Value: coinTypeIDs},
+		EntIDs: &basetypes.StringSliceVal{Op: cruder.IN, Value: coinTypeIDs},
 	}, int32(0), int32(len(coinTypeIDs)))
 	if err != nil {
 		return err
 	}
 	for _, coin := range coins {
-		h.coins[coin.ID] = coin
+		h.coins[coin.EntID] = coin
 	}
 	return nil
 }

@@ -244,7 +244,7 @@ func WithUnitAmount(n *int32, must bool) func(context.Context, *Handler) error {
 func WithSupportCoinTypeIDs(ss []string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		coins, _, err := coinmwcli.GetCoins(ctx, &coinmwpb.Conds{
-			IDs: &basetypes.StringSliceVal{Op: cruder.IN, Value: ss},
+			EntIDs: &basetypes.StringSliceVal{Op: cruder.IN, Value: ss},
 		}, int32(0), int32(len(ss)))
 		if err != nil {
 			return err
