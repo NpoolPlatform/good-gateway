@@ -29,15 +29,11 @@ func (h *deleteHandler) checkUser(ctx context.Context) error {
 }
 
 func (h *deleteHandler) checkComment(ctx context.Context) error {
-	conds := &commentmwpb.Conds{}
-	conds.ID = &basetypes.StringVal{Op: cruder.EQ, Value: *h.ID}
-	conds.AppID = &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID}
-	conds.UserID = &basetypes.StringVal{Op: cruder.EQ, Value: *h.UserID}
-	if h.TargetUserID != nil {
-		conds.UserID = &basetypes.StringVal{Op: cruder.EQ, Value: *h.TargetUserID}
-	}
-
-	exist, err := commentmwcli.ExistCommentConds(ctx, conds)
+	exist, err := commentmwcli.ExistCommentConds(ctx, &commentmwpb.Conds{
+		ID:     &basetypes.StringVal{Op: cruder.EQ, Value: *h.ID},
+		AppID:  &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID},
+		UserID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.TargetUserID},
+	})
 	if err != nil {
 		return err
 	}

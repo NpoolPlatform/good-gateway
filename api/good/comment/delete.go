@@ -17,7 +17,7 @@ func (s *Server) DeleteComment(ctx context.Context, in *npool.DeleteCommentReque
 		ctx,
 		comment1.WithID(&in.ID, true),
 		comment1.WithAppID(&in.AppID, true),
-		comment1.WithUserID(&in.UserID, true),
+		comment1.WithTargetUserID(&in.UserID, true),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(
