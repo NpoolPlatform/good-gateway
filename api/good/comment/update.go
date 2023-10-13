@@ -12,6 +12,7 @@ import (
 	npool "github.com/NpoolPlatform/message/npool/good/gw/v1/good/comment"
 )
 
+//nolint
 func (s *Server) UpdateComment(ctx context.Context, in *npool.UpdateCommentRequest) (*npool.UpdateCommentResponse, error) {
 	handler, err := comment1.NewHandler(
 		ctx,

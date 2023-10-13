@@ -28,6 +28,25 @@ func (h *deleteHandler) checkUser(ctx context.Context) error {
 	return nil
 }
 
+func (h *deleteHandler) checkComment(ctx context.Context) error {
+	conds := &commentmwpb.Conds{}
+	conds.ID = &basetypes.StringVal{Op: cruder.EQ, Value: *h.ID}
+	conds.AppID = &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID}
+	conds.UserID = &basetypes.StringVal{Op: cruder.EQ, Value: *h.UserID}
+	if h.TargetUserID != nil {
+		conds.UserID = &basetypes.StringVal{Op: cruder.EQ, Value: *h.TargetUserID}
+	}
+
+	exist, err := commentmwcli.ExistCommentConds(ctx, conds)
+	if err != nil {
+		return err
+	}
+	if !exist {
+		return fmt.Errorf("invalid comment")
+	}
+	return nil
+}
+
 func (h *Handler) DeleteComment(ctx context.Context) (*npool.Comment, error) {
 	handler := &deleteHandler{
 		Handler: h,
@@ -35,34 +54,7 @@ func (h *Handler) DeleteComment(ctx context.Context) (*npool.Comment, error) {
 	if err := handler.checkUser(ctx); err != nil {
 		return nil, err
 	}
-
-	exist, err := commentmwcli.ExistCommentConds(ctx, &commentmwpb.Conds{
-		ID:     &basetypes.StringVal{Op: cruder.EQ, Value: *h.ID},
-		AppID:  &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID},
-		UserID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.UserID},
-	})
-	if err != nil {
-		return nil, err
-	}
-	if !exist {
-		return nil, fmt.Errorf("invalid comment")
-	}
-
-	info, err := h.GetComment(ctx)
-	if err != nil {
-		return nil, err
-	}
-	if _, err := commentmwcli.DeleteComment(ctx, *h.ID); err != nil {
-		return nil, err
-	}
-	return info, nil
-}
-
-func (h *Handler) DeleteAppComment(ctx context.Context) (*npool.Comment, error) {
-	handler := &deleteHandler{
-		Handler: h,
-	}
-	if err := handler.checkUser(ctx); err != nil {
+	if err := handler.checkComment(ctx); err != nil {
 		return nil, err
 	}
 
@@ -70,7 +62,6 @@ func (h *Handler) DeleteAppComment(ctx context.Context) (*npool.Comment, error) 
 	if err != nil {
 		return nil, err
 	}
-
 	if _, err := commentmwcli.DeleteComment(ctx, *h.ID); err != nil {
 		return nil, err
 	}
