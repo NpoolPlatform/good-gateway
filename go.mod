@@ -3,7 +3,7 @@ module github.com/NpoolPlatform/good-gateway
 go 1.17
 
 require (
-	github.com/NpoolPlatform/appuser-middleware v0.0.0-20231011071633-e14f373f95cb
+	github.com/NpoolPlatform/appuser-middleware v0.0.0-20231114031208-569bc00c82ed
 	github.com/NpoolPlatform/basal-middleware v0.0.0-20231015112137-254853c60eec
 	github.com/NpoolPlatform/chain-middleware v0.0.0-20231020114413-49166aeb1ec8
 	github.com/NpoolPlatform/go-service-framework v0.0.0-20230930023319-e48074d9472e

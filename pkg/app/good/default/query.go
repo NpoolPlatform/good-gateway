@@ -28,13 +28,13 @@ func (h *queryHandler) getApps(ctx context.Context) error {
 		appIDs = append(appIDs, def.AppID)
 	}
 	apps, _, err := appmwcli.GetApps(ctx, &appmwpb.Conds{
-		IDs: &basetypes.StringSliceVal{Op: cruder.IN, Value: appIDs},
+		EntIDs: &basetypes.StringSliceVal{Op: cruder.IN, Value: appIDs},
 	}, int32(0), int32(len(appIDs)))
 	if err != nil {
 		return err
 	}
 	for _, app := range apps {
-		h.apps[app.ID] = app
+		h.apps[app.EntID] = app
 	}
 	return nil
 }
