@@ -40,7 +40,7 @@ func (h *Handler) CreateComment(ctx context.Context) (*npool.Comment, error) {
 
 	if h.OrderID != nil {
 		exist, err = ordermwcli.ExistOrderConds(ctx, &ordermwpb.Conds{
-			ID:        &basetypes.StringVal{Op: cruder.EQ, Value: *h.OrderID},
+			EntID:     &basetypes.StringVal{Op: cruder.EQ, Value: *h.OrderID},
 			AppID:     &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID},
 			AppGoodID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppGoodID},
 			UserID:    &basetypes.StringVal{Op: cruder.EQ, Value: *h.UserID},
