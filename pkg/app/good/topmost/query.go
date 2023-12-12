@@ -40,6 +40,7 @@ func (h *queryHandler) formalize() {
 	for _, topmost := range h.topmosts {
 		info := &npool.TopMost{
 			ID:                     topmost.ID,
+			EntID:                  topmost.EntID,
 			AppID:                  topmost.AppID,
 			TopMostType:            topmost.TopMostType,
 			Title:                  topmost.Title,
@@ -66,10 +67,32 @@ func (h *queryHandler) formalize() {
 }
 
 func (h *Handler) GetTopMost(ctx context.Context) (*npool.TopMost, error) {
-	info, err := topmostmwcli.GetTopMost(ctx, *h.ID)
+	info, err := topmostmwcli.GetTopMost(ctx, *h.EntID)
 	if err != nil {
 		return nil, err
 	}
+	if info == nil {
+		return nil, nil
+	}
+
+	handler := &queryHandler{
+		Handler:  h,
+		topmosts: []*topmostmwpb.TopMost{info},
+		apps:     map[string]*appmwpb.App{},
+	}
+	if err := handler.getApps(ctx); err != nil {
+		return nil, err
+	}
+
+	handler.formalize()
+	if len(handler.infos) == 0 {
+		return nil, nil
+	}
+
+	return handler.infos[0], nil
+}
+
+func (h *Handler) GetTopMostExt(ctx context.Context, info *topmostmwpb.TopMost) (*npool.TopMost, error) {
 	if info == nil {
 		return nil, nil
 	}

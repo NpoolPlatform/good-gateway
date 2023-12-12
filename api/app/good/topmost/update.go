@@ -17,6 +17,7 @@ func (s *Server) UpdateTopMost(ctx context.Context, in *npool.UpdateTopMostReque
 	handler, err := topmost1.NewHandler(
 		ctx,
 		topmost1.WithID(&in.ID, true),
+		topmost1.WithEntID(&in.EntID, true),
 		topmost1.WithAppID(&in.AppID, true),
 		topmost1.WithTitle(in.Title, false),
 		topmost1.WithMessage(in.Message, false),
@@ -57,6 +58,7 @@ func (s *Server) UpdateNTopMost(ctx context.Context, in *npool.UpdateNTopMostReq
 	handler, err := topmost1.NewHandler(
 		ctx,
 		topmost1.WithID(&in.ID, true),
+		topmost1.WithEntID(&in.EntID, true),
 		topmost1.WithAppID(&in.TargetAppID, true),
 		topmost1.WithTitle(in.Title, false),
 		topmost1.WithMessage(in.Message, false),
