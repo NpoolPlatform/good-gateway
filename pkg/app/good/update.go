@@ -13,7 +13,7 @@ import (
 
 func (h *Handler) UpdateGood(ctx context.Context) (*npool.Good, error) {
 	exist, err := appgoodmwcli.ExistGoodConds(ctx, &appgoodmwpb.Conds{
-		ID:    &basetypes.StringVal{Op: cruder.EQ, Value: *h.ID},
+		EntID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.EntID},
 		AppID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID},
 	})
 	if err != nil {
