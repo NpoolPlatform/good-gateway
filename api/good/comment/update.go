@@ -17,6 +17,7 @@ func (s *Server) UpdateComment(ctx context.Context, in *npool.UpdateCommentReque
 	handler, err := comment1.NewHandler(
 		ctx,
 		comment1.WithID(&in.ID, true),
+		comment1.WithEntID(&in.EntID, true),
 		comment1.WithAppID(&in.AppID, true),
 		comment1.WithUserID(&in.UserID, true),
 		comment1.WithContent(&in.Content, true),

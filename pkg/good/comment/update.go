@@ -22,7 +22,8 @@ func (h *Handler) UpdateComment(ctx context.Context) (*npool.Comment, error) {
 	}
 
 	exist, err = commentmwcli.ExistCommentConds(ctx, &commentmwpb.Conds{
-		ID:     &basetypes.StringVal{Op: cruder.EQ, Value: *h.ID},
+		ID:     &basetypes.Uint32Val{Op: cruder.EQ, Value: *h.ID},
+		EntID:  &basetypes.StringVal{Op: cruder.EQ, Value: *h.EntID},
 		AppID:  &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID},
 		UserID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.UserID},
 	})
