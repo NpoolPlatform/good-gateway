@@ -17,6 +17,7 @@ func (s *Server) UpdateTopMostGood(ctx context.Context, in *npool.UpdateTopMostG
 	handler, err := topmostgood1.NewHandler(
 		ctx,
 		topmostgood1.WithID(&in.ID, true),
+		topmostgood1.WithEntID(&in.EntID, true),
 		topmostgood1.WithAppID(&in.AppID, true),
 		topmostgood1.WithPosters(in.Posters, true),
 		topmostgood1.WithPrice(in.Price, false),
@@ -49,6 +50,7 @@ func (s *Server) UpdateNTopMostGood(ctx context.Context, in *npool.UpdateNTopMos
 	handler, err := topmostgood1.NewHandler(
 		ctx,
 		topmostgood1.WithID(&in.ID, true),
+		topmostgood1.WithEntID(&in.EntID, true),
 		topmostgood1.WithAppID(&in.TargetAppID, true),
 		topmostgood1.WithPosters(in.Posters, true),
 		topmostgood1.WithPrice(in.Price, false),

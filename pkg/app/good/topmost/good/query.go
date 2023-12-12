@@ -60,6 +60,7 @@ func (h *queryHandler) formalize() {
 	for _, good := range h.goods {
 		info := &npool.TopMostGood{
 			ID:             good.ID,
+			EntID:          good.EntID,
 			AppID:          good.AppID,
 			GoodID:         good.GoodID,
 			GoodName:       good.GoodName,
@@ -93,10 +94,36 @@ func (h *queryHandler) formalize() {
 }
 
 func (h *Handler) GetTopMostGood(ctx context.Context) (*npool.TopMostGood, error) {
-	info, err := topmostgoodmwcli.GetTopMostGood(ctx, *h.ID)
+	info, err := topmostgoodmwcli.GetTopMostGood(ctx, *h.EntID)
 	if err != nil {
 		return nil, err
 	}
+	if info == nil {
+		return nil, nil
+	}
+
+	handler := &queryHandler{
+		Handler: h,
+		goods:   []*topmostgoodmwpb.TopMostGood{info},
+		apps:    map[string]*appmwpb.App{},
+		coins:   map[string]*coinmwpb.Coin{},
+	}
+	if err := handler.getApps(ctx); err != nil {
+		return nil, err
+	}
+	if err := handler.getCoins(ctx); err != nil {
+		return nil, err
+	}
+
+	handler.formalize()
+	if len(handler.infos) == 0 {
+		return nil, nil
+	}
+
+	return handler.infos[0], nil
+}
+
+func (h *Handler) GetTopMostGoodExt(ctx context.Context, info *topmostgoodmwpb.TopMostGood) (*npool.TopMostGood, error) {
 	if info == nil {
 		return nil, nil
 	}
