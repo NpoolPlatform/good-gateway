@@ -124,7 +124,3 @@ replace entgo.io/ent => entgo.io/ent v0.11.2
 replace ariga.io/atlas => ariga.io/atlas v0.5.1-0.20220717122844-8593d7eb1a8e
 
 replace github.com/ugorji/go => github.com/ugorji/go v0.0.0-20190204201341-e444a5086c43
-
-replace github.com/NpoolPlatform/message v0.0.0-20231207020212-a537de8b4543 => ../message
-
-replace github.com/NpoolPlatform/good-middleware v0.0.0-20231013102637-5097267121bf => ../good-middleware
