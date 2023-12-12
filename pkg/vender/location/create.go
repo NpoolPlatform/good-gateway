@@ -11,12 +11,12 @@ import (
 
 func (h *Handler) CreateLocation(ctx context.Context) (*locationmwpb.Location, error) {
 	id := uuid.NewString()
-	if h.ID == nil {
-		h.ID = &id
+	if h.EntID == nil {
+		h.EntID = &id
 	}
 
 	return locationmwcli.CreateLocation(ctx, &locationmwpb.LocationReq{
-		ID:       h.ID,
+		EntID:    h.EntID,
 		Country:  h.Country,
 		Province: h.Province,
 		City:     h.City,
