@@ -17,6 +17,7 @@ func (s *Server) UpdateDefault(ctx context.Context, in *npool.UpdateDefaultReque
 	handler, err := default1.NewHandler(
 		ctx,
 		default1.WithID(&in.ID, true),
+		default1.WithEntID(&in.EntID, true),
 		default1.WithAppID(&in.AppID, true),
 		default1.WithAppGoodID(in.AppGoodID, false),
 	)
@@ -48,6 +49,7 @@ func (s *Server) UpdateNDefault(ctx context.Context, in *npool.UpdateNDefaultReq
 	handler, err := default1.NewHandler(
 		ctx,
 		default1.WithID(&in.ID, true),
+		default1.WithEntID(&in.EntID, true),
 		default1.WithAppID(&in.TargetAppID, true),
 		default1.WithAppGoodID(in.AppGoodID, false),
 	)

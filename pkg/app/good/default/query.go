@@ -60,6 +60,7 @@ func (h *queryHandler) formalize() {
 	for _, def := range h.defaults {
 		info := &npool.Default{
 			ID:          def.ID,
+			EntID:       def.EntID,
 			AppID:       def.AppID,
 			GoodID:      def.GoodID,
 			GoodName:    def.GoodName,
@@ -87,10 +88,36 @@ func (h *queryHandler) formalize() {
 }
 
 func (h *Handler) GetDefault(ctx context.Context) (*npool.Default, error) {
-	info, err := defaultmwcli.GetDefault(ctx, *h.ID)
+	info, err := defaultmwcli.GetDefault(ctx, *h.EntID)
 	if err != nil {
 		return nil, err
 	}
+	if info == nil {
+		return nil, nil
+	}
+
+	handler := &queryHandler{
+		Handler:  h,
+		defaults: []*defaultmwpb.Default{info},
+		apps:     map[string]*appmwpb.App{},
+		coins:    map[string]*coinmwpb.Coin{},
+	}
+	if err := handler.getApps(ctx); err != nil {
+		return nil, err
+	}
+	if err := handler.getCoins(ctx); err != nil {
+		return nil, err
+	}
+
+	handler.formalize()
+	if len(handler.infos) == 0 {
+		return nil, nil
+	}
+
+	return handler.infos[0], nil
+}
+
+func (h *Handler) GetDefaultExt(ctx context.Context, info *defaultmwpb.Default) (*npool.Default, error) {
 	if info == nil {
 		return nil, nil
 	}
