@@ -41,6 +41,7 @@ func (h *queryHandler) formalize() {
 	for _, good := range h.goods {
 		info := &npool.Good{
 			ID:                     good.ID,
+			EntID:                  good.EntID,
 			DeviceInfoID:           good.DeviceInfoID,
 			DeviceType:             good.DeviceType,
 			DeviceManufacturer:     good.DeviceManufacturer,
@@ -117,7 +118,7 @@ func (h *queryHandler) formalize() {
 }
 
 func (h *Handler) GetGood(ctx context.Context) (*npool.Good, error) {
-	good, err := goodmwcli.GetGood(ctx, *h.ID)
+	good, err := goodmwcli.GetGood(ctx, *h.EntID)
 	if err != nil {
 		return nil, err
 	}

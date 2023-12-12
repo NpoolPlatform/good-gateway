@@ -16,6 +16,7 @@ func (s *Server) UpdateGood(ctx context.Context, in *npool.UpdateGoodRequest) (*
 	handler, err := good1.NewHandler(
 		ctx,
 		good1.WithID(&in.ID, true),
+		good1.WithEntID(&in.EntID, true),
 		good1.WithAppID(&in.AppID, true),
 		good1.WithOnline(in.Online, false),
 		good1.WithVisible(in.Visible, false),
@@ -69,6 +70,7 @@ func (s *Server) UpdateNGood(ctx context.Context, in *npool.UpdateNGoodRequest) 
 	handler, err := good1.NewHandler(
 		ctx,
 		good1.WithID(&in.ID, true),
+		good1.WithEntID(&in.EntID, true),
 		good1.WithAppID(&in.TargetAppID, true),
 		good1.WithOnline(in.Online, false),
 		good1.WithVisible(in.Visible, false),
