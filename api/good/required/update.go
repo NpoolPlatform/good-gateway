@@ -1,3 +1,4 @@
+//nolint:dupl
 package required
 
 import (
@@ -16,6 +17,7 @@ func (s *Server) UpdateRequired(ctx context.Context, in *npool.UpdateRequiredReq
 	handler, err := required1.NewHandler(
 		ctx,
 		required1.WithID(&in.ID, true),
+		required1.WithEntID(&in.EntID, true),
 		required1.WithMust(&in.Must, true),
 	)
 	if err != nil {
