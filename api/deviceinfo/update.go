@@ -16,6 +16,7 @@ func (s *Server) UpdateDeviceInfo(ctx context.Context, in *npool.UpdateDeviceInf
 	handler, err := deviceinfo1.NewHandler(
 		ctx,
 		deviceinfo1.WithID(&in.ID, true),
+		deviceinfo1.WithEntID(&in.EntID, true),
 		deviceinfo1.WithType(in.Type, false),
 		deviceinfo1.WithManufacturer(in.Manufacturer, false),
 		deviceinfo1.WithPowerConsumption(in.PowerConsumption, false),
