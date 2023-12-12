@@ -22,12 +22,12 @@ func (h *Handler) CreateRecommend(ctx context.Context) (*npool.Recommend, error)
 	}
 
 	id := uuid.NewString()
-	if h.ID == nil {
-		h.ID = &id
+	if h.EntID == nil {
+		h.EntID = &id
 	}
 
 	if _, err := recommendmwcli.CreateRecommend(ctx, &recommendmwpb.RecommendReq{
-		ID:             h.ID,
+		EntID:          h.EntID,
 		AppID:          h.AppID,
 		RecommenderID:  h.RecommenderID,
 		GoodID:         h.GoodID,

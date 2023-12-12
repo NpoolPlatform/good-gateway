@@ -16,6 +16,7 @@ func (s *Server) DeleteRecommend(ctx context.Context, in *npool.DeleteRecommendR
 	handler, err := recommend1.NewHandler(
 		ctx,
 		recommend1.WithID(&in.ID, true),
+		recommend1.WithEntID(&in.EntID, true),
 		recommend1.WithAppID(&in.AppID, true),
 		recommend1.WithRecommenderID(&in.UserID, true),
 	)
