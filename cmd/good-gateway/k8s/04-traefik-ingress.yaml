@@ -132,6 +132,10 @@ spec:
             backend:
               serviceName: good-gateway
               servicePort: 50550
+          - path: /api/good/v1/delete/deviceinfo
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
 
           - path: /api/good/v1/create/good
             backend:
@@ -188,6 +192,10 @@ spec:
               serviceName: good-gateway
               servicePort: 50550
           - path: /api/good/v1/get/vendorlocations
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/delete/vendorlocation
             backend:
               serviceName: good-gateway
               servicePort: 50550
@@ -316,6 +324,50 @@ spec:
             backend:
               serviceName: good-gateway
               servicePort: 50550
+
+          - path: /api/good/v1/get/requiredgoods
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/delete/requiredgood
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/update/requiredgood
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/create/requiredgood
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+
+          - path: /api/good/v1/get/mygoodlikes
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/delete/goodlike
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+
+          - path: /api/good/v1/get/mygoodrecommends
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/delete/goodrecommend
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+
+          - path: /api/good/v1/get/mygoodscores
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/delete/goodscore
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550            
     - host: api.procyon.vip
       http: *http_rules
     - host: api.xpool.top
