@@ -2,6 +2,7 @@ package required
 
 import (
 	"context"
+	"fmt"
 
 	requiredmwcli "github.com/NpoolPlatform/good-middleware/pkg/client/good/required"
 	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
@@ -18,7 +19,7 @@ func (h *Handler) DeleteRequired(ctx context.Context) (*requiredmwpb.Required, e
 		return nil, err
 	}
 	if info == nil {
-		return nil, nil
+		return nil, fmt.Errorf("invalid required")
 	}
 
 	return requiredmwcli.DeleteRequired(ctx, *h.ID)

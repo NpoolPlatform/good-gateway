@@ -2,6 +2,7 @@ package location
 
 import (
 	"context"
+	"fmt"
 
 	locationmwcli "github.com/NpoolPlatform/good-middleware/pkg/client/vender/location"
 	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
@@ -18,7 +19,7 @@ func (h *Handler) UpdateLocation(ctx context.Context) (*locationmwpb.Location, e
 		return nil, err
 	}
 	if info == nil {
-		return nil, nil
+		return nil, fmt.Errorf("invalid venderlocation")
 	}
 
 	return locationmwcli.UpdateLocation(ctx, &locationmwpb.LocationReq{

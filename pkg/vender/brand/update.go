@@ -2,6 +2,7 @@ package brand
 
 import (
 	"context"
+	"fmt"
 
 	brandmwcli "github.com/NpoolPlatform/good-middleware/pkg/client/vender/brand"
 	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
@@ -18,7 +19,7 @@ func (h *Handler) UpdateBrand(ctx context.Context) (*brandmwpb.Brand, error) {
 		return nil, err
 	}
 	if info == nil {
-		return nil, nil
+		return nil, fmt.Errorf("invalid venderbrand")
 	}
 
 	return brandmwcli.UpdateBrand(ctx, &brandmwpb.BrandReq{

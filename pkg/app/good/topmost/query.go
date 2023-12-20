@@ -2,6 +2,7 @@ package topmost
 
 import (
 	"context"
+	"fmt"
 
 	appmwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/app"
 	topmostmwcli "github.com/NpoolPlatform/good-middleware/pkg/client/app/good/topmost"
@@ -72,7 +73,7 @@ func (h *Handler) GetTopMost(ctx context.Context) (*npool.TopMost, error) {
 		return nil, err
 	}
 	if info == nil {
-		return nil, nil
+		return nil, fmt.Errorf("invalid topmost")
 	}
 
 	handler := &queryHandler{

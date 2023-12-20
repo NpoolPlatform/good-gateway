@@ -2,6 +2,7 @@ package topmostgood
 
 import (
 	"context"
+	"fmt"
 
 	topmostgoodmwcli "github.com/NpoolPlatform/good-middleware/pkg/client/app/good/topmost/good"
 	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
@@ -19,7 +20,7 @@ func (h *Handler) DeleteTopMostGood(ctx context.Context) (*npool.TopMostGood, er
 		return nil, err
 	}
 	if info == nil {
-		return nil, nil
+		return nil, fmt.Errorf("invalid topmostgood")
 	}
 
 	// TODO: check exist of topmost and appgood

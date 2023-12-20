@@ -2,6 +2,7 @@ package good
 
 import (
 	"context"
+	"fmt"
 
 	appcoinmwcli "github.com/NpoolPlatform/chain-middleware/pkg/client/app/coin"
 	appgoodmwcli "github.com/NpoolPlatform/good-middleware/pkg/client/app/good"
@@ -145,7 +146,7 @@ func (h *Handler) GetGood(ctx context.Context) (*npool.Good, error) {
 		return nil, err
 	}
 	if good == nil {
-		return nil, nil
+		return nil, fmt.Errorf("invalid appgood")
 	}
 
 	handler := &queryHandler{

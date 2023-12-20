@@ -2,6 +2,7 @@ package topmost
 
 import (
 	"context"
+	"fmt"
 
 	topmostmwcli "github.com/NpoolPlatform/good-middleware/pkg/client/app/good/topmost"
 	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
@@ -19,7 +20,7 @@ func (h *Handler) UpdateTopMost(ctx context.Context) (*npool.TopMost, error) {
 		return nil, err
 	}
 	if info == nil {
-		return nil, nil
+		return nil, fmt.Errorf("invalid topmost")
 	}
 
 	if _, err := topmostmwcli.UpdateTopMost(ctx, &topmostmwpb.TopMostReq{

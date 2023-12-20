@@ -2,6 +2,7 @@ package default1
 
 import (
 	"context"
+	"fmt"
 
 	defaultmwcli "github.com/NpoolPlatform/good-middleware/pkg/client/app/good/default"
 	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
@@ -19,7 +20,7 @@ func (h *Handler) DeleteDefault(ctx context.Context) (*npool.Default, error) {
 		return nil, err
 	}
 	if info == nil {
-		return nil, nil
+		return nil, fmt.Errorf("invalid default")
 	}
 
 	if _, err := defaultmwcli.DeleteDefault(ctx, *h.ID); err != nil {

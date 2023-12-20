@@ -2,6 +2,7 @@ package topmostgood
 
 import (
 	"context"
+	"fmt"
 
 	appmwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/app"
 	coinmwcli "github.com/NpoolPlatform/chain-middleware/pkg/client/coin"
@@ -99,7 +100,7 @@ func (h *Handler) GetTopMostGood(ctx context.Context) (*npool.TopMostGood, error
 		return nil, err
 	}
 	if info == nil {
-		return nil, nil
+		return nil, fmt.Errorf("invalid topmostgood")
 	}
 
 	handler := &queryHandler{

@@ -2,6 +2,7 @@ package deviceinfo
 
 import (
 	"context"
+	"fmt"
 
 	deviceinfomwcli "github.com/NpoolPlatform/good-middleware/pkg/client/deviceinfo"
 	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
@@ -18,7 +19,7 @@ func (h *Handler) UpdateDeviceInfo(ctx context.Context) (*deviceinfomwpb.DeviceI
 		return nil, err
 	}
 	if info == nil {
-		return nil, nil
+		return nil, fmt.Errorf("invalid deviceinfo")
 	}
 
 	return deviceinfomwcli.UpdateDeviceInfo(ctx, &deviceinfomwpb.DeviceInfoReq{

@@ -3,6 +3,7 @@ package good
 
 import (
 	"context"
+	"fmt"
 
 	goodmwcli "github.com/NpoolPlatform/good-middleware/pkg/client/good"
 	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
@@ -20,7 +21,7 @@ func (h *Handler) UpdateGood(ctx context.Context) (*npool.Good, error) {
 		return nil, err
 	}
 	if info == nil {
-		return nil, nil
+		return nil, fmt.Errorf("invalid good")
 	}
 
 	// TODO: if start mode is set from TBD to confirmed, we should update all order's start at and start mode

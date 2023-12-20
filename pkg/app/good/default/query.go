@@ -2,6 +2,7 @@ package default1
 
 import (
 	"context"
+	"fmt"
 
 	appmwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/app"
 	coinmwcli "github.com/NpoolPlatform/chain-middleware/pkg/client/coin"
@@ -93,7 +94,7 @@ func (h *Handler) GetDefault(ctx context.Context) (*npool.Default, error) {
 		return nil, err
 	}
 	if info == nil {
-		return nil, nil
+		return nil, fmt.Errorf("invalid default")
 	}
 
 	handler := &queryHandler{
