@@ -1,4 +1,3 @@
-//nolint:dupl
 package recommend
 
 import (
@@ -17,6 +16,7 @@ func (s *Server) UpdateRecommend(ctx context.Context, in *npool.UpdateRecommendR
 	handler, err := recommend1.NewHandler(
 		ctx,
 		recommend1.WithID(&in.ID, true),
+		recommend1.WithEntID(&in.EntID, true),
 		recommend1.WithAppID(&in.AppID, true),
 		recommend1.WithRecommenderID(&in.UserID, true),
 		recommend1.WithRecommendIndex(&in.RecommendIndex, true),

@@ -2,6 +2,7 @@ package good
 
 import (
 	"context"
+	"fmt"
 
 	appcoinmwcli "github.com/NpoolPlatform/chain-middleware/pkg/client/app/coin"
 	appgoodmwcli "github.com/NpoolPlatform/good-middleware/pkg/client/app/good"
@@ -42,6 +43,7 @@ func (h *queryHandler) formalize() {
 	for _, good := range h.goods {
 		info := &npool.Good{
 			ID:                     good.ID,
+			EntID:                  good.EntID,
 			AppID:                  good.AppID,
 			GoodID:                 good.GoodID,
 			Online:                 good.Online,
@@ -139,12 +141,12 @@ func (h *queryHandler) formalize() {
 }
 
 func (h *Handler) GetGood(ctx context.Context) (*npool.Good, error) {
-	good, err := appgoodmwcli.GetGood(ctx, *h.ID)
+	good, err := appgoodmwcli.GetGood(ctx, *h.EntID)
 	if err != nil {
 		return nil, err
 	}
 	if good == nil {
-		return nil, nil
+		return nil, fmt.Errorf("invalid appgood")
 	}
 
 	handler := &queryHandler{
@@ -197,8 +199,8 @@ func (h *Handler) GetGoods(ctx context.Context) ([]*npool.Good, uint32, error) {
 
 func (h *Handler) GetGoodOnly(ctx context.Context) (*npool.Good, error) {
 	conds := &appgoodmwpb.Conds{}
-	if h.ID != nil {
-		conds.ID = &basetypes.StringVal{Op: cruder.EQ, Value: *h.ID}
+	if h.EntID != nil {
+		conds.EntID = &basetypes.StringVal{Op: cruder.EQ, Value: *h.EntID}
 	}
 	if h.AppID != nil {
 		conds.AppID = &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID}

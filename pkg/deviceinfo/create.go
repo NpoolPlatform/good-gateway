@@ -11,12 +11,12 @@ import (
 
 func (h *Handler) CreateDeviceInfo(ctx context.Context) (*deviceinfomwpb.DeviceInfo, error) {
 	id := uuid.NewString()
-	if h.ID == nil {
-		h.ID = &id
+	if h.EntID == nil {
+		h.EntID = &id
 	}
 
 	return deviceinfomwcli.CreateDeviceInfo(ctx, &deviceinfomwpb.DeviceInfoReq{
-		ID:               h.ID,
+		EntID:            h.EntID,
 		Type:             h.Type,
 		Manufacturer:     h.Manufacturer,
 		PowerConsumption: h.PowerConsumption,

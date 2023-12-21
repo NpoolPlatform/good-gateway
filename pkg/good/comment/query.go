@@ -63,6 +63,7 @@ func (h *queryHandler) formalize() {
 	for _, comment := range h.comments {
 		info := &npool.Comment{
 			ID:        comment.ID,
+			EntID:     comment.EntID,
 			AppID:     comment.AppID,
 			UserID:    comment.UserID,
 			GoodID:    comment.GoodID,
@@ -105,7 +106,7 @@ func (h *queryHandler) formalize() {
 }
 
 func (h *Handler) GetComment(ctx context.Context) (*npool.Comment, error) {
-	comment, err := commentmwcli.GetComment(ctx, *h.ID)
+	comment, err := commentmwcli.GetComment(ctx, *h.EntID)
 	if err != nil {
 		return nil, err
 	}

@@ -1,3 +1,4 @@
+//nolint:dupl
 package like
 
 import (
@@ -16,6 +17,7 @@ func (s *Server) DeleteLike(ctx context.Context, in *npool.DeleteLikeRequest) (*
 	handler, err := like1.NewHandler(
 		ctx,
 		like1.WithID(&in.ID, true),
+		like1.WithEntID(&in.EntID, true),
 		like1.WithAppID(&in.AppID, true),
 		like1.WithUserID(&in.UserID, true),
 	)

@@ -23,7 +23,7 @@ func (h *Handler) DeleteScore(ctx context.Context) (*npool.Score, error) {
 	}
 
 	exist, err = scoremwcli.ExistScoreConds(ctx, &scoremwpb.Conds{
-		ID:     &basetypes.StringVal{Op: cruder.EQ, Value: *h.ID},
+		ID:     &basetypes.Uint32Val{Op: cruder.EQ, Value: *h.ID},
 		AppID:  &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID},
 		UserID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.UserID},
 	})

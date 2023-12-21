@@ -11,13 +11,13 @@ import (
 
 func (h *Handler) CreateBrand(ctx context.Context) (*brandmwpb.Brand, error) {
 	id := uuid.NewString()
-	if h.ID == nil {
-		h.ID = &id
+	if h.EntID == nil {
+		h.EntID = &id
 	}
 
 	return brandmwcli.CreateBrand(ctx, &brandmwpb.BrandReq{
-		ID:   h.ID,
-		Name: h.Name,
-		Logo: h.Logo,
+		EntID: h.EntID,
+		Name:  h.Name,
+		Logo:  h.Logo,
 	})
 }

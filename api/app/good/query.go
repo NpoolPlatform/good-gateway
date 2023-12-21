@@ -16,7 +16,7 @@ import (
 func (s *Server) GetGood(ctx context.Context, in *npool.GetGoodRequest) (*npool.GetGoodResponse, error) {
 	handler, err := good1.NewHandler(
 		ctx,
-		good1.WithID(&in.ID, true),
+		good1.WithEntID(&in.EntID, true),
 		good1.WithAppID(&in.AppID, true),
 	)
 	if err != nil {

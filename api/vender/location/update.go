@@ -16,6 +16,7 @@ func (s *Server) UpdateLocation(ctx context.Context, in *npool.UpdateLocationReq
 	handler, err := location1.NewHandler(
 		ctx,
 		location1.WithID(&in.ID, true),
+		location1.WithEntID(&in.EntID, true),
 		location1.WithCountry(in.Country, false),
 		location1.WithProvince(in.Province, false),
 		location1.WithCity(in.City, false),

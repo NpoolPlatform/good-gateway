@@ -39,7 +39,8 @@ func (h *deleteHandler) checkUser(ctx context.Context) error {
 
 func (h *deleteHandler) checkComment(ctx context.Context) error {
 	exist, err := commentmwcli.ExistCommentConds(ctx, &commentmwpb.Conds{
-		ID:     &basetypes.StringVal{Op: cruder.EQ, Value: *h.ID},
+		ID:     &basetypes.Uint32Val{Op: cruder.EQ, Value: *h.ID},
+		EntID:  &basetypes.StringVal{Op: cruder.EQ, Value: *h.EntID},
 		AppID:  &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID},
 		UserID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.TargetUserID},
 	})

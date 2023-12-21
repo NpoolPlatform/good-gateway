@@ -16,6 +16,7 @@ func (s *Server) UpdateGood(ctx context.Context, in *npool.UpdateGoodRequest) (*
 	handler, err := good1.NewHandler(
 		ctx,
 		good1.WithID(&in.ID, true),
+		good1.WithEntID(&in.EntID, true),
 		good1.WithDeviceInfoID(in.DeviceInfoID, false),
 		good1.WithDurationDays(in.DurationDays, false),
 		good1.WithCoinTypeID(in.CoinTypeID, false),

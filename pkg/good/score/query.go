@@ -61,6 +61,7 @@ func (h *queryHandler) formalize() {
 	for _, score := range h.scores {
 		info := &npool.Score{
 			ID:        score.ID,
+			EntID:     score.EntID,
 			AppID:     score.AppID,
 			UserID:    score.UserID,
 			GoodID:    score.GoodID,
@@ -91,7 +92,7 @@ func (h *queryHandler) formalize() {
 }
 
 func (h *Handler) GetScore(ctx context.Context) (*npool.Score, error) {
-	score, err := scoremwcli.GetScore(ctx, *h.ID)
+	score, err := scoremwcli.GetScore(ctx, *h.EntID)
 	if err != nil {
 		return nil, err
 	}

@@ -14,12 +14,12 @@ func (h *Handler) CreateTopMostGood(ctx context.Context) (*npool.TopMostGood, er
 	// TODO: check exist of topmost and appgood
 
 	id := uuid.NewString()
-	if h.ID == nil {
-		h.ID = &id
+	if h.EntID == nil {
+		h.EntID = &id
 	}
 
 	if _, err := topmostgoodmwcli.CreateTopMostGood(ctx, &topmostgoodmwpb.TopMostGoodReq{
-		ID:        h.ID,
+		EntID:     h.EntID,
 		AppGoodID: h.AppGoodID,
 		TopMostID: h.TopMostID,
 		Posters:   h.Posters,

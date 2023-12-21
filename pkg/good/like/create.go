@@ -26,7 +26,7 @@ func (h *Handler) CreateLike(ctx context.Context) (*npool.Like, error) {
 	}
 
 	exist, err = appgooodmwcli.ExistGoodConds(ctx, &appgoodmwpb.Conds{
-		ID:    &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppGoodID},
+		EntID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppGoodID},
 		AppID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID},
 	})
 	if err != nil {
@@ -37,12 +37,12 @@ func (h *Handler) CreateLike(ctx context.Context) (*npool.Like, error) {
 	}
 
 	id := uuid.NewString()
-	if h.ID == nil {
-		h.ID = &id
+	if h.EntID == nil {
+		h.EntID = &id
 	}
 
 	if _, err := likemwcli.CreateLike(ctx, &likemwpb.LikeReq{
-		ID:        h.ID,
+		EntID:     h.EntID,
 		AppID:     h.AppID,
 		UserID:    h.UserID,
 		AppGoodID: h.AppGoodID,

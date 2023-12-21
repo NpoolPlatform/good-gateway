@@ -16,6 +16,7 @@ func (s *Server) UpdateBrand(ctx context.Context, in *npool.UpdateBrandRequest) 
 	handler, err := brand1.NewHandler(
 		ctx,
 		brand1.WithID(&in.ID, true),
+		brand1.WithEntID(&in.EntID, true),
 		brand1.WithName(in.Name, false),
 		brand1.WithLogo(in.Logo, false),
 	)

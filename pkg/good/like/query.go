@@ -61,6 +61,7 @@ func (h *queryHandler) formalize() {
 	for _, like := range h.likes {
 		info := &npool.Like{
 			ID:        like.ID,
+			EntID:     like.EntID,
 			AppID:     like.AppID,
 			UserID:    like.UserID,
 			GoodID:    like.GoodID,
@@ -91,7 +92,7 @@ func (h *queryHandler) formalize() {
 }
 
 func (h *Handler) GetLike(ctx context.Context) (*npool.Like, error) {
-	like, err := likemwcli.GetLike(ctx, *h.ID)
+	like, err := likemwcli.GetLike(ctx, *h.EntID)
 	if err != nil {
 		return nil, err
 	}

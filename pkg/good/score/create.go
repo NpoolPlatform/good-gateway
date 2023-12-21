@@ -27,7 +27,7 @@ func (h *Handler) CreateScore(ctx context.Context) (*npool.Score, error) {
 	}
 
 	exist, err = appgooodmwcli.ExistGoodConds(ctx, &appgoodmwpb.Conds{
-		ID:    &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppGoodID},
+		EntID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppGoodID},
 		AppID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID},
 	})
 	if err != nil {
@@ -38,8 +38,8 @@ func (h *Handler) CreateScore(ctx context.Context) (*npool.Score, error) {
 	}
 
 	id := uuid.NewString()
-	if h.ID == nil {
-		h.ID = &id
+	if h.EntID == nil {
+		h.EntID = &id
 	}
 
 	if h.Score != nil {
@@ -54,7 +54,7 @@ func (h *Handler) CreateScore(ctx context.Context) (*npool.Score, error) {
 	}
 
 	if _, err := scoremwcli.CreateScore(ctx, &scoremwpb.ScoreReq{
-		ID:        h.ID,
+		EntID:     h.EntID,
 		AppID:     h.AppID,
 		UserID:    h.UserID,
 		AppGoodID: h.AppGoodID,

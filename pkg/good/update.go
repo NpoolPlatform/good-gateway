@@ -6,13 +6,22 @@ import (
 	"fmt"
 
 	goodmwcli "github.com/NpoolPlatform/good-middleware/pkg/client/good"
+	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
+	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 	npool "github.com/NpoolPlatform/message/npool/good/gw/v1/good"
 	goodmwpb "github.com/NpoolPlatform/message/npool/good/mw/v1/good"
 )
 
 func (h *Handler) UpdateGood(ctx context.Context) (*npool.Good, error) {
-	if h.ID == nil {
-		return nil, fmt.Errorf("invalid id")
+	info, err := goodmwcli.GetGoodOnly(ctx, &goodmwpb.Conds{
+		ID:    &basetypes.Uint32Val{Op: cruder.EQ, Value: *h.ID},
+		EntID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.EntID},
+	})
+	if err != nil {
+		return nil, err
+	}
+	if info == nil {
+		return nil, fmt.Errorf("invalid good")
 	}
 
 	// TODO: if start mode is set from TBD to confirmed, we should update all order's start at and start mode

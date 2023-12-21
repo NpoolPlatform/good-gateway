@@ -23,7 +23,8 @@ func (h *Handler) UpdateLike(ctx context.Context) (*npool.Like, error) {
 	}
 
 	exist, err = likemwcli.ExistLikeConds(ctx, &likemwpb.Conds{
-		ID:     &basetypes.StringVal{Op: cruder.EQ, Value: *h.ID},
+		ID:     &basetypes.Uint32Val{Op: cruder.EQ, Value: *h.ID},
+		EntID:  &basetypes.StringVal{Op: cruder.EQ, Value: *h.EntID},
 		AppID:  &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID},
 		UserID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.UserID},
 	})

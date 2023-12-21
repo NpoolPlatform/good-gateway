@@ -12,12 +12,12 @@ import (
 
 func (h *Handler) CreateDefault(ctx context.Context) (*npool.Default, error) {
 	id := uuid.NewString()
-	if h.ID == nil {
-		h.ID = &id
+	if h.EntID == nil {
+		h.EntID = &id
 	}
 
 	if _, err := defaultmwcli.CreateDefault(ctx, &defaultmwpb.DefaultReq{
-		ID:        h.ID,
+		EntID:     h.EntID,
 		AppGoodID: h.AppGoodID,
 	}); err != nil {
 		return nil, err

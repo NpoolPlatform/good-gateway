@@ -13,7 +13,8 @@ import (
 
 func (h *Handler) DeleteRecommend(ctx context.Context) (*npool.Recommend, error) {
 	exist, err := recommendmwcli.ExistRecommendConds(ctx, &recommendmwpb.Conds{
-		ID:            &basetypes.StringVal{Op: cruder.EQ, Value: *h.ID},
+		ID:            &basetypes.Uint32Val{Op: cruder.EQ, Value: *h.ID},
+		EntID:         &basetypes.StringVal{Op: cruder.EQ, Value: *h.EntID},
 		AppID:         &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID},
 		RecommenderID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.RecommenderID},
 	})

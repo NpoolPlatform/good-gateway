@@ -13,12 +13,12 @@ import (
 
 func (h *Handler) CreateGood(ctx context.Context) (*npool.Good, error) {
 	id := uuid.NewString()
-	if h.ID == nil {
-		h.ID = &id
+	if h.EntID == nil {
+		h.EntID = &id
 	}
 
 	if _, err := goodmwcli.CreateGood(ctx, &goodmwpb.GoodReq{
-		ID:                   h.ID,
+		EntID:                h.EntID,
 		DeviceInfoID:         h.DeviceInfoID,
 		DurationDays:         h.DurationDays,
 		CoinTypeID:           h.CoinTypeID,

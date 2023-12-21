@@ -16,6 +16,7 @@ func (s *Server) DeleteComment(ctx context.Context, in *npool.DeleteCommentReque
 	handler, err := comment1.NewHandler(
 		ctx,
 		comment1.WithID(&in.ID, true),
+		comment1.WithEntID(&in.EntID, true),
 		comment1.WithAppID(&in.AppID, true),
 		comment1.WithTargetUserID(&in.UserID, true),
 	)
@@ -48,6 +49,7 @@ func (s *Server) DeleteAppComment(ctx context.Context, in *npool.DeleteAppCommen
 	handler, err := comment1.NewHandler(
 		ctx,
 		comment1.WithID(&in.ID, true),
+		comment1.WithEntID(&in.EntID, true),
 		comment1.WithAppID(&in.AppID, true),
 		comment1.WithUserID(&in.UserID, true),
 		comment1.WithTargetUserID(&in.TargetUserID, true),

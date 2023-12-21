@@ -12,7 +12,8 @@ import (
 )
 
 type Handler struct {
-	ID                     *string
+	ID                     *uint32
+	EntID                  *string
 	AppID                  *string
 	TopMostType            *types.GoodTopMostType
 	Title                  *string
@@ -39,7 +40,20 @@ func NewHandler(ctx context.Context, options ...func(context.Context, *Handler) 
 	return handler, nil
 }
 
-func WithID(id *string, must bool) func(context.Context, *Handler) error {
+func WithID(id *uint32, must bool) func(context.Context, *Handler) error {
+	return func(ctx context.Context, h *Handler) error {
+		if id == nil {
+			if must {
+				return fmt.Errorf("invalid id")
+			}
+			return nil
+		}
+		h.ID = id
+		return nil
+	}
+}
+
+func WithEntID(id *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if id == nil {
 			if must {
@@ -50,7 +64,7 @@ func WithID(id *string, must bool) func(context.Context, *Handler) error {
 		if _, err := uuid.Parse(*id); err != nil {
 			return err
 		}
-		h.ID = id
+		h.EntID = id
 		return nil
 	}
 }

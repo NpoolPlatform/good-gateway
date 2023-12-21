@@ -28,7 +28,7 @@ func (h *Handler) CreateComment(ctx context.Context) (*npool.Comment, error) {
 	}
 
 	exist, err = appgoodmwcli.ExistGoodConds(ctx, &appgoodmwpb.Conds{
-		ID:    &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppGoodID},
+		EntID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppGoodID},
 		AppID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID},
 	})
 	if err != nil {
@@ -54,12 +54,12 @@ func (h *Handler) CreateComment(ctx context.Context) (*npool.Comment, error) {
 	}
 
 	id := uuid.NewString()
-	if h.ID == nil {
-		h.ID = &id
+	if h.EntID == nil {
+		h.EntID = &id
 	}
 
 	if _, err := commentmwcli.CreateComment(ctx, &commentmwpb.CommentReq{
-		ID:        h.ID,
+		EntID:     h.EntID,
 		AppID:     h.AppID,
 		UserID:    h.UserID,
 		AppGoodID: h.AppGoodID,

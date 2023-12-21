@@ -1,3 +1,4 @@
+//nolint:dupl
 package score
 
 import (
@@ -16,6 +17,7 @@ func (s *Server) DeleteScore(ctx context.Context, in *npool.DeleteScoreRequest) 
 	handler, err := score1.NewHandler(
 		ctx,
 		score1.WithID(&in.ID, true),
+		score1.WithEntID(&in.EntID, true),
 		score1.WithAppID(&in.AppID, true),
 		score1.WithUserID(&in.UserID, true),
 	)

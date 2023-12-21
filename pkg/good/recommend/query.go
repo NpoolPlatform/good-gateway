@@ -61,6 +61,7 @@ func (h *queryHandler) formalize() {
 	for _, recommend := range h.recommends {
 		info := &npool.Recommend{
 			ID:             recommend.ID,
+			EntID:          recommend.EntID,
 			AppID:          recommend.AppID,
 			RecommenderID:  recommend.RecommenderID,
 			GoodID:         recommend.GoodID,
@@ -92,7 +93,7 @@ func (h *queryHandler) formalize() {
 }
 
 func (h *Handler) GetRecommend(ctx context.Context) (*npool.Recommend, error) {
-	recommend, err := recommendmwcli.GetRecommend(ctx, *h.ID)
+	recommend, err := recommendmwcli.GetRecommend(ctx, *h.EntID)
 	if err != nil {
 		return nil, err
 	}

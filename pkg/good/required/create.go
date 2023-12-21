@@ -11,12 +11,12 @@ import (
 
 func (h *Handler) CreateRequired(ctx context.Context) (*requiredmwpb.Required, error) {
 	id := uuid.NewString()
-	if h.ID == nil {
-		h.ID = &id
+	if h.EntID == nil {
+		h.EntID = &id
 	}
 
 	return requiredmwcli.CreateRequired(ctx, &requiredmwpb.RequiredReq{
-		ID:             h.ID,
+		EntID:          h.EntID,
 		MainGoodID:     h.MainGoodID,
 		RequiredGoodID: h.RequiredGoodID,
 		Must:           h.Must,

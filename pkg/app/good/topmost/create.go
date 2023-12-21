@@ -12,12 +12,12 @@ import (
 
 func (h *Handler) CreateTopMost(ctx context.Context) (*npool.TopMost, error) {
 	id := uuid.NewString()
-	if h.ID == nil {
-		h.ID = &id
+	if h.EntID == nil {
+		h.EntID = &id
 	}
 
 	if _, err := topmostmwcli.CreateTopMost(ctx, &topmostmwpb.TopMostReq{
-		ID:                     h.ID,
+		EntID:                  h.EntID,
 		AppID:                  h.AppID,
 		TopMostType:            h.TopMostType,
 		Title:                  h.Title,

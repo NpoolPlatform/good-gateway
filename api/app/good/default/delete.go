@@ -1,4 +1,3 @@
-//nolint:dupl
 package default1
 
 import (
@@ -17,6 +16,7 @@ func (s *Server) DeleteDefault(ctx context.Context, in *npool.DeleteDefaultReque
 	handler, err := default1.NewHandler(
 		ctx,
 		default1.WithID(&in.ID, true),
+		default1.WithEntID(&in.EntID, true),
 		default1.WithAppID(&in.AppID, true),
 	)
 	if err != nil {
