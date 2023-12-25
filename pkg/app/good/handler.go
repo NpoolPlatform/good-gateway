@@ -40,6 +40,11 @@ type Handler struct {
 	ProductPage            *string
 	EnableSetCommission    *bool
 	Posters                []string
+	MinOrderAmount         *string
+	MaxOrderAmount         *string
+	MaxUserAmount          *string
+	MinOrderDuration       *uint32
+	MaxOrderDuration       *uint32
 	Offset                 int32
 	Limit                  int32
 }
@@ -342,6 +347,71 @@ func WithProductPage(s *string, must bool) func(context.Context, *Handler) error
 func WithEnableSetCommission(b *bool, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		h.EnableSetCommission = b
+		return nil
+	}
+}
+
+func WithMinOrderAmount(s *string, must bool) func(context.Context, *Handler) error {
+	return func(ctx context.Context, h *Handler) error {
+		if s == nil {
+			if must {
+				return fmt.Errorf("invalid minorderamount")
+			}
+			return nil
+		}
+		_, err := decimal.NewFromString(*s)
+		if err != nil {
+			return err
+		}
+		h.MinOrderAmount = s
+		return nil
+	}
+}
+
+func WithMaxOrderAmount(s *string, must bool) func(context.Context, *Handler) error {
+	return func(ctx context.Context, h *Handler) error {
+		if s == nil {
+			if must {
+				return fmt.Errorf("invalid maxorderamount")
+			}
+			return nil
+		}
+		_, err := decimal.NewFromString(*s)
+		if err != nil {
+			return err
+		}
+		h.MaxOrderAmount = s
+		return nil
+	}
+}
+
+func WithMaxUserAmount(s *string, must bool) func(context.Context, *Handler) error {
+	return func(ctx context.Context, h *Handler) error {
+		if s == nil {
+			if must {
+				return fmt.Errorf("invalid price")
+			}
+			return nil
+		}
+		_, err := decimal.NewFromString(*s)
+		if err != nil {
+			return err
+		}
+		h.MaxUserAmount = s
+		return nil
+	}
+}
+
+func WithMinOrderDuration(n *uint32, must bool) func(context.Context, *Handler) error {
+	return func(ctx context.Context, h *Handler) error {
+		h.MinOrderDuration = n
+		return nil
+	}
+}
+
+func WithMaxOrderDuration(n *uint32, must bool) func(context.Context, *Handler) error {
+	return func(ctx context.Context, h *Handler) error {
+		h.MaxOrderDuration = n
 		return nil
 	}
 }

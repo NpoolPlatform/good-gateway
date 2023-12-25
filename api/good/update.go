@@ -25,9 +25,8 @@ func (s *Server) UpdateGood(ctx context.Context, in *npool.UpdateGoodRequest) (*
 		good1.WithBenefitType(in.BenefitType, false),
 		good1.WithGoodType(in.GoodType, false),
 		good1.WithTitle(in.Title, false),
-		good1.WithUnit(in.Unit, false),
-		good1.WithUnitAmount(in.UnitAmount, false),
-		good1.WithSupportCoinTypeIDs(in.SupportCoinTypeIDs, false),
+		good1.WithQuantityUnit(in.QuantityUnit, false),
+		good1.WithQuantityUnitAmount(in.QuantityUnitAmount, false),
 		good1.WithDeliveryAt(in.DeliveryAt, false),
 		good1.WithStartAt(in.StartAt, false),
 		good1.WithStartMode(in.StartMode, false),
@@ -37,6 +36,10 @@ func (s *Server) UpdateGood(ctx context.Context, in *npool.UpdateGoodRequest) (*
 		good1.WithLabels(in.Labels, false),
 		good1.WithBenefitIntervalHours(in.BenefitIntervalHours, false),
 		good1.WithUnitLockDeposit(in.UnitLockDeposit, false),
+		good1.WithUnitType(in.UnitType, false),
+		good1.WithQuantityCalculateType(in.QuantityCalculateType, false),
+		good1.WithDurationType(in.DurationType, false),
+		good1.WithDurationCalculateType(in.DurationCalculateType, false),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(

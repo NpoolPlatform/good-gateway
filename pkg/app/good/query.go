@@ -24,7 +24,6 @@ func (h *queryHandler) getCoins(ctx context.Context) error {
 	coinTypeIDs := []string{}
 	for _, good := range h.goods {
 		coinTypeIDs = append(coinTypeIDs, good.CoinTypeID)
-		coinTypeIDs = append(coinTypeIDs, good.SupportCoinTypeIDs...)
 	}
 	coins, _, err := appcoinmwcli.GetCoins(ctx, &appcoinmwpb.Conds{
 		AppID:       &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID},
@@ -64,8 +63,8 @@ func (h *queryHandler) formalize() {
 			GoodType:               good.GoodType,
 			BenefitType:            good.BenefitType,
 			GoodName:               good.GoodName,
-			Unit:                   good.Unit,
-			UnitAmount:             good.UnitAmount,
+			QuantityUnit:           good.QuantityUnit,
+			QuantityUnitAmount:     good.QuantityUnitAmount,
 			TestOnly:               good.TestOnly,
 			Posters:                good.Posters,
 			Labels:                 good.Labels,
@@ -109,6 +108,15 @@ func (h *queryHandler) formalize() {
 			TotalRewardAmount:      good.TotalRewardAmount,
 			LastUnitRewardAmount:   good.LastUnitRewardAmount,
 			AppGoodPosters:         good.AppGoodPosters,
+			UnitType:               good.UnitType,
+			QuantityCalculateType:  good.QuantityCalculateType,
+			DurationType:           good.DurationType,
+			DurationCalculateType:  good.DurationCalculateType,
+			MinOrderAmount:         good.MinOrderAmount,
+			MaxOrderAmount:         good.MaxOrderAmount,
+			MaxUserAmount:          good.MaxUserAmount,
+			MinOrderDuration:       good.MinOrderDuration,
+			MaxOrderDuration:       good.MaxOrderDuration,
 		}
 
 		coin, ok := h.appCoins[good.CoinTypeID]
@@ -120,22 +128,6 @@ func (h *queryHandler) formalize() {
 			info.CoinEnv = coin.ENV
 		}
 
-		supportCoins := []*npool.Good_CoinInfo{}
-		for _, coinTypeID := range good.SupportCoinTypeIDs {
-			coin, ok := h.appCoins[coinTypeID]
-			if !ok {
-				continue
-			}
-			supportCoins = append(supportCoins, &npool.Good_CoinInfo{
-				CoinTypeID:  coinTypeID,
-				CoinLogo:    coin.Logo,
-				CoinName:    coin.Name,
-				CoinUnit:    coin.Unit,
-				CoinPreSale: coin.Presale,
-			})
-		}
-
-		info.SupportCoins = supportCoins
 		h.infos = append(h.infos, info)
 	}
 }

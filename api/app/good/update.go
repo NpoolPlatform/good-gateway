@@ -41,6 +41,11 @@ func (s *Server) UpdateGood(ctx context.Context, in *npool.UpdateGoodRequest) (*
 		good1.WithDescriptions(in.Descriptions, false),
 		good1.WithGoodBanner(in.GoodBanner, false),
 		good1.WithDisplayNames(in.DisplayNames, false),
+		good1.WithMinOrderAmount(in.MinOrderAmount, false),
+		good1.WithMaxOrderAmount(in.MaxOrderAmount, false),
+		good1.WithMaxUserAmount(in.MaxUserAmount, false),
+		good1.WithMinOrderDuration(in.MinOrderDuration, false),
+		good1.WithMaxOrderDuration(in.MaxOrderDuration, false),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(
