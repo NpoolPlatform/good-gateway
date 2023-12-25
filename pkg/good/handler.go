@@ -296,6 +296,9 @@ func WithStartMode(e *types.GoodStartMode, must bool) func(context.Context, *Han
 		switch *e {
 		case types.GoodStartMode_GoodStartModeTBD:
 		case types.GoodStartMode_GoodStartModeConfirmed:
+		case types.GoodStartMode_GoodStartModeNextDay:
+		case types.GoodStartMode_GoodStartModeInstantly:
+		case types.GoodStartMode_GoodStartModePreset:
 		default:
 			return fmt.Errorf("invalid goodstartmode")
 		}
