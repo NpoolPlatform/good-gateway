@@ -19,7 +19,7 @@ type Handler struct {
 	DurationDays          *int32
 	CoinTypeID            *string
 	VendorLocationID      *string
-	Price                 *string
+	UnitPrice             *string
 	BenefitType           *types.BenefitType
 	GoodType              *types.GoodType
 	Title                 *string
@@ -148,18 +148,18 @@ func WithVendorLocationID(id *string, must bool) func(context.Context, *Handler)
 	}
 }
 
-func WithPrice(s *string, must bool) func(context.Context, *Handler) error {
+func WithUnitPrice(s *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if s == nil {
 			if must {
-				return fmt.Errorf("invalid price")
+				return fmt.Errorf("invalid unitprice")
 			}
 			return nil
 		}
 		if _, err := decimal.NewFromString(*s); err != nil {
 			return err
 		}
-		h.Price = s
+		h.UnitPrice = s
 		return nil
 	}
 }

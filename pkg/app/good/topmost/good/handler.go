@@ -19,7 +19,8 @@ type Handler struct {
 	TopMostID    *string
 	DisplayIndex *uint32
 	Posters      []string
-	Price        *string
+	UnitPrice    *string
+	PackagePrice *string
 	Offset       int32
 	Limit        int32
 }
@@ -129,18 +130,34 @@ func WithPosters(ss []string, must bool) func(context.Context, *Handler) error {
 	}
 }
 
-func WithPrice(s *string, must bool) func(context.Context, *Handler) error {
+func WithUnitPrice(s *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if s == nil {
 			if must {
-				return fmt.Errorf("invalid price")
+				return fmt.Errorf("invalid unitprice")
 			}
 			return nil
 		}
 		if _, err := decimal.NewFromString(*s); err != nil {
 			return err
 		}
-		h.Price = s
+		h.UnitPrice = s
+		return nil
+	}
+}
+
+func WithPackagePrice(s *string, must bool) func(context.Context, *Handler) error {
+	return func(ctx context.Context, h *Handler) error {
+		if s == nil {
+			if must {
+				return fmt.Errorf("invalid packageprice")
+			}
+			return nil
+		}
+		if _, err := decimal.NewFromString(*s); err != nil {
+			return err
+		}
+		h.PackagePrice = s
 		return nil
 	}
 }

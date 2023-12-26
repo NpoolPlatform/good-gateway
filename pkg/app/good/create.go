@@ -23,7 +23,8 @@ func (h *Handler) CreateGood(ctx context.Context) (*npool.Good, error) {
 		Online:                 h.Online,
 		Visible:                h.Visible,
 		GoodName:               h.GoodName,
-		Price:                  h.Price,
+		UnitPrice:              h.UnitPrice,
+		PackagePrice:           h.PackagePrice,
 		DisplayIndex:           h.DisplayIndex,
 		PurchaseLimit:          h.PurchaseLimit,
 		SaleStartAt:            h.SaleStartAt,
@@ -43,6 +44,7 @@ func (h *Handler) CreateGood(ctx context.Context) (*npool.Good, error) {
 		ProductPage:            h.ProductPage,
 		EnableSetCommission:    h.EnableSetCommission,
 		Posters:                h.Posters,
+		PackageWithRequireds:   h.PackageWithRequireds,
 	}); err != nil {
 		return nil, err
 	}

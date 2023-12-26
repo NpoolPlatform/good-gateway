@@ -59,7 +59,7 @@ func (h *queryHandler) formalize() {
 			VendorBrandLogo:        good.VendorBrandLogo,
 			GoodType:               good.GoodType,
 			BenefitType:            good.BenefitType,
-			Price:                  good.Price,
+			UnitPrice:              good.UnitPrice,
 			Title:                  good.Title,
 			QuantityUnit:           good.QuantityUnit,
 			QuantityUnitAmount:     good.QuantityUnitAmount,

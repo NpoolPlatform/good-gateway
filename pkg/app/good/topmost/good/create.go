@@ -19,11 +19,12 @@ func (h *Handler) CreateTopMostGood(ctx context.Context) (*npool.TopMostGood, er
 	}
 
 	if _, err := topmostgoodmwcli.CreateTopMostGood(ctx, &topmostgoodmwpb.TopMostGoodReq{
-		EntID:     h.EntID,
-		AppGoodID: h.AppGoodID,
-		TopMostID: h.TopMostID,
-		Posters:   h.Posters,
-		Price:     h.Price,
+		EntID:        h.EntID,
+		AppGoodID:    h.AppGoodID,
+		TopMostID:    h.TopMostID,
+		Posters:      h.Posters,
+		UnitPrice:    h.UnitPrice,
+		PackagePrice: h.PackagePrice,
 	}); err != nil {
 		return nil, err
 	}

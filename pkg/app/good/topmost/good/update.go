@@ -25,9 +25,10 @@ func (h *Handler) UpdateTopMostGood(ctx context.Context) (*npool.TopMostGood, er
 
 	// TODO: check exist of topmost and appgood
 	if _, err := topmostgoodmwcli.UpdateTopMostGood(ctx, &topmostgoodmwpb.TopMostGoodReq{
-		ID:      h.ID,
-		Posters: h.Posters,
-		Price:   h.Price,
+		ID:           h.ID,
+		Posters:      h.Posters,
+		UnitPrice:    h.UnitPrice,
+		PackagePrice: h.PackagePrice,
 	}); err != nil {
 		return nil, err
 	}
