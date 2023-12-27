@@ -38,6 +38,7 @@ type Handler struct {
 	QuantityCalculateType *types.GoodUnitCalculateType
 	DurationType          *types.GoodDurationType
 	DurationCalculateType *types.GoodUnitCalculateType
+	SettlementType        *types.GoodSettlementType
 	Offset                int32
 	Limit                 int32
 }
@@ -444,6 +445,25 @@ func WithDurationType(e *types.GoodDurationType, must bool) func(context.Context
 			return fmt.Errorf("invalid durationtype")
 		}
 		h.DurationType = e
+		return nil
+	}
+}
+
+func WithSettlementType(e *types.GoodSettlementType, must bool) func(context.Context, *Handler) error {
+	return func(ctx context.Context, h *Handler) error {
+		if e == nil {
+			if must {
+				return fmt.Errorf("invalid settlementype")
+			}
+			return nil
+		}
+		switch *e {
+		case types.GoodSettlementType_GoodSettledByCash:
+		case types.GoodSettlementType_GoodSettledByProfit:
+		default:
+			return fmt.Errorf("invalid settlementtype")
+		}
+		h.SettlementType = e
 		return nil
 	}
 }

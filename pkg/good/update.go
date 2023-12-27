@@ -51,6 +51,7 @@ func (h *Handler) UpdateGood(ctx context.Context) (*npool.Good, error) {
 		QuantityCalculateType: h.QuantityCalculateType,
 		DurationType:          h.DurationType,
 		DurationCalculateType: h.DurationCalculateType,
+		SettlementType:        h.SettlementType,
 	}); err != nil {
 		return nil, err
 	}

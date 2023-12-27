@@ -40,6 +40,7 @@ func (s *Server) UpdateGood(ctx context.Context, in *npool.UpdateGoodRequest) (*
 		good1.WithQuantityCalculateType(in.QuantityCalculateType, false),
 		good1.WithDurationType(in.DurationType, false),
 		good1.WithDurationCalculateType(in.DurationCalculateType, false),
+		good1.WithSettlementType(in.SettlementType, false),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(

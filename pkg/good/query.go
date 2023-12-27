@@ -91,6 +91,7 @@ func (h *queryHandler) formalize() {
 			QuantityCalculateType:  good.QuantityCalculateType,
 			DurationType:           good.DurationType,
 			DurationCalculateType:  good.DurationCalculateType,
+			SettlementType:         good.SettlementType,
 		}
 
 		coin, ok := h.coins[good.CoinTypeID]

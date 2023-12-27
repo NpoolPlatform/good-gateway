@@ -38,6 +38,7 @@ func (s *Server) CreateGood(ctx context.Context, in *npool.CreateGoodRequest) (*
 		good1.WithQuantityCalculateType(in.QuantityCalculateType, false),
 		good1.WithDurationType(in.DurationType, false),
 		good1.WithDurationCalculateType(in.DurationCalculateType, false),
+		good1.WithSettlementType(in.SettlementType, false),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(
