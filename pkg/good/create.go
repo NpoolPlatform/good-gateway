@@ -20,7 +20,6 @@ func (h *Handler) CreateGood(ctx context.Context) (*npool.Good, error) {
 	if _, err := goodmwcli.CreateGood(ctx, &goodmwpb.GoodReq{
 		EntID:                 h.EntID,
 		DeviceInfoID:          h.DeviceInfoID,
-		DurationDays:          h.DurationDays,
 		CoinTypeID:            h.CoinTypeID,
 		VendorLocationID:      h.VendorLocationID,
 		UnitPrice:             h.UnitPrice,

@@ -16,7 +16,6 @@ func (s *Server) CreateGood(ctx context.Context, in *npool.CreateGoodRequest) (*
 	handler, err := good1.NewHandler(
 		ctx,
 		good1.WithDeviceInfoID(&in.DeviceInfoID, true),
-		good1.WithDurationDays(&in.DurationDays, true),
 		good1.WithCoinTypeID(&in.CoinTypeID, true),
 		good1.WithVendorLocationID(&in.VendorLocationID, true),
 		good1.WithUnitPrice(&in.UnitPrice, true),

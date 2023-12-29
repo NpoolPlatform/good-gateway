@@ -29,7 +29,6 @@ func (h *Handler) UpdateGood(ctx context.Context) (*npool.Good, error) {
 	if _, err := goodmwcli.UpdateGood(ctx, &goodmwpb.GoodReq{
 		ID:                    h.ID,
 		DeviceInfoID:          h.DeviceInfoID,
-		DurationDays:          h.DurationDays,
 		CoinTypeID:            h.CoinTypeID,
 		VendorLocationID:      h.VendorLocationID,
 		UnitPrice:             h.UnitPrice,

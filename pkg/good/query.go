@@ -48,7 +48,6 @@ func (h *queryHandler) formalize() {
 			DevicePowerConsumption: good.DevicePowerConsumption,
 			DeviceShipmentAt:       good.DeviceShipmentAt,
 			DevicePosters:          good.DevicePosters,
-			DurationDays:           good.DurationDays,
 			CoinTypeID:             good.CoinTypeID,
 			VendorLocationID:       good.VendorLocationID,
 			VendorLocationCountry:  good.VendorLocationCountry,
