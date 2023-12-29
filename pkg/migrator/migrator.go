@@ -103,7 +103,7 @@ func migrateGoodOrder(ctx context.Context, conn *sql.DB) error {
 		_, err := conn.ExecContext(
 			ctx,
 			fmt.Sprintf(
-				"update good_manager.goods set quantity_unit='%v',quantity_unit_amount='%v' where ent_id='%v'",
+				"update good_manager.goods set quantity_unit='%v',quantity_unit_amount='%v' where ent_id='%v and quantity_unit_amount is NULL'",
 				g.Unit,
 				g.UnitAmount,
 				goodID,
@@ -161,7 +161,7 @@ func migrateGoodOrder(ctx context.Context, conn *sql.DB) error {
 		result, err = conn.ExecContext(
 			ctx,
 			fmt.Sprintf(
-				"update good_manager.app_goods set ,min_order_amount='0.1',max_order_amount='%v',max_user_amount='%v',min_order_duration='%v',max_order_duration='%v' where ent_id='%v'",
+				"update good_manager.app_goods set min_order_amount='0.1',max_order_amount='%v',max_user_amount='%v',min_order_duration='%v',max_order_duration='%v' where ent_id='%v'",
 				ag.PurchaseLimit,
 				ag.UserPurchaseLimit,
 				ag.DurationDays,
