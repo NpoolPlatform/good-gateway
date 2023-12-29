@@ -73,11 +73,13 @@ func migrateGoodOrder(ctx context.Context, conn *sql.DB) error {
 	// Get goods
 	type good struct {
 		EntID        uuid.UUID
+		Unit         string
+		UnitAmount   decimal.Decimal
 		DurationDays uint32
 	}
 	rows, err := conn.QueryContext(
 		ctx,
-		"select ent_id,duration_days from good_manager.goods",
+		"select ent_id,duration_days,unit,unit_amount from good_manager.goods",
 	)
 	if err != nil {
 		return err
@@ -85,7 +87,7 @@ func migrateGoodOrder(ctx context.Context, conn *sql.DB) error {
 	goods := map[uuid.UUID]*good{}
 	for rows.Next() {
 		g := &good{}
-		if err := rows.Scan(&g.EntID, &g.DurationDays); err != nil {
+		if err := rows.Scan(&g.EntID, &g.DurationDays, &g.Unit, &g.UnitAmount); err != nil {
 			return err
 		}
 		goods[g.EntID] = g
@@ -96,6 +98,20 @@ func migrateGoodOrder(ctx context.Context, conn *sql.DB) error {
 	)
 	if err != nil {
 		return err
+	}
+	for goodID, g := range goods {
+		_, err := conn.ExecContext(
+			ctx,
+			fmt.Sprintf(
+				"update good_manager.goods set quantity_unit='%v',quantity_unit_amount='%v' where ent_id='%v'",
+				g.Unit,
+				g.UnitAmount,
+				goodID,
+			),
+		)
+		if err != nil {
+			return err
+		}
 	}
 	// Get app goods
 	type appGood struct {
@@ -145,7 +161,7 @@ func migrateGoodOrder(ctx context.Context, conn *sql.DB) error {
 		result, err = conn.ExecContext(
 			ctx,
 			fmt.Sprintf(
-				"update good_manager.app_goods set min_order_amount='0.1',max_order_amount='%v',max_user_amount='%v',min_order_duration='%v',max_order_duration='%v' where ent_id='%v'",
+				"update good_manager.app_goods set ,min_order_amount='0.1',max_order_amount='%v',max_user_amount='%v',min_order_duration='%v',max_order_duration='%v' where ent_id='%v'",
 				ag.PurchaseLimit,
 				ag.UserPurchaseLimit,
 				ag.DurationDays,
