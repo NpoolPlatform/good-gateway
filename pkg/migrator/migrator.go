@@ -103,7 +103,7 @@ func migrateGoodOrder(ctx context.Context, conn *sql.DB) error {
 		_, err := conn.ExecContext(
 			ctx,
 			fmt.Sprintf(
-				"update good_manager.goods set quantity_unit='%v',quantity_unit_amount='%v' where ent_id='%v and quantity_unit_amount is NULL'",
+				"update good_manager.goods set quantity_unit='%v',quantity_unit_amount='%v' where ent_id='%v' and quantity_unit_amount is NULL and unit_amount is not NULL",
 				g.Unit,
 				g.UnitAmount,
 				goodID,
