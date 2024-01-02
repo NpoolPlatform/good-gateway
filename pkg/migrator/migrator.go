@@ -76,10 +76,18 @@ func migrateGoodOrder(ctx context.Context, conn *sql.DB) error {
 		Unit         string
 		UnitAmount   decimal.Decimal
 		DurationDays uint32
+		Price        decimal.Decimal
+	}
+	_, err := conn.ExecContext(
+		ctx,
+		"update good_manager.goods set price='0' where price is NULL",
+	)
+	if err != nil {
+		return err
 	}
 	rows, err := conn.QueryContext(
 		ctx,
-		"select ent_id,duration_days,unit,unit_amount from good_manager.goods",
+		"select ent_id,duration_days,unit,unit_amount,price from good_manager.goods",
 	)
 	if err != nil {
 		return err
@@ -87,7 +95,7 @@ func migrateGoodOrder(ctx context.Context, conn *sql.DB) error {
 	goods := map[uuid.UUID]*good{}
 	for rows.Next() {
 		g := &good{}
-		if err := rows.Scan(&g.EntID, &g.DurationDays, &g.Unit, &g.UnitAmount); err != nil {
+		if err := rows.Scan(&g.EntID, &g.DurationDays, &g.Unit, &g.UnitAmount, &g.Price); err != nil {
 			return err
 		}
 		goods[g.EntID] = g
@@ -100,7 +108,19 @@ func migrateGoodOrder(ctx context.Context, conn *sql.DB) error {
 		return err
 	}
 	for goodID, g := range goods {
+		unitPrice := g.Price.Div(decimal.NewFromInt(365))
 		_, err := conn.ExecContext(
+			ctx,
+			fmt.Sprintf(
+				"update good_manager.goods set unit_price='%v' where ent_id='%v' and unit_price is NULL and price is not NULL",
+				unitPrice,
+				goodID,
+			),
+		)
+		if err != nil {
+			return err
+		}
+		_, err = conn.ExecContext(
 			ctx,
 			fmt.Sprintf(
 				"update good_manager.goods set quantity_unit='%v',quantity_unit_amount='%v' where ent_id='%v' and quantity_unit_amount is NULL and unit_amount is not NULL",
@@ -123,7 +143,7 @@ func migrateGoodOrder(ctx context.Context, conn *sql.DB) error {
 	}
 	rows, err = conn.QueryContext(
 		ctx,
-		"select ent_id,purchase_limit,user_purchase_limit,good_id from good_manager.app_goods",
+		"select ent_id,price,purchase_limit,user_purchase_limit,good_id from good_manager.app_goods",
 	)
 	if err != nil {
 		return err
@@ -158,14 +178,24 @@ func migrateGoodOrder(ctx context.Context, conn *sql.DB) error {
 		if err != nil {
 			return err
 		}
+		unitPrice := decimal.NewFromInt(0)
+		packagePrice := decimal.NewFromInt(0)
+		g, ok := goods[ag.GoodID]
+		if ok {
+			unitPrice = g.Price.Div(decimal.NewFromInt(365))
+			packagePrice = g.Price
+			continue
+		}
 		result, err = conn.ExecContext(
 			ctx,
 			fmt.Sprintf(
-				"update good_manager.app_goods set min_order_amount='0.1',max_order_amount='%v',max_user_amount='%v',min_order_duration='%v',max_order_duration='%v' where ent_id='%v'",
+				"update good_manager.app_goods set min_order_amount='0.1',max_order_amount='%v',max_user_amount='%v',min_order_duration='%v',max_order_duration='%v',unit_price='%v',package_price='%v' where ent_id='%v'",
 				ag.PurchaseLimit,
 				ag.UserPurchaseLimit,
 				ag.DurationDays,
 				ag.DurationDays,
+				unitPrice,
+				packagePrice,
 				appGoodID,
 			),
 		)
