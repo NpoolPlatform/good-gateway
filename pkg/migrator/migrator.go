@@ -69,6 +69,7 @@ func open(hostname string) (conn *sql.DB, err error) {
 	return conn, nil
 }
 
+//nolint
 func migrateGoodOrder(ctx context.Context, conn *sql.DB) error {
 	// Get goods
 	type good struct {
@@ -108,7 +109,7 @@ func migrateGoodOrder(ctx context.Context, conn *sql.DB) error {
 		return err
 	}
 	for goodID, g := range goods {
-		unitPrice := g.Price.Div(decimal.NewFromInt(365))
+		unitPrice := g.Price.Div(decimal.NewFromInt(365)) //nolint
 		_, err := conn.ExecContext(
 			ctx,
 			fmt.Sprintf(
@@ -143,7 +144,7 @@ func migrateGoodOrder(ctx context.Context, conn *sql.DB) error {
 	}
 	rows, err = conn.QueryContext(
 		ctx,
-		"select ent_id,price,purchase_limit,user_purchase_limit,good_id from good_manager.app_goods",
+		"select ent_id,purchase_limit,user_purchase_limit,good_id from good_manager.app_goods",
 	)
 	if err != nil {
 		return err
@@ -182,14 +183,13 @@ func migrateGoodOrder(ctx context.Context, conn *sql.DB) error {
 		packagePrice := decimal.NewFromInt(0)
 		g, ok := goods[ag.GoodID]
 		if ok {
-			unitPrice = g.Price.Div(decimal.NewFromInt(365))
+			unitPrice = g.Price.Div(decimal.NewFromInt(365)) //nolint
 			packagePrice = g.Price
-			continue
 		}
 		result, err = conn.ExecContext(
 			ctx,
 			fmt.Sprintf(
-				"update good_manager.app_goods set min_order_amount='0.1',max_order_amount='%v',max_user_amount='%v',min_order_duration='%v',max_order_duration='%v',unit_price='%v',package_price='%v' where ent_id='%v'",
+				"update good_manager.app_goods set min_order_amount='0.1',max_order_amount='%v',max_user_amount='%v',min_order_duration='%v',max_order_duration='%v',unit_price='%v',package_price='%v' where ent_id='%v'", //nolint
 				ag.PurchaseLimit,
 				ag.UserPurchaseLimit,
 				ag.DurationDays,
