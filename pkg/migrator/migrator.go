@@ -144,7 +144,7 @@ func migrateGoodOrder(ctx context.Context, conn *sql.DB) error {
 	}
 	rows, err = conn.QueryContext(
 		ctx,
-		"select ent_id,purchase_limit,user_purchase_limit,good_id from good_manager.app_goods",
+		"select ent_id,purchase_limit,user_purchase_limit,good_id from good_manager.app_goods where price is not NULL",
 	)
 	if err != nil {
 		return err
@@ -189,7 +189,7 @@ func migrateGoodOrder(ctx context.Context, conn *sql.DB) error {
 		result, err = conn.ExecContext(
 			ctx,
 			fmt.Sprintf(
-				"update good_manager.app_goods set min_order_amount='0.1',max_order_amount='%v',max_user_amount='%v',min_order_duration='%v',max_order_duration='%v',unit_price='%v',package_price='%v' where ent_id='%v'", //nolint
+				"update good_manager.app_goods set min_order_amount='0.1',max_order_amount='%v',max_user_amount='%v',min_order_duration='%v',max_order_duration='%v',unit_price='%v',package_price='%v' where ent_id='%v' and unit_price is NULL and price is not NULL", //nolint
 				ag.PurchaseLimit,
 				ag.UserPurchaseLimit,
 				ag.DurationDays,
