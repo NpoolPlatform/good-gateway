@@ -51,6 +51,10 @@ spec:
             backend:
               serviceName: good-gateway
               servicePort: 50550
+          - path: /api/good/v1/get/requiredgoods
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
     - host: api.procyon.vip
       http: *http_rules
     - host: api.xpool.top
@@ -325,10 +329,6 @@ spec:
               serviceName: good-gateway
               servicePort: 50550
 
-          - path: /api/good/v1/get/requiredgoods
-            backend:
-              serviceName: good-gateway
-              servicePort: 50550
           - path: /api/good/v1/delete/requiredgood
             backend:
               serviceName: good-gateway
