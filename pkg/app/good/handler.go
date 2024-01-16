@@ -163,8 +163,12 @@ func WithUnitPrice(s *string, must bool) func(context.Context, *Handler) error {
 			}
 			return nil
 		}
-		if _, err := decimal.NewFromString(*s); err != nil {
+		price, err := decimal.NewFromString(*s)
+		if err != nil {
 			return err
+		}
+		if price.Cmp(decimal.NewFromInt(0)) <= 0 {
+			return fmt.Errorf("invalid unitprice")
 		}
 		h.UnitPrice = s
 		return nil
@@ -179,8 +183,12 @@ func WithPackagePrice(s *string, must bool) func(context.Context, *Handler) erro
 			}
 			return nil
 		}
-		if _, err := decimal.NewFromString(*s); err != nil {
+		price, err := decimal.NewFromString(*s)
+		if err != nil {
 			return err
+		}
+		if price.Cmp(decimal.NewFromInt(0)) <= 0 {
+			return fmt.Errorf("invalid packageprice")
 		}
 		h.PackagePrice = s
 		return nil
