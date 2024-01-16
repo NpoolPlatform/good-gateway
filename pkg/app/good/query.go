@@ -116,6 +116,7 @@ func (h *queryHandler) formalize() {
 			MinOrderDuration:       good.MinOrderDuration,
 			MaxOrderDuration:       good.MaxOrderDuration,
 			SettlementType:         good.SettlementType,
+			PackageWithRequireds:   good.PackageWithRequireds,
 		}
 
 		coin, ok := h.appCoins[good.CoinTypeID]
