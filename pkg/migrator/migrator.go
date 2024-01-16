@@ -79,11 +79,24 @@ func migrateGoodOrder(ctx context.Context, conn *sql.DB) error {
 		DurationDays uint32
 		Price        decimal.Decimal
 	}
-	_, err := conn.ExecContext(
+	result, err := conn.ExecContext(
 		ctx,
 		"update good_manager.goods set price='0' where price is NULL",
 	)
 	if err != nil {
+		return err
+	}
+	if _, err := result.RowsAffected(); err != nil {
+		return err
+	}
+	result, err = conn.ExecContext(
+		ctx,
+		"update good_manager.goods set start_mode='GoodStartModePreset' where start_mode='GoodStartModeConfirmed'",
+	)
+	if err != nil {
+		return err
+	}
+	if _, err := result.RowsAffected(); err != nil {
 		return err
 	}
 	rows, err := conn.QueryContext(
