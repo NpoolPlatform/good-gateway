@@ -16,16 +16,14 @@ func (s *Server) CreateGood(ctx context.Context, in *npool.CreateGoodRequest) (*
 	handler, err := good1.NewHandler(
 		ctx,
 		good1.WithDeviceInfoID(&in.DeviceInfoID, true),
-		good1.WithDurationDays(&in.DurationDays, true),
 		good1.WithCoinTypeID(&in.CoinTypeID, true),
 		good1.WithVendorLocationID(&in.VendorLocationID, true),
-		good1.WithPrice(&in.Price, true),
+		good1.WithUnitPrice(&in.UnitPrice, true),
 		good1.WithBenefitType(&in.BenefitType, true),
 		good1.WithGoodType(&in.GoodType, true),
 		good1.WithTitle(&in.Title, true),
-		good1.WithUnit(&in.Unit, true),
-		good1.WithUnitAmount(&in.UnitAmount, true),
-		good1.WithSupportCoinTypeIDs(in.SupportCoinTypeIDs, true),
+		good1.WithQuantityUnit(&in.QuantityUnit, true),
+		good1.WithQuantityUnitAmount(&in.QuantityUnitAmount, true),
 		good1.WithDeliveryAt(&in.DeliveryAt, true),
 		good1.WithStartAt(&in.StartAt, true),
 		good1.WithStartMode(&in.StartMode, true),
@@ -35,6 +33,11 @@ func (s *Server) CreateGood(ctx context.Context, in *npool.CreateGoodRequest) (*
 		good1.WithLabels(in.Labels, true),
 		good1.WithBenefitIntervalHours(in.BenefitIntervalHours, false),
 		good1.WithUnitLockDeposit(in.UnitLockDeposit, false),
+		good1.WithUnitType(in.UnitType, false),
+		good1.WithQuantityCalculateType(in.QuantityCalculateType, false),
+		good1.WithDurationType(in.DurationType, false),
+		good1.WithDurationCalculateType(in.DurationCalculateType, false),
+		good1.WithSettlementType(in.SettlementType, false),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(

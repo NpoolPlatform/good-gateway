@@ -24,7 +24,6 @@ func (h *queryHandler) getCoins(ctx context.Context) error {
 	coinTypeIDs := []string{}
 	for _, good := range h.goods {
 		coinTypeIDs = append(coinTypeIDs, good.CoinTypeID)
-		coinTypeIDs = append(coinTypeIDs, good.SupportCoinTypeIDs...)
 	}
 	coins, _, err := coinmwcli.GetCoins(ctx, &coinmwpb.Conds{
 		EntIDs: &basetypes.StringSliceVal{Op: cruder.IN, Value: coinTypeIDs},
@@ -49,7 +48,6 @@ func (h *queryHandler) formalize() {
 			DevicePowerConsumption: good.DevicePowerConsumption,
 			DeviceShipmentAt:       good.DeviceShipmentAt,
 			DevicePosters:          good.DevicePosters,
-			DurationDays:           good.DurationDays,
 			CoinTypeID:             good.CoinTypeID,
 			VendorLocationID:       good.VendorLocationID,
 			VendorLocationCountry:  good.VendorLocationCountry,
@@ -60,10 +58,10 @@ func (h *queryHandler) formalize() {
 			VendorBrandLogo:        good.VendorBrandLogo,
 			GoodType:               good.GoodType,
 			BenefitType:            good.BenefitType,
-			Price:                  good.Price,
+			UnitPrice:              good.UnitPrice,
 			Title:                  good.Title,
-			Unit:                   good.Unit,
-			UnitAmount:             good.UnitAmount,
+			QuantityUnit:           good.QuantityUnit,
+			QuantityUnitAmount:     good.QuantityUnitAmount,
 			TestOnly:               good.TestOnly,
 			Posters:                good.Posters,
 			Labels:                 good.Labels,
@@ -88,6 +86,11 @@ func (h *queryHandler) formalize() {
 			RecommendCount:         good.RecommendCount,
 			CommentCount:           good.CommentCount,
 			UnitLockDeposit:        good.UnitLockDeposit,
+			UnitType:               good.UnitType,
+			QuantityCalculateType:  good.QuantityCalculateType,
+			DurationType:           good.DurationType,
+			DurationCalculateType:  good.DurationCalculateType,
+			SettlementType:         good.SettlementType,
 		}
 
 		coin, ok := h.coins[good.CoinTypeID]
@@ -97,23 +100,6 @@ func (h *queryHandler) formalize() {
 			info.CoinUnit = coin.Unit
 			info.CoinPreSale = coin.Presale
 		}
-
-		supportCoins := []*npool.Good_CoinInfo{}
-		for _, coinTypeID := range good.SupportCoinTypeIDs {
-			coin, ok := h.coins[coinTypeID]
-			if !ok {
-				continue
-			}
-			supportCoins = append(supportCoins, &npool.Good_CoinInfo{
-				CoinTypeID:  coinTypeID,
-				CoinLogo:    coin.Logo,
-				CoinName:    coin.Name,
-				CoinUnit:    coin.Unit,
-				CoinPreSale: coin.Presale,
-			})
-		}
-
-		info.SupportCoins = supportCoins
 		h.infos = append(h.infos, info)
 	}
 }

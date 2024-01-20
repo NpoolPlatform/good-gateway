@@ -20,9 +20,9 @@ func (s *Server) CreateGood(ctx context.Context, in *npool.CreateGoodRequest) (*
 		good1.WithOnline(&in.Online, true),
 		good1.WithVisible(&in.Visible, true),
 		good1.WithGoodName(&in.GoodName, true),
-		good1.WithPrice(&in.Price, true),
+		good1.WithUnitPrice(&in.UnitPrice, true),
+		good1.WithPackagePrice(in.PackagePrice, false),
 		good1.WithDisplayIndex(&in.DisplayIndex, true),
-		good1.WithPurchaseLimit(&in.PurchaseLimit, true),
 		good1.WithSaleStartAt(in.SaleStartAt, false),
 		good1.WithSaleEndAt(in.SaleEndAt, false),
 		good1.WithServiceStartAt(in.ServiceStartAt, false),
@@ -31,7 +31,6 @@ func (s *Server) CreateGood(ctx context.Context, in *npool.CreateGoodRequest) (*
 		good1.WithEnablePurchase(in.EnablePurchase, false),
 		good1.WithEnableProductPage(in.EnableProductPage, false),
 		good1.WithCancelMode(in.CancelMode, false),
-		good1.WithUserPurchaseLimit(in.UserPurchaseLimit, false),
 		good1.WithDisplayColors(in.DisplayColors, false),
 		good1.WithCancellableBeforeStart(in.CancellableBeforeStart, false),
 		good1.WithProductPage(in.ProductPage, false),
@@ -40,6 +39,12 @@ func (s *Server) CreateGood(ctx context.Context, in *npool.CreateGoodRequest) (*
 		good1.WithDescriptions(in.Descriptions, false),
 		good1.WithGoodBanner(in.GoodBanner, false),
 		good1.WithDisplayNames(in.DisplayNames, false),
+		good1.WithMinOrderAmount(in.MinOrderAmount, false),
+		good1.WithMaxOrderAmount(in.MaxOrderAmount, false),
+		good1.WithMaxUserAmount(in.MaxUserAmount, false),
+		good1.WithMinOrderDuration(in.MinOrderDuration, false),
+		good1.WithMaxOrderDuration(in.MaxOrderDuration, false),
+		good1.WithPackageWithRequireds(in.PackageWithRequireds, false),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(

@@ -19,8 +19,9 @@ func (s *Server) UpdateTopMostGood(ctx context.Context, in *npool.UpdateTopMostG
 		topmostgood1.WithID(&in.ID, true),
 		topmostgood1.WithEntID(&in.EntID, true),
 		topmostgood1.WithAppID(&in.AppID, true),
-		topmostgood1.WithPosters(in.Posters, true),
-		topmostgood1.WithPrice(in.Price, false),
+		topmostgood1.WithPosters(in.Posters, false),
+		topmostgood1.WithUnitPrice(in.UnitPrice, false),
+		topmostgood1.WithPackagePrice(in.PackagePrice, false),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(
@@ -52,8 +53,9 @@ func (s *Server) UpdateNTopMostGood(ctx context.Context, in *npool.UpdateNTopMos
 		topmostgood1.WithID(&in.ID, true),
 		topmostgood1.WithEntID(&in.EntID, true),
 		topmostgood1.WithAppID(&in.TargetAppID, true),
-		topmostgood1.WithPosters(in.Posters, true),
-		topmostgood1.WithPrice(in.Price, false),
+		topmostgood1.WithPosters(in.Posters, false),
+		topmostgood1.WithUnitPrice(in.UnitPrice, false),
+		topmostgood1.WithPackagePrice(in.PackagePrice, false),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(

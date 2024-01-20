@@ -1,3 +1,4 @@
+//nolint:dupl
 package good
 
 import (
@@ -20,7 +21,8 @@ type Handler struct {
 	Online                 *bool
 	Visible                *bool
 	GoodName               *string
-	Price                  *string
+	UnitPrice              *string
+	PackagePrice           *string
 	DisplayIndex           *int32
 	PurchaseLimit          *int32
 	SaleStartAt            *uint32
@@ -40,6 +42,12 @@ type Handler struct {
 	ProductPage            *string
 	EnableSetCommission    *bool
 	Posters                []string
+	MinOrderAmount         *string
+	MaxOrderAmount         *string
+	MaxUserAmount          *string
+	MinOrderDuration       *uint32
+	MaxOrderDuration       *uint32
+	PackageWithRequireds   *bool
 	Offset                 int32
 	Limit                  int32
 }
@@ -148,18 +156,42 @@ func WithGoodName(s *string, must bool) func(context.Context, *Handler) error {
 	}
 }
 
-func WithPrice(s *string, must bool) func(context.Context, *Handler) error {
+func WithUnitPrice(s *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if s == nil {
 			if must {
-				return fmt.Errorf("invalid price")
+				return fmt.Errorf("invalid unitprice")
 			}
 			return nil
 		}
-		if _, err := decimal.NewFromString(*s); err != nil {
+		price, err := decimal.NewFromString(*s)
+		if err != nil {
 			return err
 		}
-		h.Price = s
+		if price.Cmp(decimal.NewFromInt(0)) <= 0 {
+			return fmt.Errorf("invalid unitprice")
+		}
+		h.UnitPrice = s
+		return nil
+	}
+}
+
+func WithPackagePrice(s *string, must bool) func(context.Context, *Handler) error {
+	return func(ctx context.Context, h *Handler) error {
+		if s == nil {
+			if must {
+				return fmt.Errorf("invalid packageprice")
+			}
+			return nil
+		}
+		price, err := decimal.NewFromString(*s)
+		if err != nil {
+			return err
+		}
+		if price.Cmp(decimal.NewFromInt(0)) <= 0 {
+			return fmt.Errorf("invalid packageprice")
+		}
+		h.PackagePrice = s
 		return nil
 	}
 }
@@ -342,6 +374,78 @@ func WithProductPage(s *string, must bool) func(context.Context, *Handler) error
 func WithEnableSetCommission(b *bool, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		h.EnableSetCommission = b
+		return nil
+	}
+}
+
+func WithMinOrderAmount(s *string, must bool) func(context.Context, *Handler) error {
+	return func(ctx context.Context, h *Handler) error {
+		if s == nil {
+			if must {
+				return fmt.Errorf("invalid minorderamount")
+			}
+			return nil
+		}
+		_, err := decimal.NewFromString(*s)
+		if err != nil {
+			return err
+		}
+		h.MinOrderAmount = s
+		return nil
+	}
+}
+
+func WithMaxOrderAmount(s *string, must bool) func(context.Context, *Handler) error {
+	return func(ctx context.Context, h *Handler) error {
+		if s == nil {
+			if must {
+				return fmt.Errorf("invalid maxorderamount")
+			}
+			return nil
+		}
+		_, err := decimal.NewFromString(*s)
+		if err != nil {
+			return err
+		}
+		h.MaxOrderAmount = s
+		return nil
+	}
+}
+
+func WithMaxUserAmount(s *string, must bool) func(context.Context, *Handler) error {
+	return func(ctx context.Context, h *Handler) error {
+		if s == nil {
+			if must {
+				return fmt.Errorf("invalid price")
+			}
+			return nil
+		}
+		_, err := decimal.NewFromString(*s)
+		if err != nil {
+			return err
+		}
+		h.MaxUserAmount = s
+		return nil
+	}
+}
+
+func WithMinOrderDuration(n *uint32, must bool) func(context.Context, *Handler) error {
+	return func(ctx context.Context, h *Handler) error {
+		h.MinOrderDuration = n
+		return nil
+	}
+}
+
+func WithMaxOrderDuration(n *uint32, must bool) func(context.Context, *Handler) error {
+	return func(ctx context.Context, h *Handler) error {
+		h.MaxOrderDuration = n
+		return nil
+	}
+}
+
+func WithPackageWithRequireds(b *bool, must bool) func(context.Context, *Handler) error {
+	return func(ctx context.Context, h *Handler) error {
+		h.PackageWithRequireds = b
 		return nil
 	}
 }

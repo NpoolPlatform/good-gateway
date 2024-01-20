@@ -6,40 +6,41 @@ import (
 
 	coinmwcli "github.com/NpoolPlatform/chain-middleware/pkg/client/coin"
 	constant "github.com/NpoolPlatform/good-gateway/pkg/const"
-	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 	types "github.com/NpoolPlatform/message/npool/basetypes/good/v1"
-	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
-	coinmwpb "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin"
 
 	"github.com/google/uuid"
 	"github.com/shopspring/decimal"
 )
 
 type Handler struct {
-	ID                   *uint32
-	EntID                *string
-	DeviceInfoID         *string
-	DurationDays         *int32
-	CoinTypeID           *string
-	VendorLocationID     *string
-	Price                *string
-	BenefitType          *types.BenefitType
-	GoodType             *types.GoodType
-	Title                *string
-	Unit                 *string
-	UnitAmount           *int32
-	SupportCoinTypeIDs   []string
-	DeliveryAt           *uint32
-	StartAt              *uint32
-	StartMode            *types.GoodStartMode
-	TestOnly             *bool
-	Total                *string
-	Posters              []string
-	Labels               []types.GoodLabel
-	BenefitIntervalHours *uint32
-	UnitLockDeposit      *string
-	Offset               int32
-	Limit                int32
+	ID                    *uint32
+	EntID                 *string
+	DeviceInfoID          *string
+	DurationDays          *int32
+	CoinTypeID            *string
+	VendorLocationID      *string
+	UnitPrice             *string
+	BenefitType           *types.BenefitType
+	GoodType              *types.GoodType
+	Title                 *string
+	QuantityUnit          *string
+	QuantityUnitAmount    *string
+	DeliveryAt            *uint32
+	StartAt               *uint32
+	StartMode             *types.GoodStartMode
+	TestOnly              *bool
+	Total                 *string
+	Posters               []string
+	Labels                []types.GoodLabel
+	BenefitIntervalHours  *uint32
+	UnitLockDeposit       *string
+	UnitType              *types.GoodUnitType
+	QuantityCalculateType *types.GoodUnitCalculateType
+	DurationType          *types.GoodDurationType
+	DurationCalculateType *types.GoodUnitCalculateType
+	SettlementType        *types.GoodSettlementType
+	Offset                int32
+	Limit                 int32
 }
 
 const leastStrLen = 3
@@ -148,18 +149,18 @@ func WithVendorLocationID(id *string, must bool) func(context.Context, *Handler)
 	}
 }
 
-func WithPrice(s *string, must bool) func(context.Context, *Handler) error {
+func WithUnitPrice(s *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if s == nil {
 			if must {
-				return fmt.Errorf("invalid price")
+				return fmt.Errorf("invalid unitprice")
 			}
 			return nil
 		}
 		if _, err := decimal.NewFromString(*s); err != nil {
 			return err
 		}
-		h.Price = s
+		h.UnitPrice = s
 		return nil
 	}
 }
@@ -193,14 +194,12 @@ func WithGoodType(e *types.GoodType, must bool) func(context.Context, *Handler) 
 		}
 		switch *e {
 		case types.GoodType_PowerRenting:
+		case types.GoodType_TechniqueServiceFee:
+		case types.GoodType_ElectricityFee:
 		case types.GoodType_MachineRenting:
 			fallthrough //nolint
 		case types.GoodType_MachineHosting:
 			fallthrough //nolint
-		case types.GoodType_TechniqueServiceFee:
-			fallthrough //nolint
-		case types.GoodType_ElectricityFee:
-			return fmt.Errorf("not implemented")
 		default:
 			return fmt.Errorf("invalid goodtype")
 		}
@@ -225,11 +224,11 @@ func WithTitle(s *string, must bool) func(context.Context, *Handler) error {
 	}
 }
 
-func WithUnit(s *string, must bool) func(context.Context, *Handler) error {
+func WithQuantityUnit(s *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if s == nil {
 			if must {
-				return fmt.Errorf("invalid unit")
+				return fmt.Errorf("invalid quantityunit")
 			}
 			return nil
 		}
@@ -237,36 +236,24 @@ func WithUnit(s *string, must bool) func(context.Context, *Handler) error {
 		if len(*s) < leastUnitLen {
 			return fmt.Errorf("invalid unit")
 		}
-		h.Unit = s
+		h.QuantityUnit = s
 		return nil
 	}
 }
 
-func WithUnitAmount(n *int32, must bool) func(context.Context, *Handler) error {
+func WithQuantityUnitAmount(s *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
-		if n == nil {
+		if s == nil {
 			if must {
-				return fmt.Errorf("invalid unitamount")
+				return fmt.Errorf("invalid quantityunitamount")
 			}
 			return nil
 		}
-		h.UnitAmount = n
-		return nil
-	}
-}
-
-func WithSupportCoinTypeIDs(ss []string, must bool) func(context.Context, *Handler) error {
-	return func(ctx context.Context, h *Handler) error {
-		coins, _, err := coinmwcli.GetCoins(ctx, &coinmwpb.Conds{
-			EntIDs: &basetypes.StringSliceVal{Op: cruder.IN, Value: ss},
-		}, int32(0), int32(len(ss)))
+		_, err := decimal.NewFromString(*s)
 		if err != nil {
 			return err
 		}
-		if len(coins) < len(ss) {
-			return fmt.Errorf("invalid supportcointypeids")
-		}
-		h.SupportCoinTypeIDs = ss
+		h.QuantityUnitAmount = s
 		return nil
 	}
 }
@@ -308,6 +295,9 @@ func WithStartMode(e *types.GoodStartMode, must bool) func(context.Context, *Han
 		switch *e {
 		case types.GoodStartMode_GoodStartModeTBD:
 		case types.GoodStartMode_GoodStartModeConfirmed:
+		case types.GoodStartMode_GoodStartModeNextDay:
+		case types.GoodStartMode_GoodStartModeInstantly:
+		case types.GoodStartMode_GoodStartModePreset:
 		default:
 			return fmt.Errorf("invalid goodstartmode")
 		}
@@ -393,6 +383,104 @@ func WithUnitLockDeposit(s *string, must bool) func(context.Context, *Handler) e
 			return err
 		}
 		h.UnitLockDeposit = s
+		return nil
+	}
+}
+
+func WithUnitType(e *types.GoodUnitType, must bool) func(context.Context, *Handler) error {
+	return func(ctx context.Context, h *Handler) error {
+		if e == nil {
+			if must {
+				return fmt.Errorf("invalid unittype")
+			}
+			return nil
+		}
+		switch *e {
+		case types.GoodUnitType_GoodUnitByDuration:
+		case types.GoodUnitType_GoodUnitByQuantity:
+		case types.GoodUnitType_GoodUnitByDurationAndQuantity:
+		default:
+			return fmt.Errorf("invalid unittype")
+		}
+		h.UnitType = e
+		return nil
+	}
+}
+
+func WithQuantityCalculateType(e *types.GoodUnitCalculateType, must bool) func(context.Context, *Handler) error {
+	return func(ctx context.Context, h *Handler) error {
+		if e == nil {
+			if must {
+				return fmt.Errorf("invalid quantitycalculatetype")
+			}
+			return nil
+		}
+		switch *e {
+		case types.GoodUnitCalculateType_GoodUnitCalculateBySelf:
+		case types.GoodUnitCalculateType_GoodUnitCalculateByParent:
+		default:
+			return fmt.Errorf("invalid quantitycalculatetype")
+		}
+		h.QuantityCalculateType = e
+		return nil
+	}
+}
+
+func WithDurationType(e *types.GoodDurationType, must bool) func(context.Context, *Handler) error {
+	return func(ctx context.Context, h *Handler) error {
+		if e == nil {
+			if must {
+				return fmt.Errorf("invalid durationtype")
+			}
+			return nil
+		}
+		switch *e {
+		case types.GoodDurationType_GoodDurationByHour:
+		case types.GoodDurationType_GoodDurationByDay:
+		case types.GoodDurationType_GoodDurationByMonth:
+		case types.GoodDurationType_GoodDurationByYear:
+		default:
+			return fmt.Errorf("invalid durationtype")
+		}
+		h.DurationType = e
+		return nil
+	}
+}
+
+func WithSettlementType(e *types.GoodSettlementType, must bool) func(context.Context, *Handler) error {
+	return func(ctx context.Context, h *Handler) error {
+		if e == nil {
+			if must {
+				return fmt.Errorf("invalid settlementype")
+			}
+			return nil
+		}
+		switch *e {
+		case types.GoodSettlementType_GoodSettledByCash:
+		case types.GoodSettlementType_GoodSettledByProfit:
+		default:
+			return fmt.Errorf("invalid settlementtype")
+		}
+		h.SettlementType = e
+		return nil
+	}
+}
+
+func WithDurationCalculateType(e *types.GoodUnitCalculateType, must bool) func(context.Context, *Handler) error {
+	return func(ctx context.Context, h *Handler) error {
+		if e == nil {
+			if must {
+				return fmt.Errorf("invalid durationcalculatetype")
+			}
+			return nil
+		}
+		switch *e {
+		case types.GoodUnitCalculateType_GoodUnitCalculateBySelf:
+		case types.GoodUnitCalculateType_GoodUnitCalculateByParent:
+		default:
+			return fmt.Errorf("invalid durationcalculatetype")
+		}
+		h.DurationCalculateType = e
 		return nil
 	}
 }
