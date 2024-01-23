@@ -2,6 +2,7 @@ package topmostgood
 
 import (
 	"context"
+	"fmt"
 
 	topmostgoodmwcli "github.com/NpoolPlatform/good-middleware/pkg/client/app/good/topmost/good"
 	npool "github.com/NpoolPlatform/message/npool/good/gw/v1/app/good/topmost/good"
@@ -12,6 +13,10 @@ import (
 
 func (h *Handler) CreateTopMostGood(ctx context.Context) (*npool.TopMostGood, error) {
 	// TODO: check exist of topmost and appgood
+
+	if h.UnitPrice == nil && h.PackagePrice == nil {
+		return nil, fmt.Errorf("invalid price")
+	}
 
 	id := uuid.NewString()
 	if h.EntID == nil {
