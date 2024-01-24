@@ -55,6 +55,22 @@ spec:
             backend:
               serviceName: good-gateway
               servicePort: 50550
+          - path: /api/good/v1/get/deviceinfos
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/get/vendorlocations
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/get/vendorbrands
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/get/goodrewardhistories
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
     - host: api.procyon.vip
       http: *http_rules
     - host: api.xpool.top
@@ -132,10 +148,6 @@ spec:
             backend:
               serviceName: good-gateway
               servicePort: 50550
-          - path: /api/good/v1/get/deviceinfos
-            backend:
-              serviceName: good-gateway
-              servicePort: 50550
           - path: /api/good/v1/delete/deviceinfo
             backend:
               serviceName: good-gateway
@@ -195,10 +207,6 @@ spec:
             backend:
               serviceName: good-gateway
               servicePort: 50550
-          - path: /api/good/v1/get/vendorlocations
-            backend:
-              serviceName: good-gateway
-              servicePort: 50550
           - path: /api/good/v1/delete/vendorlocation
             backend:
               serviceName: good-gateway
@@ -217,10 +225,6 @@ spec:
               serviceName: good-gateway
               servicePort: 50550
           - path: /api/good/v1/get/vendorbrand
-            backend:
-              serviceName: good-gateway
-              servicePort: 50550
-          - path: /api/good/v1/get/vendorbrands
             backend:
               serviceName: good-gateway
               servicePort: 50550
