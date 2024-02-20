@@ -21,6 +21,7 @@ type Handler struct {
 	OrderID      *string
 	Content      *string
 	ReplyToID    *string
+	Anonymous    *bool
 	TargetUserID *string
 	Offset       int32
 	Limit        int32
@@ -205,6 +206,13 @@ func WithReplyToID(id *string, must bool) func(context.Context, *Handler) error 
 			return err
 		}
 		h.ReplyToID = id
+		return nil
+	}
+}
+
+func WithAnonymous(b *bool, must bool) func(context.Context, *Handler) error {
+	return func(ctx context.Context, h *Handler) error {
+		h.Anonymous = b
 		return nil
 	}
 }
