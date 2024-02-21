@@ -258,6 +258,35 @@ spec:
               serviceName: good-gateway
               servicePort: 50550
 
+          - path: /api/good/v1/create/simulategood
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/create/n/simulategood
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/get/simulategoods
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/get/n/simulategoods
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/delete/simulategood
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/update/simulategood
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/update/n/simulategood
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+
           - path: /api/good/v1/create/topmost
             backend:
               serviceName: good-gateway
