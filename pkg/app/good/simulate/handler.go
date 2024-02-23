@@ -6,17 +6,20 @@ import (
 
 	appmwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/app"
 	constant "github.com/NpoolPlatform/good-middleware/pkg/const"
+	"github.com/shopspring/decimal"
 
 	"github.com/google/uuid"
 )
 
 type Handler struct {
-	ID        *uint32
-	EntID     *string
-	AppID     *string
-	AppGoodID *string
-	Offset    int32
-	Limit     int32
+	ID                 *uint32
+	EntID              *string
+	AppID              *string
+	AppGoodID          *string
+	FixedOrderUnits    *string
+	FixedOrderDuration *uint32
+	Offset             int32
+	Limit              int32
 }
 
 func NewHandler(ctx context.Context, options ...func(context.Context, *Handler) error) (*Handler, error) {
@@ -90,6 +93,39 @@ func WithAppGoodID(id *string, must bool) func(context.Context, *Handler) error 
 			return err
 		}
 		h.AppGoodID = id
+		return nil
+	}
+}
+
+func WithFixedOrderUnits(amount *string, must bool) func(context.Context, *Handler) error {
+	return func(ctx context.Context, h *Handler) error {
+		if amount == nil {
+			if must {
+				return fmt.Errorf("invalid units")
+			}
+			return nil
+		}
+		_amount, err := decimal.NewFromString(*amount)
+		if err != nil {
+			return err
+		}
+		if _amount.Cmp(decimal.NewFromInt32(0)) <= 0 {
+			return fmt.Errorf("invalid units")
+		}
+		h.FixedOrderUnits = amount
+		return nil
+	}
+}
+
+func WithFixedOrderDuration(duration *uint32, must bool) func(context.Context, *Handler) error {
+	return func(ctx context.Context, h *Handler) error {
+		if duration == nil {
+			if must {
+				return fmt.Errorf("invalid duration")
+			}
+			return nil
+		}
+		h.FixedOrderDuration = duration
 		return nil
 	}
 }

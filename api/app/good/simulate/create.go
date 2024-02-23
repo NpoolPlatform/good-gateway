@@ -18,6 +18,8 @@ func (s *Server) CreateSimulate(ctx context.Context, in *npool.CreateSimulateReq
 		ctx,
 		simulate1.WithAppID(&in.AppID, true),
 		simulate1.WithAppGoodID(&in.AppGoodID, true),
+		simulate1.WithFixedOrderUnits(&in.FixedOrderUnits, true),
+		simulate1.WithFixedOrderDuration(&in.FixedOrderDuration, true),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(
@@ -48,6 +50,8 @@ func (s *Server) CreateNSimulate(ctx context.Context, in *npool.CreateNSimulateR
 		ctx,
 		simulate1.WithAppID(&in.TargetAppID, true),
 		simulate1.WithAppGoodID(&in.AppGoodID, true),
+		simulate1.WithFixedOrderUnits(&in.FixedOrderUnits, true),
+		simulate1.WithFixedOrderDuration(&in.FixedOrderDuration, true),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(

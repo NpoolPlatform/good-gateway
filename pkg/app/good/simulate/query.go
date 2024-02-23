@@ -60,16 +60,18 @@ func (h *queryHandler) getCoins(ctx context.Context) error {
 func (h *queryHandler) formalize() {
 	for _, def := range h.simulates {
 		info := &npool.Simulate{
-			ID:          def.ID,
-			EntID:       def.EntID,
-			AppID:       def.AppID,
-			GoodID:      def.GoodID,
-			GoodName:    def.GoodName,
-			AppGoodID:   def.AppGoodID,
-			AppGoodName: def.AppGoodName,
-			CoinTypeID:  def.CoinTypeID,
-			CreatedAt:   def.CreatedAt,
-			UpdatedAt:   def.UpdatedAt,
+			ID:                 def.ID,
+			EntID:              def.EntID,
+			AppID:              def.AppID,
+			GoodID:             def.GoodID,
+			GoodName:           def.GoodName,
+			AppGoodID:          def.AppGoodID,
+			AppGoodName:        def.AppGoodName,
+			CoinTypeID:         def.CoinTypeID,
+			FixedOrderUnits:    def.FixedOrderUnits,
+			FixedOrderDuration: def.FixedOrderDuration,
+			CreatedAt:          def.CreatedAt,
+			UpdatedAt:          def.UpdatedAt,
 		}
 
 		app, ok := h.apps[def.AppID]
