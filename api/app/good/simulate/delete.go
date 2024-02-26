@@ -1,3 +1,4 @@
+//nolint:dupl
 package simulate
 
 import (
@@ -39,6 +40,37 @@ func (s *Server) DeleteSimulate(ctx context.Context, in *npool.DeleteSimulateReq
 	}
 
 	return &npool.DeleteSimulateResponse{
+		Info: info,
+	}, nil
+}
+
+func (s *Server) DeleteNSimulate(ctx context.Context, in *npool.DeleteNSimulateRequest) (*npool.DeleteNSimulateResponse, error) {
+	handler, err := simulate1.NewHandler(
+		ctx,
+		simulate1.WithID(&in.ID, true),
+		simulate1.WithEntID(&in.EntID, true),
+		simulate1.WithAppID(&in.TargetAppID, true),
+	)
+	if err != nil {
+		logger.Sugar().Errorw(
+			"DeleteNSimulate",
+			"In", in,
+			"Error", err,
+		)
+		return &npool.DeleteNSimulateResponse{}, status.Error(codes.Aborted, err.Error())
+	}
+
+	info, err := handler.DeleteSimulate(ctx)
+	if err != nil {
+		logger.Sugar().Errorw(
+			"DeleteNSimulate",
+			"In", in,
+			"Error", err,
+		)
+		return &npool.DeleteNSimulateResponse{}, status.Error(codes.Aborted, err.Error())
+	}
+
+	return &npool.DeleteNSimulateResponse{
 		Info: info,
 	}, nil
 }
