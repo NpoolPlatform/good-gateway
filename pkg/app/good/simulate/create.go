@@ -17,9 +17,10 @@ func (h *Handler) CreateSimulate(ctx context.Context) (*npool.Simulate, error) {
 	}
 
 	if _, err := simulatemwcli.CreateSimulate(ctx, &simulatemwpb.SimulateReq{
-		EntID:           h.EntID,
-		AppGoodID:       h.AppGoodID,
-		FixedOrderUnits: h.FixedOrderUnits,
+		EntID:              h.EntID,
+		AppGoodID:          h.AppGoodID,
+		FixedOrderUnits:    h.FixedOrderUnits,
+		FixedOrderDuration: h.FixedOrderDuration,
 	}); err != nil {
 		return nil, err
 	}
