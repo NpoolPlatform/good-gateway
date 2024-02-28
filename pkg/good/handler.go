@@ -196,6 +196,7 @@ func WithGoodType(e *types.GoodType, must bool) func(context.Context, *Handler) 
 		case types.GoodType_PowerRenting:
 		case types.GoodType_TechniqueServiceFee:
 		case types.GoodType_ElectricityFee:
+		case types.GoodType_DelegatedStaking:
 		case types.GoodType_MachineRenting:
 			fallthrough //nolint
 		case types.GoodType_MachineHosting:
