@@ -66,6 +66,7 @@ func (h *Handler) CreateComment(ctx context.Context) (*npool.Comment, error) {
 		OrderID:   h.OrderID,
 		Content:   h.Content,
 		ReplyToID: h.ReplyToID,
+		Anonymous: h.Anonymous,
 	}); err != nil {
 		return nil, err
 	}
