@@ -5,6 +5,7 @@ import (
 
 	appgood "github.com/NpoolPlatform/good-gateway/api/app/good"
 	default1 "github.com/NpoolPlatform/good-gateway/api/app/good/default"
+	appsimulategood "github.com/NpoolPlatform/good-gateway/api/app/good/simulate"
 	"github.com/NpoolPlatform/good-gateway/api/app/good/topmost"
 	topmostgood "github.com/NpoolPlatform/good-gateway/api/app/good/topmost/good"
 	"github.com/NpoolPlatform/good-gateway/api/deviceinfo"
@@ -43,6 +44,7 @@ func Register(server grpc.ServiceRegistrar) {
 	default1.Register(server)
 	topmost.Register(server)
 	topmostgood.Register(server)
+	appsimulategood.Register(server)
 }
 
 //nolint:gocyclo
@@ -90,6 +92,9 @@ func RegisterGateway(mux *runtime.ServeMux, endpoint string, opts []grpc.DialOpt
 		return err
 	}
 	if err := topmostgood.RegisterGateway(mux, endpoint, opts); err != nil {
+		return err
+	}
+	if err := appsimulategood.RegisterGateway(mux, endpoint, opts); err != nil {
 		return err
 	}
 	return nil
