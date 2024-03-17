@@ -11,6 +11,8 @@ import (
 	appcoinmwpb "github.com/NpoolPlatform/message/npool/chain/mw/v1/app/coin"
 	npool "github.com/NpoolPlatform/message/npool/good/gw/v1/app/good"
 	appgoodmwpb "github.com/NpoolPlatform/message/npool/good/mw/v1/app/good"
+
+	"github.com/google/uuid"
 )
 
 type queryHandler struct {
@@ -23,6 +25,9 @@ type queryHandler struct {
 func (h *queryHandler) getCoins(ctx context.Context) error {
 	coinTypeIDs := []string{}
 	for _, good := range h.goods {
+		if _, err := uuid.Parse(good.CoinTypeID); err != nil {
+			continue
+		}
 		coinTypeIDs = append(coinTypeIDs, good.CoinTypeID)
 	}
 	coins, _, err := appcoinmwcli.GetCoins(ctx, &appcoinmwpb.Conds{
