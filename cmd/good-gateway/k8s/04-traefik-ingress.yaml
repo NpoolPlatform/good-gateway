@@ -71,6 +71,14 @@ spec:
             backend:
               serviceName: good-gateway
               servicePort: 50550
+          - path: /api/good/v1/get/goodcomments
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/get/goodrecommends
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
     - host: api.procyon.vip
       http: *http_rules
     - host: api.xpool.top
@@ -90,6 +98,8 @@ spec:
     - host: api.hk-cryptomore-production.npool.top
       http: *http_rules
     - host: api.cryptomore.io
+      http: *http_rules
+    - host: api.epool.tech
       http: *http_rules
 
 ---
@@ -341,10 +351,6 @@ spec:
               serviceName: good-gateway
               servicePort: 50550
 
-          - path: /api/good/v1/get/goodcomments
-            backend:
-              serviceName: good-gateway
-              servicePort: 50550
           - path: /api/good/v1/get/mygoodcomments
             backend:
               serviceName: good-gateway
@@ -424,4 +430,6 @@ spec:
     - host: api.hk-cryptomore-production.npool.top
       http: *http_rules
     - host: api.cryptomore.io
+      http: *http_rules
+    - host: api.epool.tech
       http: *http_rules
