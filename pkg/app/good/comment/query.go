@@ -73,6 +73,9 @@ func (h *queryHandler) formalize() {
 			Anonymous:     comment.Anonymous,
 			PurchasedUser: comment.PurchasedUser,
 			TrialUser:     comment.TrialUser,
+			Score:         comment.Score,
+			Hide:          comment.Hide,
+			HideReason:    comment.HideReason,
 			CreatedAt:     comment.CreatedAt,
 			UpdatedAt:     comment.UpdatedAt,
 		}

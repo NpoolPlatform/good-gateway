@@ -6,6 +6,7 @@ import (
 
 	appmwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/app"
 	constant "github.com/NpoolPlatform/good-middleware/pkg/const"
+	types "github.com/NpoolPlatform/message/npool/basetypes/good/v1"
 	ordermwcli "github.com/NpoolPlatform/order-middleware/pkg/client/order"
 
 	"github.com/google/uuid"
@@ -23,6 +24,8 @@ type Handler struct {
 	ReplyToID    *string
 	Anonymous    *bool
 	Score        *string
+	Hide         *bool
+	HideReason   *types.GoodCommentHideReason
 	TargetUserID *string
 	Offset       int32
 	Limit        int32
@@ -195,6 +198,33 @@ func WithScore(s *string, must bool) func(context.Context, *Handler) error {
 			return fmt.Errorf("invalid score")
 		}
 		h.Score = s
+		return nil
+	}
+}
+
+func WithHide(b *bool, must bool) func(context.Context, *Handler) error {
+	return func(ctx context.Context, h *Handler) error {
+		h.Hide = b
+		return nil
+	}
+}
+
+func WithHideReason(e *types.GoodCommentHideReason, must bool) func(context.Context, *Handler) error {
+	return func(ctx context.Context, h *Handler) error {
+		if e == nil {
+			if must {
+				return fmt.Errorf("invalid hidereason")
+			}
+			return nil
+		}
+		switch *e {
+		case types.GoodCommentHideReason_GoodCommentHideBySpam:
+		case types.GoodCommentHideReason_GoodCommentHideByNotThisGood:
+		case types.GoodCommentHideReason_GoodCommentHideByFalseDescription:
+		default:
+			return fmt.Errorf("invalid hidereason")
+		}
+		h.HideReason = e
 		return nil
 	}
 }

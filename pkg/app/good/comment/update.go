@@ -21,14 +21,16 @@ func (h *Handler) UpdateComment(ctx context.Context) (*npool.Comment, error) {
 	if err := handler.checkUser(ctx, *h.UserID); err != nil {
 		return nil, err
 	}
-	if err := handler.checkUserComment(ctx, *h.UserID); err != nil {
+	if err := handler.checkUserComment(ctx); err != nil {
 		return nil, err
 	}
 	if err := commentmwcli.UpdateComment(ctx, &commentmwpb.CommentReq{
-		ID:        h.ID,
-		EntID:     h.EntID,
-		Anonymous: h.Anonymous,
-		Content:   h.Content,
+		ID:         h.ID,
+		EntID:      h.EntID,
+		Anonymous:  h.Anonymous,
+		Content:    h.Content,
+		Hide:       h.Hide,
+		HideReason: h.HideReason,
 	}); err != nil {
 		return nil, err
 	}

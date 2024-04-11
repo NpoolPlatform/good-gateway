@@ -63,13 +63,18 @@ func (h *checkHandler) checkOrder(ctx context.Context) error {
 	return nil
 }
 
-func (h *checkHandler) checkUserComment(ctx context.Context, userID string) error {
-	exist, err := commentmwcli.ExistCommentConds(ctx, &commentmwpb.Conds{
-		ID:     &basetypes.Uint32Val{Op: cruder.EQ, Value: *h.ID},
-		EntID:  &basetypes.StringVal{Op: cruder.EQ, Value: *h.EntID},
-		AppID:  &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID},
-		UserID: &basetypes.StringVal{Op: cruder.EQ, Value: userID},
-	})
+func (h *checkHandler) checkUserComment(ctx context.Context) error {
+	conds := &commentmwpb.Conds{
+		ID:    &basetypes.Uint32Val{Op: cruder.EQ, Value: *h.ID},
+		EntID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.EntID},
+		AppID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID},
+	}
+	if h.TargetUserID != nil {
+		conds.UserID = &basetypes.StringVal{Op: cruder.EQ, Value: *h.TargetUserID}
+	} else {
+		conds.UserID = &basetypes.StringVal{Op: cruder.EQ, Value: *h.UserID}
+	}
+	exist, err := commentmwcli.ExistCommentConds(ctx, conds)
 	if err != nil {
 		return err
 	}
