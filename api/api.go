@@ -4,18 +4,18 @@ import (
 	"context"
 
 	appgood "github.com/NpoolPlatform/good-gateway/api/app/good"
+	"github.com/NpoolPlatform/good-gateway/api/app/good/comment"
 	default1 "github.com/NpoolPlatform/good-gateway/api/app/good/default"
-	appsimulategood "github.com/NpoolPlatform/good-gateway/api/app/good/simulate"
+	"github.com/NpoolPlatform/good-gateway/api/app/good/like"
+	"github.com/NpoolPlatform/good-gateway/api/app/good/recommend"
+	"github.com/NpoolPlatform/good-gateway/api/app/good/score"
 	"github.com/NpoolPlatform/good-gateway/api/app/good/topmost"
 	topmostgood "github.com/NpoolPlatform/good-gateway/api/app/good/topmost/good"
-	"github.com/NpoolPlatform/good-gateway/api/deviceinfo"
+	apppowerrentalsimulate "github.com/NpoolPlatform/good-gateway/api/app/powerrental/simulate"
+	devicetype "github.com/NpoolPlatform/good-gateway/api/device"
 	"github.com/NpoolPlatform/good-gateway/api/good"
-	"github.com/NpoolPlatform/good-gateway/api/good/comment"
-	"github.com/NpoolPlatform/good-gateway/api/good/like"
-	"github.com/NpoolPlatform/good-gateway/api/good/recommend"
 	"github.com/NpoolPlatform/good-gateway/api/good/required"
 	"github.com/NpoolPlatform/good-gateway/api/good/reward/history"
-	"github.com/NpoolPlatform/good-gateway/api/good/score"
 	"github.com/NpoolPlatform/good-gateway/api/vender/brand"
 	"github.com/NpoolPlatform/good-gateway/api/vender/location"
 
@@ -30,7 +30,7 @@ type Server struct {
 
 func Register(server grpc.ServiceRegistrar) {
 	v1.RegisterGatewayServer(server, &Server{})
-	deviceinfo.Register(server)
+	devicetype.Register(server)
 	brand.Register(server)
 	location.Register(server)
 	good.Register(server)
@@ -44,7 +44,7 @@ func Register(server grpc.ServiceRegistrar) {
 	default1.Register(server)
 	topmost.Register(server)
 	topmostgood.Register(server)
-	appsimulategood.Register(server)
+	apppowerrentalsimulate.Register(server)
 }
 
 //nolint:gocyclo
@@ -52,7 +52,7 @@ func RegisterGateway(mux *runtime.ServeMux, endpoint string, opts []grpc.DialOpt
 	if err := v1.RegisterGatewayHandlerFromEndpoint(context.Background(), mux, endpoint, opts); err != nil {
 		return err
 	}
-	if err := deviceinfo.RegisterGateway(mux, endpoint, opts); err != nil {
+	if err := devicetype.RegisterGateway(mux, endpoint, opts); err != nil {
 		return err
 	}
 	if err := brand.RegisterGateway(mux, endpoint, opts); err != nil {
@@ -94,7 +94,7 @@ func RegisterGateway(mux *runtime.ServeMux, endpoint string, opts []grpc.DialOpt
 	if err := topmostgood.RegisterGateway(mux, endpoint, opts); err != nil {
 		return err
 	}
-	if err := appsimulategood.RegisterGateway(mux, endpoint, opts); err != nil {
+	if err := apppowerrentalsimulate.RegisterGateway(mux, endpoint, opts); err != nil {
 		return err
 	}
 	return nil
