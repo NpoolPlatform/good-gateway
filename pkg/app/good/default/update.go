@@ -23,7 +23,7 @@ func (h *Handler) UpdateDefault(ctx context.Context) (*npool.Default, error) {
 		return nil, fmt.Errorf("invalid default")
 	}
 
-	if _, err := defaultmwcli.UpdateDefault(ctx, &defaultmwpb.DefaultReq{
+	if err := defaultmwcli.UpdateDefault(ctx, &defaultmwpb.DefaultReq{
 		ID:        h.ID,
 		AppGoodID: h.AppGoodID,
 	}); err != nil {

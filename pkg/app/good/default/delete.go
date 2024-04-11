@@ -23,7 +23,7 @@ func (h *Handler) DeleteDefault(ctx context.Context) (*npool.Default, error) {
 		return nil, fmt.Errorf("invalid default")
 	}
 
-	if _, err := defaultmwcli.DeleteDefault(ctx, *h.ID); err != nil {
+	if err := defaultmwcli.DeleteDefault(ctx, h.ID, h.EntID); err != nil {
 		return nil, err
 	}
 

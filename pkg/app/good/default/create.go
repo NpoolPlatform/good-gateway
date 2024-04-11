@@ -10,18 +10,27 @@ import (
 	"github.com/google/uuid"
 )
 
-func (h *Handler) CreateDefault(ctx context.Context) (*npool.Default, error) {
-	id := uuid.NewString()
-	if h.EntID == nil {
-		h.EntID = &id
-	}
+type createHandler struct {
+	*checkHandler
+}
 
-	if _, err := defaultmwcli.CreateDefault(ctx, &defaultmwpb.DefaultReq{
+func (h *Handler) CreateDefault(ctx context.Context) (*npool.Default, error) {
+	handler := &createHandler{
+		checkHandler: &checkHandler{
+			Handler: h,
+		},
+	}
+	if err := handler.checkAppGood(ctx); err != nil {
+		return nil, err
+	}
+	if h.EntID == nil {
+		h.EntID = func() *string { s := uuid.NewString(); return &s }()
+	}
+	if err := defaultmwcli.CreateDefault(ctx, &defaultmwpb.DefaultReq{
 		EntID:     h.EntID,
 		AppGoodID: h.AppGoodID,
 	}); err != nil {
 		return nil, err
 	}
-
 	return h.GetDefault(ctx)
 }
