@@ -62,20 +62,19 @@ func (h *queryHandler) getUsers(ctx context.Context) error {
 func (h *queryHandler) formalize() {
 	for _, comment := range h.comments {
 		info := &npool.Comment{
-			ID:                comment.ID,
-			EntID:             comment.EntID,
-			AppID:             comment.AppID,
-			UserID:            comment.UserID,
-			GoodID:            comment.GoodID,
-			AppGoodID:         comment.AppGoodID,
-			GoodName:          comment.GoodName,
-			Content:           comment.Content,
-			Anonymous:         comment.Anonymous,
-			PurchasedUser:     comment.PurchasedUser,
-			TrialUser:         comment.TrialUser,
-			OrderFirstComment: comment.OrderFirstComment,
-			CreatedAt:         comment.CreatedAt,
-			UpdatedAt:         comment.UpdatedAt,
+			ID:            comment.ID,
+			EntID:         comment.EntID,
+			AppID:         comment.AppID,
+			UserID:        comment.UserID,
+			GoodID:        comment.GoodID,
+			AppGoodID:     comment.AppGoodID,
+			GoodName:      comment.GoodName,
+			Content:       comment.Content,
+			Anonymous:     comment.Anonymous,
+			PurchasedUser: comment.PurchasedUser,
+			TrialUser:     comment.TrialUser,
+			CreatedAt:     comment.CreatedAt,
+			UpdatedAt:     comment.UpdatedAt,
 		}
 
 		if _, err := uuid.Parse(comment.OrderID); err == nil {
@@ -157,9 +156,6 @@ func (h *Handler) GetComments(ctx context.Context) ([]*npool.Comment, uint32, er
 	}
 	if h.UserID != nil {
 		conds.UserID = &basetypes.StringVal{Op: cruder.EQ, Value: *h.UserID}
-	}
-	if h.GoodID != nil {
-		conds.GoodID = &basetypes.StringVal{Op: cruder.EQ, Value: *h.GoodID}
 	}
 	comments, total, err := commentmwcli.GetComments(ctx, conds, h.Offset, h.Limit)
 	if err != nil {

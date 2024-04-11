@@ -2,44 +2,35 @@ package comment
 
 import (
 	"context"
-	"fmt"
 
-	usermwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/user"
 	commentmwcli "github.com/NpoolPlatform/good-middleware/pkg/client/app/good/comment"
-	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
-	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 	npool "github.com/NpoolPlatform/message/npool/good/gw/v1/app/good/comment"
 	commentmwpb "github.com/NpoolPlatform/message/npool/good/mw/v1/app/good/comment"
 )
 
+type updateHandler struct {
+	*checkHandler
+}
+
 func (h *Handler) UpdateComment(ctx context.Context) (*npool.Comment, error) {
-	exist, err := usermwcli.ExistUser(ctx, *h.AppID, *h.UserID)
-	if err != nil {
+	handler := &updateHandler{
+		checkHandler: &checkHandler{
+			Handler: h,
+		},
+	}
+	if err := handler.checkUser(ctx, *h.UserID); err != nil {
 		return nil, err
 	}
-	if !exist {
-		return nil, fmt.Errorf("invalid user")
-	}
-
-	exist, err = commentmwcli.ExistCommentConds(ctx, &commentmwpb.Conds{
-		ID:     &basetypes.Uint32Val{Op: cruder.EQ, Value: *h.ID},
-		EntID:  &basetypes.StringVal{Op: cruder.EQ, Value: *h.EntID},
-		AppID:  &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID},
-		UserID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.UserID},
-	})
-	if err != nil {
+	if err := handler.checkUserComment(ctx, *h.UserID); err != nil {
 		return nil, err
 	}
-	if !exist {
-		return nil, fmt.Errorf("invalid comment")
-	}
-
-	if _, err := commentmwcli.UpdateComment(ctx, &commentmwpb.CommentReq{
-		ID:      h.ID,
-		Content: h.Content,
+	if err := commentmwcli.UpdateComment(ctx, &commentmwpb.CommentReq{
+		ID:        h.ID,
+		EntID:     h.EntID,
+		Anonymous: h.Anonymous,
+		Content:   h.Content,
 	}); err != nil {
 		return nil, err
 	}
-
 	return h.GetComment(ctx)
 }

@@ -5,10 +5,11 @@ import (
 	"fmt"
 
 	appmwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/app"
-	goodmwcli "github.com/NpoolPlatform/good-middleware/pkg/client/good"
 	constant "github.com/NpoolPlatform/good-middleware/pkg/const"
 	ordermwcli "github.com/NpoolPlatform/order-middleware/pkg/client/order"
+
 	"github.com/google/uuid"
+	"github.com/shopspring/decimal"
 )
 
 type Handler struct {
@@ -16,12 +17,12 @@ type Handler struct {
 	EntID        *string
 	AppID        *string
 	UserID       *string
-	GoodID       *string
 	AppGoodID    *string
 	OrderID      *string
 	Content      *string
 	ReplyToID    *string
 	Anonymous    *bool
+	Score        *string
 	TargetUserID *string
 	Offset       int32
 	Limit        int32
@@ -102,45 +103,6 @@ func WithUserID(id *string, must bool) func(context.Context, *Handler) error {
 	}
 }
 
-func WithTargetUserID(id *string, must bool) func(context.Context, *Handler) error {
-	return func(ctx context.Context, h *Handler) error {
-		if id == nil {
-			if must {
-				return fmt.Errorf("invalid targetuserid")
-			}
-			return nil
-		}
-		if _, err := uuid.Parse(*id); err != nil {
-			return err
-		}
-		h.TargetUserID = id
-		return nil
-	}
-}
-
-func WithGoodID(id *string, must bool) func(context.Context, *Handler) error {
-	return func(ctx context.Context, h *Handler) error {
-		if id == nil {
-			if must {
-				return fmt.Errorf("invalid goodid")
-			}
-			return nil
-		}
-		if _, err := uuid.Parse(*id); err != nil {
-			return err
-		}
-		good, err := goodmwcli.GetGood(ctx, *id)
-		if err != nil {
-			return err
-		}
-		if good == nil {
-			return fmt.Errorf("good not found")
-		}
-		h.GoodID = id
-		return nil
-	}
-}
-
 func WithAppGoodID(id *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if id == nil {
@@ -213,6 +175,42 @@ func WithReplyToID(id *string, must bool) func(context.Context, *Handler) error 
 func WithAnonymous(b *bool, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		h.Anonymous = b
+		return nil
+	}
+}
+
+func WithScore(s *string, must bool) func(context.Context, *Handler) error {
+	return func(ctx context.Context, h *Handler) error {
+		if s == nil {
+			if must {
+				return fmt.Errorf("invalid score")
+			}
+		}
+		score, err := decimal.NewFromString(*s)
+		if err != nil {
+			return err
+		}
+		if score.Cmp(decimal.NewFromInt(0)) < 0 ||
+			score.Cmp(decimal.NewFromInt(5)) > 0 {
+			return fmt.Errorf("invalid score")
+		}
+		h.Score = s
+		return nil
+	}
+}
+
+func WithTargetUserID(id *string, must bool) func(context.Context, *Handler) error {
+	return func(ctx context.Context, h *Handler) error {
+		if id == nil {
+			if must {
+				return fmt.Errorf("invalid targetuserid")
+			}
+			return nil
+		}
+		if _, err := uuid.Parse(*id); err != nil {
+			return err
+		}
+		h.TargetUserID = id
 		return nil
 	}
 }
