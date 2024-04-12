@@ -11,16 +11,14 @@ import (
 )
 
 type createHandler struct {
-	*checkHandler
+	*Handler
 }
 
 func (h *Handler) CreateDefault(ctx context.Context) (*npool.Default, error) {
 	handler := &createHandler{
-		checkHandler: &checkHandler{
-			Handler: h,
-		},
+		Handler: h,
 	}
-	if err := handler.checkAppGood(ctx); err != nil {
+	if err := handler.CheckAppGood(ctx); err != nil {
 		return nil, err
 	}
 	if h.EntID == nil {

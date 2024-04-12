@@ -1,4 +1,4 @@
-package default1
+package common
 
 import (
 	"context"
@@ -10,11 +10,12 @@ import (
 	appgoodmwpb "github.com/NpoolPlatform/message/npool/good/mw/v1/app/good"
 )
 
-type checkHandler struct {
-	*Handler
+type CheckHandler struct {
+	AppID     *string
+	AppGoodID *string
 }
 
-func (h *checkHandler) checkAppGood(ctx context.Context) error {
+func (h *CheckHandler) CheckAppGood(ctx context.Context) error {
 	exist, err := appgoodmwcli.ExistGoodConds(ctx, &appgoodmwpb.Conds{
 		EntID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppGoodID},
 		AppID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID},

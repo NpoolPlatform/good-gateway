@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	appmwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/app"
 	coinmwcli "github.com/NpoolPlatform/chain-middleware/pkg/client/coin"
+	appgoodcommon "github.com/NpoolPlatform/good-gateway/pkg/app/good/common"
 	defaultmwcli "github.com/NpoolPlatform/good-middleware/pkg/client/app/good/default"
 	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 	appmwpb "github.com/NpoolPlatform/message/npool/appuser/mw/v1/app"
@@ -23,20 +23,13 @@ type queryHandler struct {
 	coins    map[string]*coinmwpb.Coin
 }
 
-func (h *queryHandler) getApps(ctx context.Context) error {
-	appIDs := []string{}
-	for _, def := range h.defaults {
-		appIDs = append(appIDs, def.AppID)
-	}
-	apps, _, err := appmwcli.GetApps(ctx, &appmwpb.Conds{
-		EntIDs: &basetypes.StringSliceVal{Op: cruder.IN, Value: appIDs},
-	}, int32(0), int32(len(appIDs)))
-	if err != nil {
-		return err
-	}
-	for _, app := range apps {
-		h.apps[app.EntID] = app
-	}
+func (h *queryHandler) getApps(ctx context.Context) (err error) {
+	h.apps, err = appgoodcommon.GetApps(ctx, func() (appIDs []string) {
+		for _, defalut := range h.defaults {
+			appIDs = append(appIDs, defalut.AppID)
+		}
+		return
+	}())
 	return nil
 }
 

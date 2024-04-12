@@ -1,4 +1,4 @@
-package default1
+package description
 
 import (
 	"context"
@@ -15,8 +15,10 @@ type Handler struct {
 	ID    *uint32
 	EntID *string
 	appgoodcommon.CheckHandler
-	Offset int32
-	Limit  int32
+	Description *string
+	Index       *uint32
+	Offset      int32
+	Limit       int32
 }
 
 func NewHandler(ctx context.Context, options ...func(context.Context, *Handler) error) (*Handler, error) {
@@ -90,6 +92,29 @@ func WithAppGoodID(id *string, must bool) func(context.Context, *Handler) error 
 			return err
 		}
 		h.AppGoodID = id
+		return nil
+	}
+}
+
+func WithDescription(s *string, must bool) func(context.Context, *Handler) error {
+	return func(ctx context.Context, h *Handler) error {
+		if s == nil {
+			if must {
+				return fmt.Errorf("invalid description")
+			}
+			return nil
+		}
+		if len(*s) < 10 {
+			return fmt.Errorf("invalid description")
+		}
+		h.Description = s
+		return nil
+	}
+}
+
+func WithIndex(u *uint32, must bool) func(context.Context, *Handler) error {
+	return func(ctx context.Context, h *Handler) error {
+		h.Index = u
 		return nil
 	}
 }

@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	appmwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/app"
 	usermwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/user"
+	appgoodcommon "github.com/NpoolPlatform/good-gateway/pkg/app/good/common"
 	commentmwcli "github.com/NpoolPlatform/good-middleware/pkg/client/app/good/comment"
 	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 	appmwpb "github.com/NpoolPlatform/message/npool/appuser/mw/v1/app"
@@ -18,27 +18,20 @@ import (
 )
 
 type queryHandler struct {
-	*Handler
+	*checkHandler
 	comments []*commentmwpb.Comment
 	infos    []*npool.Comment
 	apps     map[string]*appmwpb.App
 	users    map[string]*usermwpb.User
 }
 
-func (h *queryHandler) getApps(ctx context.Context) error {
-	appIDs := []string{}
-	for _, comment := range h.comments {
-		appIDs = append(appIDs, comment.AppID)
-	}
-	apps, _, err := appmwcli.GetApps(ctx, &appmwpb.Conds{
-		EntIDs: &basetypes.StringSliceVal{Op: cruder.IN, Value: appIDs},
-	}, int32(0), int32(len(appIDs)))
-	if err != nil {
-		return err
-	}
-	for _, app := range apps {
-		h.apps[app.EntID] = app
-	}
+func (h *queryHandler) getApps(ctx context.Context) (err error) {
+	h.apps, err = appgoodcommon.GetApps(ctx, func() (appIDs []string) {
+		for _, comment := range h.comments {
+			appIDs = append(appIDs, comment.AppID)
+		}
+		return
+	}())
 	return nil
 }
 
@@ -121,7 +114,9 @@ func (h *Handler) GetComment(ctx context.Context) (*npool.Comment, error) {
 	}
 
 	handler := &queryHandler{
-		Handler:  h,
+		checkHandler: &checkHandler{
+			Handler: h,
+		},
 		comments: []*commentmwpb.Comment{comment},
 		apps:     map[string]*appmwpb.App{},
 		users:    map[string]*usermwpb.User{},
@@ -142,18 +137,22 @@ func (h *Handler) GetComment(ctx context.Context) (*npool.Comment, error) {
 }
 
 func (h *Handler) GetComments(ctx context.Context) ([]*npool.Comment, uint32, error) {
+	handler := &queryHandler{
+		checkHandler: &checkHandler{
+			Handler: h,
+		},
+		apps:  map[string]*appmwpb.App{},
+		users: map[string]*usermwpb.User{},
+	}
 	if h.UserID != nil {
-		exist, err := usermwcli.ExistUser(ctx, *h.AppID, *h.UserID)
-		if err != nil {
-			return nil, 0, err
-		}
-		if !exist {
+		if err := handler.checkUser(ctx, *h.UserID); err != nil {
 			return nil, 0, fmt.Errorf("invalid user")
 		}
 	}
 
-	conds := &commentmwpb.Conds{}
-	conds.AppID = &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID}
+	conds := &commentmwpb.Conds{
+		AppID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID},
+	}
 	if h.AppGoodID != nil {
 		conds.AppGoodID = &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppGoodID}
 	}
@@ -168,12 +167,7 @@ func (h *Handler) GetComments(ctx context.Context) ([]*npool.Comment, uint32, er
 		return nil, total, nil
 	}
 
-	handler := &queryHandler{
-		Handler:  h,
-		comments: comments,
-		apps:     map[string]*appmwpb.App{},
-		users:    map[string]*usermwpb.User{},
-	}
+	handler.comments = comments
 	if err := handler.getApps(ctx); err != nil {
 		return nil, 0, err
 	}

@@ -5,11 +5,9 @@ import (
 	"fmt"
 
 	usermwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/user"
-	appgoodmwcli "github.com/NpoolPlatform/good-middleware/pkg/client/app/good"
 	commentmwcli "github.com/NpoolPlatform/good-middleware/pkg/client/app/good/comment"
 	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
-	appgoodmwpb "github.com/NpoolPlatform/message/npool/good/mw/v1/app/good"
 	commentmwpb "github.com/NpoolPlatform/message/npool/good/mw/v1/app/good/comment"
 	ordermwpb "github.com/NpoolPlatform/message/npool/order/mw/v1/order"
 	ordermwcli "github.com/NpoolPlatform/order-middleware/pkg/client/order"
@@ -26,20 +24,6 @@ func (h *checkHandler) checkUser(ctx context.Context, userID string) error {
 	}
 	if !exist {
 		return fmt.Errorf("invalid user")
-	}
-	return nil
-}
-
-func (h *checkHandler) checkAppGood(ctx context.Context) error {
-	exist, err := appgoodmwcli.ExistGoodConds(ctx, &appgoodmwpb.Conds{
-		EntID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppGoodID},
-		AppID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID},
-	})
-	if err != nil {
-		return err
-	}
-	if !exist {
-		return fmt.Errorf("invalid appgood")
 	}
 	return nil
 }

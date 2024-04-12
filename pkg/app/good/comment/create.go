@@ -25,7 +25,7 @@ func (h *Handler) CreateComment(ctx context.Context) (*npool.Comment, error) {
 	if err := handler.checkUser(ctx, *h.UserID); err != nil {
 		return nil, err
 	}
-	if err := handler.checkAppGood(ctx); err != nil {
+	if err := handler.CheckAppGood(ctx); err != nil {
 		return nil, err
 	}
 	if err := handler.checkOrder(ctx); err != nil {
