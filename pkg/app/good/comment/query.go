@@ -4,8 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	usermwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/user"
-	appgoodcommon "github.com/NpoolPlatform/good-gateway/pkg/app/good/common"
+	goodgwcommon "github.com/NpoolPlatform/good-gateway/pkg/common"
 	commentmwcli "github.com/NpoolPlatform/good-middleware/pkg/client/app/good/comment"
 	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 	appmwpb "github.com/NpoolPlatform/message/npool/appuser/mw/v1/app"
@@ -26,7 +25,7 @@ type queryHandler struct {
 }
 
 func (h *queryHandler) getApps(ctx context.Context) (err error) {
-	h.apps, err = appgoodcommon.GetApps(ctx, func() (appIDs []string) {
+	h.apps, err = goodgwcommon.GetApps(ctx, func() (appIDs []string) {
 		for _, comment := range h.comments {
 			appIDs = append(appIDs, comment.AppID)
 		}
@@ -35,20 +34,13 @@ func (h *queryHandler) getApps(ctx context.Context) (err error) {
 	return nil
 }
 
-func (h *queryHandler) getUsers(ctx context.Context) error {
-	userIDs := []string{}
-	for _, comment := range h.comments {
-		userIDs = append(userIDs, comment.UserID)
-	}
-	users, _, err := usermwcli.GetUsers(ctx, &usermwpb.Conds{
-		EntIDs: &basetypes.StringSliceVal{Op: cruder.IN, Value: userIDs},
-	}, int32(0), int32(len(userIDs)))
-	if err != nil {
-		return err
-	}
-	for _, user := range users {
-		h.users[user.EntID] = user
-	}
+func (h *queryHandler) getUsers(ctx context.Context) (err error) {
+	h.users, err = goodgwcommon.GetUsers(ctx, func() (userIDs []string) {
+		for _, comment := range h.comments {
+			userIDs = append(userIDs, comment.UserID)
+		}
+		return
+	}())
 	return nil
 }
 

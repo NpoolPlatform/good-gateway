@@ -9,10 +9,13 @@ import (
 )
 
 func (h *Handler) UpdateAppFee(ctx context.Context) (*npool.AppFee, error) {
+	if err := h.CheckAppGood(ctx); err != nil {
+		return nil, err
+	}
+
 	if err := appfeemwcli.UpdateFee(ctx, &appfeemwpb.FeeReq{
 		ID:               h.ID,
 		EntID:            h.EntID,
-		AppID:            h.AppID,
 		AppGoodID:        h.AppGoodID,
 		ProductPage:      h.ProductPage,
 		Name:             h.Name,

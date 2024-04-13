@@ -3,7 +3,7 @@ package appfee
 import (
 	"context"
 
-	appmwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/app"
+	goodgwcommon "github.com/NpoolPlatform/good-gateway/pkg/common"
 	appfeemwcli "github.com/NpoolPlatform/good-middleware/pkg/client/app/fee"
 	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 	appmwpb "github.com/NpoolPlatform/message/npool/appuser/mw/v1/app"
@@ -19,23 +19,13 @@ type queryHandler struct {
 	apps  map[string]*appmwpb.App
 }
 
-func (h *queryHandler) getApps(ctx context.Context) error {
-	appIDs := func() (_appIDs []string) {
+func (h *queryHandler) getApps(ctx context.Context) (err error) {
+	h.apps, err = goodgwcommon.GetApps(ctx, func() (appIDs []string) {
 		for _, fee := range h.fees {
-			_appIDs = append(_appIDs, fee.AppID)
+			appIDs = append(appIDs, fee.AppID)
 		}
 		return
-	}()
-	apps, _, err := appmwcli.GetApps(ctx, &appmwpb.Conds{
-		EntIDs: &basetypes.StringSliceVal{Op: cruder.IN, Value: appIDs},
-	}, 0, int32(len(appIDs)))
-	if err != nil {
-		return err
-	}
-	h.apps = map[string]*appmwpb.App{}
-	for _, app := range apps {
-		h.apps[app.EntID] = app
-	}
+	}())
 	return nil
 }
 

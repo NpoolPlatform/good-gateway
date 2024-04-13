@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	appmwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/app"
+	appgoodcommon "github.com/NpoolPlatform/good-gateway/pkg/app/good/common"
 	constant "github.com/NpoolPlatform/good-gateway/pkg/const"
 
 	"github.com/google/uuid"
@@ -12,11 +13,10 @@ import (
 )
 
 type Handler struct {
-	ID               *uint32
-	EntID            *string
-	AppID            *string
+	ID    *uint32
+	EntID *string
+	appgoodcommon.CheckHandler
 	GoodID           *string
-	AppGoodID        *string
 	ProductPage      *string
 	Name             *string
 	Banner           *string

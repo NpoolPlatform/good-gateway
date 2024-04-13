@@ -24,19 +24,12 @@ type queryHandler struct {
 }
 
 func (h *queryHandler) getApps(ctx context.Context) error {
-	appIDs := []string{}
-	for _, like := range h.likes {
-		appIDs = append(appIDs, like.AppID)
-	}
-	apps, _, err := appmwcli.GetApps(ctx, &appmwpb.Conds{
-		EntIDs: &basetypes.StringSliceVal{Op: cruder.IN, Value: appIDs},
-	}, int32(0), int32(len(appIDs)))
-	if err != nil {
-		return err
-	}
-	for _, app := range apps {
-		h.apps[app.EntID] = app
-	}
+	h.apps, err = appgoodcommon.GetApps(ctx, func() (appIDs []string) {
+		for _, like := range h.likes {
+			appIDs = append(appIDs, like.AppID)
+		}
+		return
+	}())
 	return nil
 }
 
@@ -139,9 +132,6 @@ func (h *Handler) GetLikes(ctx context.Context) ([]*npool.Like, uint32, error) {
 	}
 	if h.UserID != nil {
 		conds.UserID = &basetypes.StringVal{Op: cruder.EQ, Value: *h.UserID}
-	}
-	if h.GoodID != nil {
-		conds.GoodID = &basetypes.StringVal{Op: cruder.EQ, Value: *h.GoodID}
 	}
 	likes, total, err := likemwcli.GetLikes(ctx, conds, h.Offset, h.Limit)
 	if err != nil {
