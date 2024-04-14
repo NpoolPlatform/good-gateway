@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	appgoodcommon "github.com/NpoolPlatform/good-gateway/pkg/app/good/common"
+	goodgwcommon "github.com/NpoolPlatform/good-gateway/pkg/common"
 	appgooddescriptionmwcli "github.com/NpoolPlatform/good-middleware/pkg/client/app/good/description"
 	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 	appmwpb "github.com/NpoolPlatform/message/npool/appuser/mw/v1/app"
@@ -21,7 +21,7 @@ type queryHandler struct {
 }
 
 func (h *queryHandler) getApps(ctx context.Context) (err error) {
-	h.apps, err = appgoodcommon.GetApps(ctx, func() (appIDs []string) {
+	h.apps, err = goodgwcommon.GetApps(ctx, func() (appIDs []string) {
 		for _, description := range h.descriptions {
 			appIDs = append(appIDs, description.AppID)
 		}
