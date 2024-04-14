@@ -2,42 +2,33 @@ package like
 
 import (
 	"context"
-	"fmt"
-
-	usermwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/user"
 
 	likemwcli "github.com/NpoolPlatform/good-middleware/pkg/client/app/good/like"
-	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
-	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 	npool "github.com/NpoolPlatform/message/npool/good/gw/v1/app/good/like"
 	likemwpb "github.com/NpoolPlatform/message/npool/good/mw/v1/app/good/like"
 )
 
+type updateHandler struct {
+	*checkHandler
+}
+
 func (h *Handler) UpdateLike(ctx context.Context) (*npool.Like, error) {
-	exist, err := usermwcli.ExistUser(ctx, *h.AppID, *h.UserID)
-	if err != nil {
+	handler := &updateHandler{
+		checkHandler: &checkHandler{
+			Handler: h,
+		},
+	}
+	if err := handler.checkUser(ctx); err != nil {
 		return nil, err
 	}
-	if !exist {
-		return nil, fmt.Errorf("invalid user")
-	}
-
-	exist, err = likemwcli.ExistLikeConds(ctx, &likemwpb.Conds{
-		ID:     &basetypes.Uint32Val{Op: cruder.EQ, Value: *h.ID},
-		EntID:  &basetypes.StringVal{Op: cruder.EQ, Value: *h.EntID},
-		AppID:  &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID},
-		UserID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.UserID},
-	})
-	if err != nil {
+	if err := handler.checkUserLike(ctx); err != nil {
 		return nil, err
 	}
-	if !exist {
-		return nil, fmt.Errorf("invalid like")
-	}
 
-	if _, err := likemwcli.UpdateLike(ctx, &likemwpb.LikeReq{
-		ID:   h.ID,
-		Like: h.Like,
+	if err := likemwcli.UpdateLike(ctx, &likemwpb.LikeReq{
+		ID:    h.ID,
+		EntID: h.EntID,
+		Like:  h.Like,
 	}); err != nil {
 		return nil, err
 	}

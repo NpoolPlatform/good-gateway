@@ -4,8 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	appmwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/app"
-	usermwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/user"
+	goodgwcommon "github.com/NpoolPlatform/good-gateway/pkg/common"
 	likemwcli "github.com/NpoolPlatform/good-middleware/pkg/client/app/good/like"
 	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 	appmwpb "github.com/NpoolPlatform/message/npool/appuser/mw/v1/app"
@@ -16,15 +15,15 @@ import (
 )
 
 type queryHandler struct {
-	*Handler
+	*checkHandler
 	likes []*likemwpb.Like
 	infos []*npool.Like
 	apps  map[string]*appmwpb.App
 	users map[string]*usermwpb.User
 }
 
-func (h *queryHandler) getApps(ctx context.Context) error {
-	h.apps, err = appgoodcommon.GetApps(ctx, func() (appIDs []string) {
+func (h *queryHandler) getApps(ctx context.Context) (err error) {
+	h.apps, err = goodgwcommon.GetApps(ctx, func() (appIDs []string) {
 		for _, like := range h.likes {
 			appIDs = append(appIDs, like.AppID)
 		}
@@ -33,20 +32,13 @@ func (h *queryHandler) getApps(ctx context.Context) error {
 	return nil
 }
 
-func (h *queryHandler) getUsers(ctx context.Context) error {
-	userIDs := []string{}
-	for _, like := range h.likes {
-		userIDs = append(userIDs, like.UserID)
-	}
-	users, _, err := usermwcli.GetUsers(ctx, &usermwpb.Conds{
-		EntIDs: &basetypes.StringSliceVal{Op: cruder.IN, Value: userIDs},
-	}, int32(0), int32(len(userIDs)))
-	if err != nil {
-		return err
-	}
-	for _, user := range users {
-		h.users[user.EntID] = user
-	}
+func (h *queryHandler) getUsers(ctx context.Context) (err error) {
+	h.users, err = goodgwcommon.GetUsers(ctx, func() (userIDs []string) {
+		for _, like := range h.likes {
+			userIDs = append(userIDs, like.UserID)
+		}
+		return
+	}())
 	return nil
 }
 
@@ -94,10 +86,12 @@ func (h *Handler) GetLike(ctx context.Context) (*npool.Like, error) {
 	}
 
 	handler := &queryHandler{
-		Handler: h,
-		likes:   []*likemwpb.Like{like},
-		apps:    map[string]*appmwpb.App{},
-		users:   map[string]*usermwpb.User{},
+		checkHandler: &checkHandler{
+			Handler: h,
+		},
+		likes: []*likemwpb.Like{like},
+		apps:  map[string]*appmwpb.App{},
+		users: map[string]*usermwpb.User{},
 	}
 	if err := handler.getApps(ctx); err != nil {
 		return nil, err
@@ -115,18 +109,22 @@ func (h *Handler) GetLike(ctx context.Context) (*npool.Like, error) {
 }
 
 func (h *Handler) GetLikes(ctx context.Context) ([]*npool.Like, uint32, error) {
+	handler := &queryHandler{
+		checkHandler: &checkHandler{
+			Handler: h,
+		},
+		apps:  map[string]*appmwpb.App{},
+		users: map[string]*usermwpb.User{},
+	}
 	if h.UserID != nil {
-		exist, err := usermwcli.ExistUser(ctx, *h.AppID, *h.UserID)
-		if err != nil {
+		if err := handler.checkUser(ctx); err != nil {
 			return nil, 0, err
-		}
-		if !exist {
-			return nil, 0, fmt.Errorf("invalid user")
 		}
 	}
 
-	conds := &likemwpb.Conds{}
-	conds.AppID = &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID}
+	conds := &likemwpb.Conds{
+		AppID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID},
+	}
 	if h.AppGoodID != nil {
 		conds.AppGoodID = &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppGoodID}
 	}
@@ -141,12 +139,7 @@ func (h *Handler) GetLikes(ctx context.Context) ([]*npool.Like, uint32, error) {
 		return nil, total, nil
 	}
 
-	handler := &queryHandler{
-		Handler: h,
-		likes:   likes,
-		apps:    map[string]*appmwpb.App{},
-		users:   map[string]*usermwpb.User{},
-	}
+	handler.likes = likes
 	if err := handler.getApps(ctx); err != nil {
 		return nil, 0, err
 	}
