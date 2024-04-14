@@ -9,7 +9,6 @@ import (
 	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 	appmwpb "github.com/NpoolPlatform/message/npool/appuser/mw/v1/app"
 	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
-	coinmwpb "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin"
 	npool "github.com/NpoolPlatform/message/npool/good/gw/v1/app/good/topmost/good"
 	topmostgoodmwpb "github.com/NpoolPlatform/message/npool/good/mw/v1/app/good/topmost/good"
 )
@@ -19,7 +18,6 @@ type queryHandler struct {
 	goods []*topmostgoodmwpb.TopMostGood
 	infos []*npool.TopMostGood
 	apps  map[string]*appmwpb.App
-	coins map[string]*coinmwpb.Coin
 }
 
 func (h *queryHandler) getApps(ctx context.Context) (err error) {
@@ -73,30 +71,6 @@ func (h *Handler) GetTopMostGood(ctx context.Context) (*npool.TopMostGood, error
 		Handler: h,
 		goods:   []*topmostgoodmwpb.TopMostGood{info},
 		apps:    map[string]*appmwpb.App{},
-		coins:   map[string]*coinmwpb.Coin{},
-	}
-	if err := handler.getApps(ctx); err != nil {
-		return nil, err
-	}
-
-	handler.formalize()
-	if len(handler.infos) == 0 {
-		return nil, nil
-	}
-
-	return handler.infos[0], nil
-}
-
-func (h *Handler) GetTopMostGoodExt(ctx context.Context, info *topmostgoodmwpb.TopMostGood) (*npool.TopMostGood, error) {
-	if info == nil {
-		return nil, nil
-	}
-
-	handler := &queryHandler{
-		Handler: h,
-		goods:   []*topmostgoodmwpb.TopMostGood{info},
-		apps:    map[string]*appmwpb.App{},
-		coins:   map[string]*coinmwpb.Coin{},
 	}
 	if err := handler.getApps(ctx); err != nil {
 		return nil, err
@@ -130,7 +104,6 @@ func (h *Handler) GetTopMostGoods(ctx context.Context) ([]*npool.TopMostGood, ui
 		Handler: h,
 		goods:   infos,
 		apps:    map[string]*appmwpb.App{},
-		coins:   map[string]*coinmwpb.Coin{},
 	}
 	if err := handler.getApps(ctx); err != nil {
 		return nil, 0, err
