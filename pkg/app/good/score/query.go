@@ -4,8 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	appmwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/app"
-	usermwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/user"
+	goodgwcommon "github.com/NpoolPlatform/good-gateway/pkg/common"
 	scoremwcli "github.com/NpoolPlatform/good-middleware/pkg/client/app/good/score"
 	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 	appmwpb "github.com/NpoolPlatform/message/npool/appuser/mw/v1/app"
@@ -23,37 +22,23 @@ type queryHandler struct {
 	users  map[string]*usermwpb.User
 }
 
-func (h *queryHandler) getApps(ctx context.Context) error {
-	appIDs := []string{}
-	for _, score := range h.scores {
-		appIDs = append(appIDs, score.AppID)
-	}
-	apps, _, err := appmwcli.GetApps(ctx, &appmwpb.Conds{
-		EntIDs: &basetypes.StringSliceVal{Op: cruder.IN, Value: appIDs},
-	}, int32(0), int32(len(appIDs)))
-	if err != nil {
-		return err
-	}
-	for _, app := range apps {
-		h.apps[app.EntID] = app
-	}
+func (h *queryHandler) getApps(ctx context.Context) (err error) {
+	h.apps, err = goodgwcommon.GetApps(ctx, func() (appIDs []string) {
+		for _, score := range h.scores {
+			appIDs = append(appIDs, score.AppID)
+		}
+		return
+	}())
 	return nil
 }
 
-func (h *queryHandler) getUsers(ctx context.Context) error {
-	userIDs := []string{}
-	for _, score := range h.scores {
-		userIDs = append(userIDs, score.UserID)
-	}
-	users, _, err := usermwcli.GetUsers(ctx, &usermwpb.Conds{
-		EntIDs: &basetypes.StringSliceVal{Op: cruder.IN, Value: userIDs},
-	}, int32(0), int32(len(userIDs)))
-	if err != nil {
-		return err
-	}
-	for _, user := range users {
-		h.users[user.EntID] = user
-	}
+func (h *queryHandler) getUsers(ctx context.Context) (err error) {
+	h.users, err = goodgwcommon.GetUsers(ctx, func() (userIDs []string) {
+		for _, score := range h.scores {
+			userIDs = append(userIDs, score.UserID)
+		}
+		return
+	}())
 	return nil
 }
 
@@ -122,12 +107,8 @@ func (h *Handler) GetScore(ctx context.Context) (*npool.Score, error) {
 
 func (h *Handler) GetScores(ctx context.Context) ([]*npool.Score, uint32, error) {
 	if h.UserID != nil {
-		exist, err := usermwcli.ExistUser(ctx, *h.AppID, *h.UserID)
-		if err != nil {
+		if err := h.CheckUser(ctx); err != nil {
 			return nil, 0, err
-		}
-		if !exist {
-			return nil, 0, fmt.Errorf("invalid user")
 		}
 	}
 

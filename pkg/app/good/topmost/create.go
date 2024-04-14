@@ -11,28 +11,19 @@ import (
 )
 
 func (h *Handler) CreateTopMost(ctx context.Context) (*npool.TopMost, error) {
-	id := uuid.NewString()
 	if h.EntID == nil {
-		h.EntID = &id
+		h.EntID = func() *string { s := uuid.NewString(); return &s }()
 	}
-
-	if _, err := topmostmwcli.CreateTopMost(ctx, &topmostmwpb.TopMostReq{
-		EntID:                  h.EntID,
-		AppID:                  h.AppID,
-		TopMostType:            h.TopMostType,
-		Title:                  h.Title,
-		Message:                h.Message,
-		Posters:                h.Posters,
-		StartAt:                h.StartAt,
-		EndAt:                  h.EndAt,
-		ThresholdCredits:       h.ThresholdCredits,
-		ThresholdPurchases:     h.ThresholdPurchases,
-		RegisterElapsedSeconds: h.RegisterElapsedSeconds,
-		ThresholdPaymentAmount: h.ThresholdPaymentAmount,
-		KycMust:                h.KycMust,
+	if err := topmostmwcli.CreateTopMost(ctx, &topmostmwpb.TopMostReq{
+		EntID:       h.EntID,
+		AppID:       h.AppID,
+		TopMostType: h.TopMostType,
+		Title:       h.Title,
+		Message:     h.Message,
+		StartAt:     h.StartAt,
+		EndAt:       h.EndAt,
 	}); err != nil {
 		return nil, err
 	}
-
 	return h.GetTopMost(ctx)
 }

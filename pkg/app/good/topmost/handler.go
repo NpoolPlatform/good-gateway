@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	appmwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/app"
+	goodgwcommon "github.com/NpoolPlatform/good-gateway/pkg/common"
 	constant "github.com/NpoolPlatform/good-gateway/pkg/const"
 	types "github.com/NpoolPlatform/message/npool/basetypes/good/v1"
 
@@ -12,22 +12,17 @@ import (
 )
 
 type Handler struct {
-	ID                     *uint32
-	EntID                  *string
-	AppID                  *string
-	TopMostType            *types.GoodTopMostType
-	Title                  *string
-	Message                *string
-	Posters                []string
-	StartAt                *uint32
-	EndAt                  *uint32
-	ThresholdCredits       *string
-	RegisterElapsedSeconds *uint32
-	ThresholdPurchases     *uint32
-	ThresholdPaymentAmount *string
-	KycMust                *bool
-	Offset                 int32
-	Limit                  int32
+	ID    *uint32
+	EntID *string
+	goodgwcommon.AppUserCheckHandler
+	TopMostType *types.GoodTopMostType
+	Title       *string
+	Message     *string
+	Posters     []string
+	StartAt     *uint32
+	EndAt       *uint32
+	Offset      int32
+	Limit       int32
 }
 
 func NewHandler(ctx context.Context, options ...func(context.Context, *Handler) error) (*Handler, error) {
@@ -77,12 +72,8 @@ func WithAppID(id *string, must bool) func(context.Context, *Handler) error {
 			}
 			return nil
 		}
-		exist, err := appmwcli.ExistApp(ctx, *id)
-		if err != nil {
+		if err := h.CheckAppWithAppID(ctx, *id); err != nil {
 			return err
-		}
-		if !exist {
-			return fmt.Errorf("invalid app")
 		}
 		h.AppID = id
 		return nil
@@ -142,53 +133,6 @@ func WithStartAt(n *uint32, must bool) func(context.Context, *Handler) error {
 func WithEndAt(n *uint32, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		h.EndAt = n
-		return nil
-	}
-}
-
-func WithThresholdCredits(s *string, must bool) func(context.Context, *Handler) error {
-	return func(ctx context.Context, h *Handler) error {
-		if s == nil {
-			if must {
-				return fmt.Errorf("invalid thresholdcredits")
-			}
-			return nil
-		}
-		h.ThresholdCredits = s
-		return nil
-	}
-}
-
-func WithRegisterElapsedSeconds(n *uint32, must bool) func(context.Context, *Handler) error {
-	return func(ctx context.Context, h *Handler) error {
-		h.RegisterElapsedSeconds = n
-		return nil
-	}
-}
-
-func WithThresholdPurchases(n *uint32, must bool) func(context.Context, *Handler) error {
-	return func(ctx context.Context, h *Handler) error {
-		h.ThresholdPurchases = n
-		return nil
-	}
-}
-
-func WithThresholdPaymentAmount(s *string, must bool) func(context.Context, *Handler) error {
-	return func(ctx context.Context, h *Handler) error {
-		if s == nil {
-			if must {
-				return fmt.Errorf("invalid thresholdpaymentamount")
-			}
-			return nil
-		}
-		h.ThresholdPaymentAmount = s
-		return nil
-	}
-}
-
-func WithKycMust(b *bool, must bool) func(context.Context, *Handler) error {
-	return func(ctx context.Context, h *Handler) error {
-		h.KycMust = b
 		return nil
 	}
 }
