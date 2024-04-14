@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	appmwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/app"
-	goodgwcommon "github.com/NpoolPlatform/good-gateway/pkg/common"
+	topmostcommon "github.com/NpoolPlatform/good-gateway/pkg/app/good/topmost/common"
 	constant "github.com/NpoolPlatform/good-middleware/pkg/const"
 
 	"github.com/google/uuid"
@@ -14,7 +14,7 @@ import (
 type Handler struct {
 	ID    *uint32
 	EntID *string
-	appgoodcommon.CheckHandler
+	topmostcommon.CheckHandler
 	Poster *string
 	Index  *uint32
 	Offset int32
@@ -80,18 +80,18 @@ func WithAppID(id *string, must bool) func(context.Context, *Handler) error {
 	}
 }
 
-func WithAppGoodID(id *string, must bool) func(context.Context, *Handler) error {
+func WithTopMostID(id *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if id == nil {
 			if must {
-				return fmt.Errorf("invalid appgoodid")
+				return fmt.Errorf("invalid topmostid")
 			}
 			return nil
 		}
 		if _, err := uuid.Parse(*id); err != nil {
 			return err
 		}
-		h.AppGoodID = id
+		h.TopMostID = id
 		return nil
 	}
 }
