@@ -20,6 +20,7 @@ func (h *Handler) CreateTopMost(ctx context.Context) (*npool.TopMost, error) {
 		TopMostType: h.TopMostType,
 		Title:       h.Title,
 		Message:     h.Message,
+		TargetUrl:   h.TargetURL,
 		StartAt:     h.StartAt,
 		EndAt:       h.EndAt,
 	}); err != nil {

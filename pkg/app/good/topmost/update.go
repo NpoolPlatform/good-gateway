@@ -23,12 +23,13 @@ func (h *Handler) UpdateTopMost(ctx context.Context) (*npool.TopMost, error) {
 	}
 
 	if err := topmostmwcli.UpdateTopMost(ctx, &topmostmwpb.TopMostReq{
-		ID:      h.ID,
-		EntID:   h.EntID,
-		Title:   h.Title,
-		Message: h.Message,
-		StartAt: h.StartAt,
-		EndAt:   h.EndAt,
+		ID:        h.ID,
+		EntID:     h.EntID,
+		Title:     h.Title,
+		Message:   h.Message,
+		TargetUrl: h.TargetURL,
+		StartAt:   h.StartAt,
+		EndAt:     h.EndAt,
 	}); err != nil {
 		return nil, err
 	}

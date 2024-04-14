@@ -18,7 +18,7 @@ type Handler struct {
 	TopMostType *types.GoodTopMostType
 	Title       *string
 	Message     *string
-	Posters     []string
+	TargetURL   *string
 	StartAt     *uint32
 	EndAt       *uint32
 	Offset      int32
@@ -116,9 +116,9 @@ func WithMessage(s *string, must bool) func(context.Context, *Handler) error {
 	}
 }
 
-func WithPosters(ss []string, must bool) func(context.Context, *Handler) error {
+func WithTargetURL(s *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
-		h.Posters = ss
+		h.TargetURL = s
 		return nil
 	}
 }

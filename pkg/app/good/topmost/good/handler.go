@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	appmwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/app"
+	appgoodcommon "github.com/NpoolPlatform/good-gateway/pkg/app/good/common"
 	constant "github.com/NpoolPlatform/good-middleware/pkg/const"
 
 	"github.com/google/uuid"
@@ -12,15 +12,12 @@ import (
 )
 
 type Handler struct {
-	ID           *uint32
-	EntID        *string
-	AppID        *string
-	AppGoodID    *string
+	ID    *uint32
+	EntID *string
+	appgoodcommon.CheckHandler
 	TopMostID    *string
-	DisplayIndex *uint32
-	Posters      []string
 	UnitPrice    *string
-	PackagePrice *string
+	DisplayIndex *uint32
 	Offset       int32
 	Limit        int32
 }
@@ -72,12 +69,8 @@ func WithAppID(id *string, must bool) func(context.Context, *Handler) error {
 			}
 			return nil
 		}
-		exist, err := appmwcli.ExistApp(ctx, *id)
-		if err != nil {
+		if err := h.CheckAppWithAppID(ctx, *id); err != nil {
 			return err
-		}
-		if !exist {
-			return fmt.Errorf("invalid app")
 		}
 		h.AppID = id
 		return nil
@@ -123,13 +116,6 @@ func WithDisplayIndex(n *uint32) func(context.Context, *Handler) error {
 	}
 }
 
-func WithPosters(ss []string, must bool) func(context.Context, *Handler) error {
-	return func(ctx context.Context, h *Handler) error {
-		h.Posters = ss
-		return nil
-	}
-}
-
 func WithUnitPrice(s *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if s == nil {
@@ -142,22 +128,6 @@ func WithUnitPrice(s *string, must bool) func(context.Context, *Handler) error {
 			return err
 		}
 		h.UnitPrice = s
-		return nil
-	}
-}
-
-func WithPackagePrice(s *string, must bool) func(context.Context, *Handler) error {
-	return func(ctx context.Context, h *Handler) error {
-		if s == nil {
-			if must {
-				return fmt.Errorf("invalid packageprice")
-			}
-			return nil
-		}
-		if _, err := decimal.NewFromString(*s); err != nil {
-			return err
-		}
-		h.PackagePrice = s
 		return nil
 	}
 }
