@@ -29,7 +29,6 @@ func (h *Handler) UpdateDescription(ctx context.Context) (*npool.Description, er
 	if err := appgooddescriptionmwcli.UpdateDescription(ctx, &appgooddescriptionmwpb.DescriptionReq{
 		ID:          h.ID,
 		EntID:       h.EntID,
-		AppGoodID:   h.AppGoodID,
 		Description: h.Description,
 		Index:       h.Index,
 	}); err != nil {
