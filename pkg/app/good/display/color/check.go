@@ -1,21 +1,21 @@
-package description
+package displaycolor
 
 import (
 	"context"
 	"fmt"
 
-	appgooddescriptionmwcli "github.com/NpoolPlatform/good-middleware/pkg/client/app/good/description"
+	appgooddisplaycolormwcli "github.com/NpoolPlatform/good-middleware/pkg/client/app/good/display/color"
 	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
-	appgooddescriptionmwpb "github.com/NpoolPlatform/message/npool/good/mw/v1/app/good/description"
+	appgooddisplaycolormwpb "github.com/NpoolPlatform/message/npool/good/mw/v1/app/good/display/color"
 )
 
 type checkHandler struct {
 	*Handler
 }
 
-func (h *checkHandler) checkDescription(ctx context.Context) error {
-	exist, err := appgooddescriptionmwcli.ExistDescriptionConds(ctx, &appgooddescriptionmwpb.Conds{
+func (h *checkHandler) checkDisplayColor(ctx context.Context) error {
+	exist, err := appgooddisplaycolormwcli.ExistDisplayColorConds(ctx, &appgooddisplaycolormwpb.Conds{
 		ID:    &basetypes.Uint32Val{Op: cruder.EQ, Value: *h.ID},
 		EntID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.EntID},
 		AppID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID},
@@ -24,7 +24,7 @@ func (h *checkHandler) checkDescription(ctx context.Context) error {
 		return err
 	}
 	if !exist {
-		return fmt.Errorf("invalid description")
+		return fmt.Errorf("invalid displaycolor")
 	}
 	return nil
 }
