@@ -1,26 +1,24 @@
-package constraint
+package poster
 
 import (
 	"context"
 	"fmt"
 
-	topmostcommon "github.com/NpoolPlatform/good-gateway/pkg/app/good/topmost/common"
+	appmwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/app"
+	goodgwcommon "github.com/NpoolPlatform/good-gateway/pkg/common"
 	constant "github.com/NpoolPlatform/good-middleware/pkg/const"
-	types "github.com/NpoolPlatform/message/npool/basetypes/good/v1"
 
 	"github.com/google/uuid"
-	"github.com/shopspring/decimal"
 )
 
 type Handler struct {
 	ID    *uint32
 	EntID *string
-	topmostcommon.CheckHandler
-	Constraint  *types.GoodTopMostConstraint
-	TargetValue *string
-	Index       *uint32
-	Offset      int32
-	Limit       int32
+	appgoodcommon.CheckHandler
+	Poster *string
+	Index  *uint32
+	Offset int32
+	Limit  int32
 }
 
 func NewHandler(ctx context.Context, options ...func(context.Context, *Handler) error) (*Handler, error) {
@@ -70,71 +68,53 @@ func WithAppID(id *string, must bool) func(context.Context, *Handler) error {
 			}
 			return nil
 		}
-		if err := h.CheckAppWithAppID(ctx, *id); err != nil {
+		exist, err := appmwcli.ExistApp(ctx, *id)
+		if err != nil {
 			return err
+		}
+		if !exist {
+			return fmt.Errorf("invalid app")
 		}
 		h.AppID = id
 		return nil
 	}
 }
 
-func WithTopMostID(id *string, must bool) func(context.Context, *Handler) error {
+func WithAppGoodID(id *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if id == nil {
 			if must {
-				return fmt.Errorf("invalid topmostid")
+				return fmt.Errorf("invalid appgoodid")
 			}
 			return nil
 		}
 		if _, err := uuid.Parse(*id); err != nil {
 			return err
 		}
-		h.TopMostID = id
+		h.AppGoodID = id
 		return nil
 	}
 }
 
-func WithConstraint(e *types.GoodTopMostConstraint, must bool) func(context.Context, *Handler) error {
-	return func(ctx context.Context, h *Handler) error {
-		if e == nil {
-			if must {
-				return fmt.Errorf("invalid constraint")
-			}
-			return nil
-		}
-		switch *e {
-		case types.GoodTopMostConstraint_TopMostCreditThreshold:
-		case types.GoodTopMostConstraint_TopMostRegisterBefore:
-		case types.GoodTopMostConstraint_TopMostOrderThreshold:
-		case types.GoodTopMostConstraint_TopMostPaymentAmount:
-		case types.GoodTopMostConstraint_TopMostKycMust:
-		default:
-			return fmt.Errorf("invalid constraint")
-		}
-		h.Constraint = e
-		return nil
-	}
-}
-
-func WithIndex(n *uint32) func(context.Context, *Handler) error {
-	return func(ctx context.Context, h *Handler) error {
-		h.Index = n
-		return nil
-	}
-}
-
-func WithTargetValue(s *string, must bool) func(context.Context, *Handler) error {
+func WithPoster(s *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if s == nil {
 			if must {
-				return fmt.Errorf("invalid targetvalue")
+				return fmt.Errorf("invalid poster")
 			}
 			return nil
 		}
-		if _, err := decimal.NewFromString(*s); err != nil {
-			return err
+		if len(*s) < 10 {
+			return fmt.Errorf("invalid poster")
 		}
-		h.TargetValue = s
+		h.Poster = s
+		return nil
+	}
+}
+
+func WithIndex(u *uint32, must bool) func(context.Context, *Handler) error {
+	return func(ctx context.Context, h *Handler) error {
+		h.Index = u
 		return nil
 	}
 }

@@ -1,19 +1,25 @@
-package topmost
+package common
 
 import (
 	"context"
 	"fmt"
 
+	goodgwcommon "github.com/NpoolPlatform/good-gateway/pkg/common"
 	topmostmwcli "github.com/NpoolPlatform/good-middleware/pkg/client/app/good/topmost"
 	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 	topmostmwpb "github.com/NpoolPlatform/message/npool/good/mw/v1/app/good/topmost"
 )
 
-func CheckTopMost(ctx context.Context, appID, topMostID string) error {
+type CheckHandler struct {
+	goodgwcommon.AppUserCheckHandler
+	TopMostID *string
+}
+
+func (h *CheckHandler) CheckTopMost(ctx context.Context) error {
 	exist, err := topmostmwcli.ExistTopMostConds(ctx, &topmostmwpb.Conds{
-		EntID: &basetypes.StringVal{Op: cruder.EQ, Value: topMostID},
-		AppID: &basetypes.StringVal{Op: cruder.EQ, Value: appID},
+		EntID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.TopMostID},
+		AppID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID},
 	})
 	if err != nil {
 		return err

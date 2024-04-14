@@ -3,7 +3,8 @@ package topmostgood
 import (
 	"context"
 
-	topmost1 "github.com/NpoolPlatform/good-gateway/pkg/app/good/topmost"
+	topmostcommon "github.com/NpoolPlatform/good-gateway/pkg/app/good/topmost/common"
+	goodgwcommon "github.com/NpoolPlatform/good-gateway/pkg/common"
 	topmostgoodmwcli "github.com/NpoolPlatform/good-middleware/pkg/client/app/good/topmost/good"
 	npool "github.com/NpoolPlatform/message/npool/good/gw/v1/app/good/topmost/good"
 	topmostgoodmwpb "github.com/NpoolPlatform/message/npool/good/mw/v1/app/good/topmost/good"
@@ -11,8 +12,22 @@ import (
 	"github.com/google/uuid"
 )
 
+type createHandler struct {
+	*Handler
+	*topmostcommon.CheckHandler
+}
+
 func (h *Handler) CreateTopMostGood(ctx context.Context) (*npool.TopMostGood, error) {
-	if err := topmost1.CheckTopMost(ctx, *h.AppID, *h.TopMostID); err != nil {
+	handler := &createHandler{
+		Handler: h,
+		CheckHandler: &topmostcommon.CheckHandler{
+			AppUserCheckHandler: goodgwcommon.AppUserCheckHandler{
+				AppID: h.AppID,
+			},
+			TopMostID: h.TopMostID,
+		},
+	}
+	if err := handler.CheckTopMost(ctx); err != nil {
 		return nil, err
 	}
 	if h.EntID == nil {

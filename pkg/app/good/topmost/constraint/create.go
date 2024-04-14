@@ -3,7 +3,6 @@ package constraint
 import (
 	"context"
 
-	topmost1 "github.com/NpoolPlatform/good-gateway/pkg/app/good/topmost"
 	constraintmwcli "github.com/NpoolPlatform/good-middleware/pkg/client/app/good/topmost/constraint"
 	npool "github.com/NpoolPlatform/message/npool/good/gw/v1/app/good/topmost/constraint"
 	constraintmwpb "github.com/NpoolPlatform/message/npool/good/mw/v1/app/good/topmost/constraint"
@@ -12,7 +11,7 @@ import (
 )
 
 func (h *Handler) CreateConstraint(ctx context.Context) (*npool.TopMostConstraint, error) {
-	if err := topmost1.CheckTopMost(ctx, *h.AppID, *h.TopMostID); err != nil {
+	if err := h.CheckTopMost(ctx); err != nil {
 		return nil, err
 	}
 	if h.EntID == nil {
