@@ -13,8 +13,8 @@ type AppUserCheckHandler struct {
 	UserID *string
 }
 
-func (h *AppUserCheckHandler) CheckApp(ctx context.Context) error {
-	exist, err := appmwcli.ExistApp(ctx, *h.AppID)
+func (h *AppUserCheckHandler) CheckAppWithAppID(ctx context.Context, appID string) error {
+	exist, err := appmwcli.ExistApp(ctx, appID)
 	if err != nil {
 		return err
 	}
@@ -22,6 +22,10 @@ func (h *AppUserCheckHandler) CheckApp(ctx context.Context) error {
 		return fmt.Errorf("invalid app")
 	}
 	return nil
+}
+
+func (h *AppUserCheckHandler) CheckApp(ctx context.Context) error {
+	return h.CheckAppWithAppID(ctx, *h.AppID)
 }
 
 func (h *AppUserCheckHandler) CheckUserWithUserID(ctx context.Context, userID string) error {

@@ -32,9 +32,9 @@ func (h *CheckHandler) CheckGood(ctx context.Context) error {
 	return nil
 }
 
-func (h *CheckHandler) CheckAppGood(ctx context.Context) error {
+func (h *CheckHandler) CheckAppGoodWithAppGoodID(ctx context.Context, appGoodID string) error {
 	exist, err := appgoodmwcli.ExistGoodConds(ctx, &appgoodmwpb.Conds{
-		EntID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppGoodID},
+		EntID: &basetypes.StringVal{Op: cruder.EQ, Value: appGoodID},
 		AppID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID},
 	})
 	if err != nil {
@@ -44,4 +44,8 @@ func (h *CheckHandler) CheckAppGood(ctx context.Context) error {
 		return fmt.Errorf("invalid appgood")
 	}
 	return nil
+}
+
+func (h *CheckHandler) CheckAppGood(ctx context.Context) error {
+	return h.CheckAppGoodWithAppGoodID(ctx, *h.AppGoodID)
 }
