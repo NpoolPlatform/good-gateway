@@ -17,11 +17,11 @@ func (h *Handler) DeleteComment(ctx context.Context) (*npool.Comment, error) {
 			Handler: h,
 		},
 	}
-	if err := handler.checkUser(ctx, *h.UserID); err != nil {
+	if err := handler.CheckUser(ctx); err != nil {
 		return nil, err
 	}
 	if h.TargetUserID != nil {
-		if err := handler.checkUser(ctx, *h.TargetUserID); err != nil {
+		if err := handler.CheckUserWithUserID(ctx, *h.TargetUserID); err != nil {
 			return nil, err
 		}
 	}

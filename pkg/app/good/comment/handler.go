@@ -18,7 +18,6 @@ type Handler struct {
 	ID    *uint32
 	EntID *string
 	appgoodcommon.CheckHandler
-	UserID       *string
 	OrderID      *string
 	Content      *string
 	ReplyToID    *string

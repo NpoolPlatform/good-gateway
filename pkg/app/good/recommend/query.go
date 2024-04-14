@@ -4,8 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	appmwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/app"
-	usermwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/user"
+	goodgwcommon "github.com/NpoolPlatform/good-gateway/pkg/common"
 	recommendmwcli "github.com/NpoolPlatform/good-middleware/pkg/client/app/good/recommend"
 	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 	appmwpb "github.com/NpoolPlatform/message/npool/appuser/mw/v1/app"
@@ -23,37 +22,23 @@ type queryHandler struct {
 	users      map[string]*usermwpb.User
 }
 
-func (h *queryHandler) getApps(ctx context.Context) error {
-	appIDs := []string{}
-	for _, recommend := range h.recommends {
-		appIDs = append(appIDs, recommend.AppID)
-	}
-	apps, _, err := appmwcli.GetApps(ctx, &appmwpb.Conds{
-		EntIDs: &basetypes.StringSliceVal{Op: cruder.IN, Value: appIDs},
-	}, int32(0), int32(len(appIDs)))
-	if err != nil {
-		return err
-	}
-	for _, app := range apps {
-		h.apps[app.EntID] = app
-	}
+func (h *queryHandler) getApps(ctx context.Context) (err error) {
+	h.apps, err = goodgwcommon.GetApps(ctx, func() (appIDs []string) {
+		for _, recommend := range h.recommends {
+			appIDs = append(appIDs, recommend.AppID)
+		}
+		return
+	}())
 	return nil
 }
 
-func (h *queryHandler) getUsers(ctx context.Context) error {
-	userIDs := []string{}
-	for _, recommend := range h.recommends {
-		userIDs = append(userIDs, recommend.RecommenderID)
-	}
-	users, _, err := usermwcli.GetUsers(ctx, &usermwpb.Conds{
-		EntIDs: &basetypes.StringSliceVal{Op: cruder.IN, Value: userIDs},
-	}, int32(0), int32(len(userIDs)))
-	if err != nil {
-		return err
-	}
-	for _, user := range users {
-		h.users[user.EntID] = user
-	}
+func (h *queryHandler) getUsers(ctx context.Context) (err error) {
+	h.users, err = goodgwcommon.GetUsers(ctx, func() (userIDs []string) {
+		for _, recommend := range h.recommends {
+			userIDs = append(userIDs, recommend.RecommenderID)
+		}
+		return
+	}())
 	return nil
 }
 
@@ -64,7 +49,7 @@ func (h *queryHandler) formalize() {
 			EntID:          recommend.EntID,
 			AppID:          recommend.AppID,
 			RecommenderID:  recommend.RecommenderID,
-			GoodID:         recommend.GoodID,
+			AppGoodID:      recommend.AppGoodID,
 			GoodName:       recommend.GoodName,
 			RecommendIndex: recommend.RecommendIndex,
 			Message:        recommend.Message,
@@ -123,12 +108,11 @@ func (h *Handler) GetRecommend(ctx context.Context) (*npool.Recommend, error) {
 }
 
 func (h *Handler) GetRecommends(ctx context.Context) ([]*npool.Recommend, uint32, error) {
-	conds := &recommendmwpb.Conds{}
-	if h.GoodID != nil {
-		conds.GoodID = &basetypes.StringVal{Op: cruder.EQ, Value: *h.GoodID}
+	conds := &recommendmwpb.Conds{
+		AppID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID},
 	}
-	if h.AppID != nil {
-		conds.AppID = &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID}
+	if h.AppGoodID != nil {
+		conds.AppGoodID = &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppGoodID}
 	}
 	if h.RecommenderID != nil {
 		conds.RecommenderID = &basetypes.StringVal{Op: cruder.EQ, Value: *h.RecommenderID}

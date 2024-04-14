@@ -15,7 +15,6 @@ type Handler struct {
 	ID    *uint32
 	EntID *string
 	appgoodcommon.CheckHandler
-	UserID *string
 	Like   *bool
 	Offset int32
 	Limit  int32

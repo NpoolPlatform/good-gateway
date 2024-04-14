@@ -117,7 +117,7 @@ func (h *Handler) GetLikes(ctx context.Context) ([]*npool.Like, uint32, error) {
 		users: map[string]*usermwpb.User{},
 	}
 	if h.UserID != nil {
-		if err := handler.checkUser(ctx); err != nil {
+		if err := handler.CheckUser(ctx); err != nil {
 			return nil, 0, err
 		}
 	}

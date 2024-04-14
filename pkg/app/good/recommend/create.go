@@ -2,9 +2,7 @@ package recommend
 
 import (
 	"context"
-	"fmt"
 
-	usermwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/user"
 	recommendmwcli "github.com/NpoolPlatform/good-middleware/pkg/client/app/good/recommend"
 	npool "github.com/NpoolPlatform/message/npool/good/gw/v1/app/good/recommend"
 	recommendmwpb "github.com/NpoolPlatform/message/npool/good/mw/v1/app/good/recommend"
@@ -13,24 +11,18 @@ import (
 )
 
 func (h *Handler) CreateRecommend(ctx context.Context) (*npool.Recommend, error) {
-	exist, err := usermwcli.ExistUser(ctx, *h.AppID, *h.RecommenderID)
-	if err != nil {
+	if err := h.CheckUserWithUserID(ctx, *h.RecommenderID); err != nil {
 		return nil, err
 	}
-	if !exist {
-		return nil, fmt.Errorf("invalid user")
-	}
 
-	id := uuid.NewString()
 	if h.EntID == nil {
-		h.EntID = &id
+		h.EntID = func() *string { s := uuid.NewString(); return &s }()
 	}
 
-	if _, err := recommendmwcli.CreateRecommend(ctx, &recommendmwpb.RecommendReq{
+	if err := recommendmwcli.CreateRecommend(ctx, &recommendmwpb.RecommendReq{
 		EntID:          h.EntID,
-		AppID:          h.AppID,
 		RecommenderID:  h.RecommenderID,
-		GoodID:         h.GoodID,
+		AppGoodID:      h.AppGoodID,
 		RecommendIndex: h.RecommendIndex,
 		Message:        h.Message,
 	}); err != nil {

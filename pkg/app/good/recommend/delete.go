@@ -2,27 +2,23 @@ package recommend
 
 import (
 	"context"
-	"fmt"
 
 	recommendmwcli "github.com/NpoolPlatform/good-middleware/pkg/client/app/good/recommend"
-	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
-	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 	npool "github.com/NpoolPlatform/message/npool/good/gw/v1/app/good/recommend"
-	recommendmwpb "github.com/NpoolPlatform/message/npool/good/mw/v1/app/good/recommend"
 )
 
+type deleteHandler struct {
+	*checkHandler
+}
+
 func (h *Handler) DeleteRecommend(ctx context.Context) (*npool.Recommend, error) {
-	exist, err := recommendmwcli.ExistRecommendConds(ctx, &recommendmwpb.Conds{
-		ID:            &basetypes.Uint32Val{Op: cruder.EQ, Value: *h.ID},
-		EntID:         &basetypes.StringVal{Op: cruder.EQ, Value: *h.EntID},
-		AppID:         &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID},
-		RecommenderID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.RecommenderID},
-	})
-	if err != nil {
-		return nil, err
+	handler := &deleteHandler{
+		checkHandler: &checkHandler{
+			Handler: h,
+		},
 	}
-	if !exist {
-		return nil, fmt.Errorf("invalid recommend")
+	if err := handler.checkUserRecommend(ctx); err != nil {
+		return nil, err
 	}
 
 	info, err := h.GetRecommend(ctx)
@@ -30,9 +26,8 @@ func (h *Handler) DeleteRecommend(ctx context.Context) (*npool.Recommend, error)
 		return nil, err
 	}
 
-	if _, err := recommendmwcli.DeleteRecommend(ctx, *h.ID); err != nil {
+	if err := recommendmwcli.DeleteRecommend(ctx, h.ID, h.EntID); err != nil {
 		return nil, err
 	}
-
 	return info, nil
 }

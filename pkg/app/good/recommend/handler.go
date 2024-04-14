@@ -5,20 +5,23 @@ import (
 	"fmt"
 
 	appmwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/app"
+	appgoodcommon "github.com/NpoolPlatform/good-gateway/pkg/app/good/common"
 	constant "github.com/NpoolPlatform/good-middleware/pkg/const"
+	types "github.com/NpoolPlatform/message/npool/basetypes/good/v1"
 
 	"github.com/google/uuid"
 	"github.com/shopspring/decimal"
 )
 
 type Handler struct {
-	ID             *uint32
-	EntID          *string
-	AppID          *string
+	ID    *uint32
+	EntID *string
+	appgoodcommon.CheckHandler
 	RecommenderID  *string
-	GoodID         *string
 	RecommendIndex *string
 	Message        *string
+	Hide           *bool
+	HideReason     *types.GoodCommentHideReason
 	Offset         int32
 	Limit          int32
 }
@@ -98,18 +101,18 @@ func WithRecommenderID(id *string, must bool) func(context.Context, *Handler) er
 	}
 }
 
-func WithGoodID(id *string, must bool) func(context.Context, *Handler) error {
+func WithAppGoodID(id *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if id == nil {
 			if must {
-				return fmt.Errorf("invalid goodid")
+				return fmt.Errorf("invalid appgoodid")
 			}
 			return nil
 		}
 		if _, err := uuid.Parse(*id); err != nil {
 			return err
 		}
-		h.GoodID = id
+		h.AppGoodID = id
 		return nil
 	}
 }
@@ -132,17 +135,43 @@ func WithRecommendIndex(s *string, must bool) func(context.Context, *Handler) er
 
 func WithMessage(s *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
-		const leastMessageLen = 10
 		if s == nil {
 			if must {
 				return fmt.Errorf("invalid message")
 			}
 			return nil
 		}
-		if len(*s) < leastMessageLen {
+		if len(*s) < 20 {
 			return fmt.Errorf("invalid message")
 		}
 		h.Message = s
+		return nil
+	}
+}
+
+func WithHide(b *bool, must bool) func(context.Context, *Handler) error {
+	return func(ctx context.Context, h *Handler) error {
+		h.Hide = b
+		return nil
+	}
+}
+
+func WithHideReason(e *types.GoodCommentHideReason, must bool) func(context.Context, *Handler) error {
+	return func(ctx context.Context, h *Handler) error {
+		if e == nil {
+			if must {
+				return fmt.Errorf("invalid hidereason")
+			}
+			return nil
+		}
+		switch *e {
+		case types.GoodCommentHideReason_GoodCommentHideBySpam:
+		case types.GoodCommentHideReason_GoodCommentHideByNotThisGood:
+		case types.GoodCommentHideReason_GoodCommentHideByFalseDescription:
+		default:
+			return fmt.Errorf("invalid hidereason")
+		}
+		h.HideReason = e
 		return nil
 	}
 }

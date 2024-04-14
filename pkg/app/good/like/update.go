@@ -18,7 +18,7 @@ func (h *Handler) UpdateLike(ctx context.Context) (*npool.Like, error) {
 			Handler: h,
 		},
 	}
-	if err := handler.checkUser(ctx); err != nil {
+	if err := handler.CheckUser(ctx); err != nil {
 		return nil, err
 	}
 	if err := handler.checkUserLike(ctx); err != nil {

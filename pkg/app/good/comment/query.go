@@ -137,7 +137,7 @@ func (h *Handler) GetComments(ctx context.Context) ([]*npool.Comment, uint32, er
 		users: map[string]*usermwpb.User{},
 	}
 	if h.UserID != nil {
-		if err := handler.checkUser(ctx, *h.UserID); err != nil {
+		if err := handler.CheckUser(ctx); err != nil {
 			return nil, 0, fmt.Errorf("invalid user")
 		}
 	}

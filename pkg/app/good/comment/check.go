@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	usermwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/user"
 	commentmwcli "github.com/NpoolPlatform/good-middleware/pkg/client/app/good/comment"
 	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
@@ -15,17 +14,6 @@ import (
 
 type checkHandler struct {
 	*Handler
-}
-
-func (h *checkHandler) checkUser(ctx context.Context, userID string) error {
-	exist, err := usermwcli.ExistUser(ctx, *h.AppID, userID)
-	if err != nil {
-		return err
-	}
-	if !exist {
-		return fmt.Errorf("invalid user")
-	}
-	return nil
 }
 
 func (h *checkHandler) checkOrder(ctx context.Context) error {
