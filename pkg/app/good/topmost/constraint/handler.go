@@ -116,7 +116,7 @@ func WithConstraint(e *types.GoodTopMostConstraint, must bool) func(context.Cont
 	}
 }
 
-func WithIndex(n *uint32) func(context.Context, *Handler) error {
+func WithIndex(n *uint32, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		h.Index = n
 		return nil
