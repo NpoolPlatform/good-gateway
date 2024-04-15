@@ -4,15 +4,16 @@ import (
 	"context"
 	"fmt"
 
+	goodcommon "github.com/NpoolPlatform/good-gateway/pkg/good/common"
 	constant "github.com/NpoolPlatform/good-middleware/pkg/const"
 
 	"github.com/google/uuid"
 )
 
 type Handler struct {
-	ID             *uint32
-	EntID          *string
-	GoodID         *string
+	ID    *uint32
+	EntID *string
+	goodcommon.GoodCheckHandler
 	MainGoodID     *string
 	RequiredGoodID *string
 	Must           *bool
