@@ -4,8 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	appmwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/app"
-	appgoodcommon "github.com/NpoolPlatform/good-gateway/pkg/app/good/common"
+	devicetypecommon "github.com/NpoolPlatform/good-gateway/pkg/device/common"
 	constant "github.com/NpoolPlatform/good-middleware/pkg/const"
 
 	"github.com/google/uuid"
@@ -14,7 +13,7 @@ import (
 type Handler struct {
 	ID    *uint32
 	EntID *string
-	appgoodcommon.AppGoodCheckHandler
+	devicetypecommon.DeviceTypeCheckHandler
 	Poster *string
 	Index  *uint32
 	Offset int32
@@ -60,38 +59,18 @@ func WithEntID(id *string, must bool) func(context.Context, *Handler) error {
 	}
 }
 
-func WithAppID(id *string, must bool) func(context.Context, *Handler) error {
+func WithDeviceTypeID(id *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if id == nil {
 			if must {
-				return fmt.Errorf("invalid appid")
+				return fmt.Errorf("invalid devicetypeid")
 			}
 			return nil
 		}
-		exist, err := appmwcli.ExistApp(ctx, *id)
-		if err != nil {
+		if err := h.CheckDeviceTypeWithDeviceTypeID(ctx, *id); err != nil {
 			return err
 		}
-		if !exist {
-			return fmt.Errorf("invalid app")
-		}
-		h.AppID = id
-		return nil
-	}
-}
-
-func WithAppGoodID(id *string, must bool) func(context.Context, *Handler) error {
-	return func(ctx context.Context, h *Handler) error {
-		if id == nil {
-			if must {
-				return fmt.Errorf("invalid appgoodid")
-			}
-			return nil
-		}
-		if err := h.CheckAppGoodWithAppGoodID(ctx, *id); err != nil {
-			return err
-		}
-		h.AppGoodID = id
+		h.DeviceTypeID = id
 		return nil
 	}
 }

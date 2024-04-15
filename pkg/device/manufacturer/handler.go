@@ -1,24 +1,21 @@
-package devicetype
+package manufacturer
 
 import (
 	"context"
 	"fmt"
 
 	constant "github.com/NpoolPlatform/good-gateway/pkg/const"
-	manufacturercommon "github.com/NpoolPlatform/good-gateway/pkg/device/manufacturer/common"
 
 	"github.com/google/uuid"
 )
 
 type Handler struct {
-	ID    *uint32
-	EntID *string
-	Type  *string
-	manufacturercommon.ManufacturerCheckHandler
-	PowerConsumption *uint32
-	ShipmentAt       *uint32
-	Offset           int32
-	Limit            int32
+	ID     *uint32
+	EntID  *string
+	Name   *string
+	Logo   *string
+	Offset int32
+	Limit  int32
 }
 
 func NewHandler(ctx context.Context, options ...func(context.Context, *Handler) error) (*Handler, error) {
@@ -60,61 +57,34 @@ func WithEntID(id *string, must bool) func(context.Context, *Handler) error {
 	}
 }
 
-func WithType(s *string, must bool) func(context.Context, *Handler) error {
+func WithName(s *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if s == nil {
 			if must {
-				return fmt.Errorf("invalid type")
+				return fmt.Errorf("invalid name")
 			}
 			return nil
 		}
-		const leastTypeLen = 3
-		if len(*s) < leastTypeLen {
-			return fmt.Errorf("invalid type")
+		if len(*s) < 3 {
+			return fmt.Errorf("invalid name")
 		}
-		h.Type = s
+		h.Name = s
 		return nil
 	}
 }
 
-func WithManufacturerID(s *string, must bool) func(context.Context, *Handler) error {
+func WithLogo(s *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if s == nil {
 			if must {
-				return fmt.Errorf("invalid manufacturerid")
+				return fmt.Errorf("invalid logo")
 			}
 			return nil
 		}
-		if err := h.CheckManufacturerWithManufacturerID(ctx, *s); err != nil {
-			return err
+		if len(*s) < 3 {
+			return fmt.Errorf("invalid logo")
 		}
-		h.ManufacturerID = s
-		return nil
-	}
-}
-
-func WithPowerConsumption(n *uint32, must bool) func(context.Context, *Handler) error {
-	return func(ctx context.Context, h *Handler) error {
-		if n == nil {
-			if must {
-				return fmt.Errorf("invalid powercunsumption")
-			}
-			return nil
-		}
-		h.PowerConsumption = n
-		return nil
-	}
-}
-
-func WithShipmentAt(n *uint32, must bool) func(context.Context, *Handler) error {
-	return func(ctx context.Context, h *Handler) error {
-		if n == nil {
-			if must {
-				return fmt.Errorf("invalid powercunsumption")
-			}
-			return nil
-		}
-		h.ShipmentAt = n
+		h.Logo = s
 		return nil
 	}
 }

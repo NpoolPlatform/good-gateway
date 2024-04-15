@@ -12,37 +12,36 @@ import (
 	npool "github.com/NpoolPlatform/message/npool/good/gw/v1/device"
 )
 
-func (s *Server) UpdateDeviceType(ctx context.Context, in *npool.UpdateDeviceTypeRequest) (*npool.UpdateDeviceTypeResponse, error) {
+func (s *Server) AdminUpdateDeviceType(ctx context.Context, in *npool.AdminUpdateDeviceTypeRequest) (*npool.AdminUpdateDeviceTypeResponse, error) {
 	handler, err := devicetype1.NewHandler(
 		ctx,
 		devicetype1.WithID(&in.ID, true),
 		devicetype1.WithEntID(&in.EntID, true),
-		devicetype1.WithType(in.Type, false),
-		devicetype1.WithManufacturer(in.Manufacturer, false),
+		devicetype1.WithType(in.DeviceType, false),
+		devicetype1.WithManufacturerID(in.ManufacturerID, false),
 		devicetype1.WithPowerConsumption(in.PowerConsumption, false),
 		devicetype1.WithShipmentAt(in.ShipmentAt, false),
-		devicetype1.WithPosters(in.Posters, false),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(
-			"UpdateDeviceType",
+			"AdminUpdateDeviceType",
 			"In", in,
 			"Error", err,
 		)
-		return &npool.UpdateDeviceTypeResponse{}, status.Error(codes.Aborted, err.Error())
+		return &npool.AdminUpdateDeviceTypeResponse{}, status.Error(codes.Aborted, err.Error())
 	}
 
 	info, err := handler.UpdateDeviceType(ctx)
 	if err != nil {
 		logger.Sugar().Errorw(
-			"UpdateDeviceType",
+			"AdminUpdateDeviceType",
 			"In", in,
 			"Error", err,
 		)
-		return &npool.UpdateDeviceTypeResponse{}, status.Error(codes.Aborted, err.Error())
+		return &npool.AdminUpdateDeviceTypeResponse{}, status.Error(codes.Aborted, err.Error())
 	}
 
-	return &npool.UpdateDeviceTypeResponse{
+	return &npool.AdminUpdateDeviceTypeResponse{
 		Info: info,
 	}, nil
 }

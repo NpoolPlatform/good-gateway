@@ -12,7 +12,7 @@ import (
 	npool "github.com/NpoolPlatform/message/npool/good/gw/v1/device"
 )
 
-func (s *Server) DeleteDeviceType(ctx context.Context, in *npool.DeleteDeviceTypeRequest) (*npool.DeleteDeviceTypeResponse, error) {
+func (s *Server) AdminDeleteDeviceType(ctx context.Context, in *npool.AdminDeleteDeviceTypeRequest) (*npool.AdminDeleteDeviceTypeResponse, error) {
 	handler, err := devicetype1.NewHandler(
 		ctx,
 		devicetype1.WithID(&in.ID, true),
@@ -20,24 +20,24 @@ func (s *Server) DeleteDeviceType(ctx context.Context, in *npool.DeleteDeviceTyp
 	)
 	if err != nil {
 		logger.Sugar().Errorw(
-			"DeleteDeviceType",
+			"AdminDeleteDeviceType",
 			"In", in,
 			"Error", err,
 		)
-		return &npool.DeleteDeviceTypeResponse{}, status.Error(codes.Aborted, err.Error())
+		return &npool.AdminDeleteDeviceTypeResponse{}, status.Error(codes.Aborted, err.Error())
 	}
 
 	info, err := handler.DeleteDeviceType(ctx)
 	if err != nil {
 		logger.Sugar().Errorw(
-			"DeleteDeviceType",
+			"AdminDeleteDeviceType",
 			"In", in,
 			"Error", err,
 		)
-		return &npool.DeleteDeviceTypeResponse{}, status.Error(codes.Aborted, err.Error())
+		return &npool.AdminDeleteDeviceTypeResponse{}, status.Error(codes.Aborted, err.Error())
 	}
 
-	return &npool.DeleteDeviceTypeResponse{
+	return &npool.AdminDeleteDeviceTypeResponse{
 		Info: info,
 	}, nil
 }
