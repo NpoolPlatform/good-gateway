@@ -11,16 +11,15 @@ import (
 )
 
 func (h *Handler) CreateSimulate(ctx context.Context) (*npool.Simulate, error) {
-	id := uuid.NewString()
 	if h.EntID == nil {
-		h.EntID = &id
+		h.EntID = func() *string { s := uuid.NewString(); return &s }()
 	}
 
-	if _, err := simulatemwcli.CreateSimulate(ctx, &simulatemwpb.SimulateReq{
-		EntID:              h.EntID,
-		AppGoodID:          h.AppGoodID,
-		FixedOrderUnits:    h.FixedOrderUnits,
-		FixedOrderDuration: h.FixedOrderDuration,
+	if err := simulatemwcli.CreateSimulate(ctx, &simulatemwpb.SimulateReq{
+		EntID:         h.EntID,
+		AppGoodID:     h.AppGoodID,
+		OrderUnits:    h.OrderUnits,
+		OrderDuration: h.OrderDuration,
 	}); err != nil {
 		return nil, err
 	}

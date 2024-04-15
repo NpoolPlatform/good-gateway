@@ -4,22 +4,21 @@ import (
 	"context"
 	"fmt"
 
-	appmwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/app"
+	appgoodcommon "github.com/NpoolPlatform/good-gateway/pkg/app/good/common"
 	constant "github.com/NpoolPlatform/good-middleware/pkg/const"
-	"github.com/shopspring/decimal"
 
 	"github.com/google/uuid"
+	"github.com/shopspring/decimal"
 )
 
 type Handler struct {
-	ID                 *uint32
-	EntID              *string
-	AppID              *string
-	AppGoodID          *string
-	FixedOrderUnits    *string
-	FixedOrderDuration *uint32
-	Offset             int32
-	Limit              int32
+	ID    *uint32
+	EntID *string
+	appgoodcommon.AppGoodCheckHandler
+	OrderUnits    *string
+	OrderDuration *uint32
+	Offset        int32
+	Limit         int32
 }
 
 func NewHandler(ctx context.Context, options ...func(context.Context, *Handler) error) (*Handler, error) {
@@ -69,12 +68,8 @@ func WithAppID(id *string, must bool) func(context.Context, *Handler) error {
 			}
 			return nil
 		}
-		exist, err := appmwcli.ExistApp(ctx, *id)
-		if err != nil {
+		if err := h.CheckAppWithAppID(ctx, *id); err != nil {
 			return err
-		}
-		if !exist {
-			return fmt.Errorf("invalid app")
 		}
 		h.AppID = id
 		return nil
@@ -97,7 +92,7 @@ func WithAppGoodID(id *string, must bool) func(context.Context, *Handler) error 
 	}
 }
 
-func WithFixedOrderUnits(amount *string, must bool) func(context.Context, *Handler) error {
+func WithOrderUnits(amount *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if amount == nil {
 			if must {
@@ -112,12 +107,12 @@ func WithFixedOrderUnits(amount *string, must bool) func(context.Context, *Handl
 		if _amount.Cmp(decimal.NewFromInt32(0)) <= 0 {
 			return fmt.Errorf("invalid units")
 		}
-		h.FixedOrderUnits = amount
+		h.OrderUnits = amount
 		return nil
 	}
 }
 
-func WithFixedOrderDuration(duration *uint32, must bool) func(context.Context, *Handler) error {
+func WithOrderDuration(duration *uint32, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if duration == nil {
 			if must {
@@ -125,7 +120,7 @@ func WithFixedOrderDuration(duration *uint32, must bool) func(context.Context, *
 			}
 			return nil
 		}
-		h.FixedOrderDuration = duration
+		h.OrderDuration = duration
 		return nil
 	}
 }
