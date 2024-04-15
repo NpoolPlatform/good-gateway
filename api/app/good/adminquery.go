@@ -13,33 +13,33 @@ import (
 	npool "github.com/NpoolPlatform/message/npool/good/gw/v1/app/good"
 )
 
-func (s *Server) GetGoods(ctx context.Context, in *npool.GetGoodsRequest) (*npool.GetGoodsResponse, error) {
+func (s *Server) AdminGetGoods(ctx context.Context, in *npool.AdminGetGoodsRequest) (*npool.AdminGetGoodsResponse, error) {
 	handler, err := appgood1.NewHandler(
 		ctx,
-		appgood1.WithAppID(&in.AppID, true),
+		appgood1.WithAppID(&in.TargetAppID, true),
 		appgood1.WithOffset(in.Offset),
 		appgood1.WithLimit(in.Limit),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(
-			"GetGoods",
+			"AdminGetGoods",
 			"In", in,
 			"Error", err,
 		)
-		return &npool.GetGoodsResponse{}, status.Error(codes.Aborted, err.Error())
+		return &npool.AdminGetGoodsResponse{}, status.Error(codes.Aborted, err.Error())
 	}
 
 	infos, total, err := handler.GetGoods(ctx)
 	if err != nil {
 		logger.Sugar().Errorw(
-			"GetGoods",
+			"AdminGetGoods",
 			"In", in,
 			"Error", err,
 		)
-		return &npool.GetGoodsResponse{}, status.Error(codes.Aborted, err.Error())
+		return &npool.AdminGetGoodsResponse{}, status.Error(codes.Aborted, err.Error())
 	}
 
-	return &npool.GetGoodsResponse{
+	return &npool.AdminGetGoodsResponse{
 		Infos: infos,
 		Total: total,
 	}, nil
