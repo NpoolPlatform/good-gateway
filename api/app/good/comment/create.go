@@ -22,6 +22,7 @@ func (s *Server) CreateComment(ctx context.Context, in *npool.CreateCommentReque
 		comment1.WithContent(&in.Content, true),
 		comment1.WithReplyToID(in.ReplyToID, false),
 		comment1.WithAnonymous(in.Anonymous, false),
+		comment1.WithScore(in.Score, false),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(
