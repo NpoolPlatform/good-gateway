@@ -1,4 +1,3 @@
-//nolint:dupl
 package default1
 
 import (
@@ -13,34 +12,33 @@ import (
 	npool "github.com/NpoolPlatform/message/npool/good/gw/v1/app/good/default"
 )
 
-func (s *Server) UpdateDefault(ctx context.Context, in *npool.UpdateDefaultRequest) (*npool.UpdateDefaultResponse, error) {
+func (s *Server) AdminDeleteDefault(ctx context.Context, in *npool.AdminDeleteDefaultRequest) (*npool.AdminDeleteDefaultResponse, error) {
 	handler, err := default1.NewHandler(
 		ctx,
 		default1.WithID(&in.ID, true),
 		default1.WithEntID(&in.EntID, true),
-		default1.WithAppID(&in.AppID, true),
-		default1.WithAppGoodID(in.AppGoodID, false),
+		default1.WithAppID(&in.TargetAppID, true),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(
-			"UpdateDefault",
+			"AdminDeleteDefault",
 			"In", in,
 			"Error", err,
 		)
-		return &npool.UpdateDefaultResponse{}, status.Error(codes.Aborted, err.Error())
+		return &npool.AdminDeleteDefaultResponse{}, status.Error(codes.Aborted, err.Error())
 	}
 
-	info, err := handler.UpdateDefault(ctx)
+	info, err := handler.DeleteDefault(ctx)
 	if err != nil {
 		logger.Sugar().Errorw(
-			"UpdateDefault",
+			"AdminDeleteDefault",
 			"In", in,
 			"Error", err,
 		)
-		return &npool.UpdateDefaultResponse{}, status.Error(codes.Aborted, err.Error())
+		return &npool.AdminDeleteDefaultResponse{}, status.Error(codes.Aborted, err.Error())
 	}
 
-	return &npool.UpdateDefaultResponse{
+	return &npool.AdminDeleteDefaultResponse{
 		Info: info,
 	}, nil
 }

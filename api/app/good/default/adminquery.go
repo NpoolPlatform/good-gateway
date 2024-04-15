@@ -13,33 +13,33 @@ import (
 	npool "github.com/NpoolPlatform/message/npool/good/gw/v1/app/good/default"
 )
 
-func (s *Server) GetDefaults(ctx context.Context, in *npool.GetDefaultsRequest) (*npool.GetDefaultsResponse, error) {
+func (s *Server) AdminGetDefaults(ctx context.Context, in *npool.AdminGetDefaultsRequest) (*npool.AdminGetDefaultsResponse, error) {
 	handler, err := default1.NewHandler(
 		ctx,
-		default1.WithAppID(&in.AppID, true),
+		default1.WithAppID(&in.TargetAppID, true),
 		default1.WithOffset(in.Offset),
 		default1.WithLimit(in.Limit),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(
-			"GetDefaults",
+			"AdminGetDefaults",
 			"In", in,
 			"Error", err,
 		)
-		return &npool.GetDefaultsResponse{}, status.Error(codes.Aborted, err.Error())
+		return &npool.AdminGetDefaultsResponse{}, status.Error(codes.Aborted, err.Error())
 	}
 
 	infos, total, err := handler.GetDefaults(ctx)
 	if err != nil {
 		logger.Sugar().Errorw(
-			"GetDefaults",
+			"AdminGetDefaults",
 			"In", in,
 			"Error", err,
 		)
-		return &npool.GetDefaultsResponse{}, status.Error(codes.Aborted, err.Error())
+		return &npool.AdminGetDefaultsResponse{}, status.Error(codes.Aborted, err.Error())
 	}
 
-	return &npool.GetDefaultsResponse{
+	return &npool.AdminGetDefaultsResponse{
 		Infos: infos,
 		Total: total,
 	}, nil

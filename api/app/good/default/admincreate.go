@@ -13,32 +13,32 @@ import (
 	npool "github.com/NpoolPlatform/message/npool/good/gw/v1/app/good/default"
 )
 
-func (s *Server) CreateDefault(ctx context.Context, in *npool.CreateDefaultRequest) (*npool.CreateDefaultResponse, error) {
+func (s *Server) AdminCreateDefault(ctx context.Context, in *npool.AdminCreateDefaultRequest) (*npool.AdminCreateDefaultResponse, error) {
 	handler, err := default1.NewHandler(
 		ctx,
-		default1.WithAppID(&in.AppID, true),
+		default1.WithAppID(&in.TargetAppID, true),
 		default1.WithAppGoodID(&in.AppGoodID, true),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(
-			"CreateDefault",
+			"AdminCreateDefault",
 			"In", in,
 			"Error", err,
 		)
-		return &npool.CreateDefaultResponse{}, status.Error(codes.Aborted, err.Error())
+		return &npool.AdminCreateDefaultResponse{}, status.Error(codes.Aborted, err.Error())
 	}
 
 	info, err := handler.CreateDefault(ctx)
 	if err != nil {
 		logger.Sugar().Errorw(
-			"CreateDefault",
+			"AdminCreateDefault",
 			"In", in,
 			"Error", err,
 		)
-		return &npool.CreateDefaultResponse{}, status.Error(codes.Aborted, err.Error())
+		return &npool.AdminCreateDefaultResponse{}, status.Error(codes.Aborted, err.Error())
 	}
 
-	return &npool.CreateDefaultResponse{
+	return &npool.AdminCreateDefaultResponse{
 		Info: info,
 	}, nil
 }
