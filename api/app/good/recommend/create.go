@@ -17,7 +17,7 @@ func (s *Server) CreateRecommend(ctx context.Context, in *npool.CreateRecommendR
 		ctx,
 		recommend1.WithAppID(&in.AppID, true),
 		recommend1.WithRecommenderID(&in.UserID, true),
-		recommend1.WithGoodID(&in.GoodID, true),
+		recommend1.WithAppGoodID(&in.AppGoodID, true),
 		recommend1.WithRecommendIndex(&in.RecommendIndex, true),
 		recommend1.WithMessage(&in.Message, true),
 	)
