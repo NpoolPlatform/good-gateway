@@ -10,17 +10,18 @@ import (
 )
 
 func (h *Handler) CreateLocation(ctx context.Context) (*locationmwpb.Location, error) {
-	id := uuid.NewString()
 	if h.EntID == nil {
-		h.EntID = &id
+		h.EntID = func() *string { s := uuid.NewString(); return &s }()
 	}
-
-	return locationmwcli.CreateLocation(ctx, &locationmwpb.LocationReq{
+	if err := locationmwcli.CreateLocation(ctx, &locationmwpb.LocationReq{
 		EntID:    h.EntID,
 		Country:  h.Country,
 		Province: h.Province,
 		City:     h.City,
 		Address:  h.Address,
 		BrandID:  h.BrandID,
-	})
+	}); err != nil {
+		return nil, err
+	}
+	return h.GetLocation(ctx)
 }

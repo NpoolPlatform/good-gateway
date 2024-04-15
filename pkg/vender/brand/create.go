@@ -10,14 +10,15 @@ import (
 )
 
 func (h *Handler) CreateBrand(ctx context.Context) (*brandmwpb.Brand, error) {
-	id := uuid.NewString()
 	if h.EntID == nil {
-		h.EntID = &id
+		h.EntID = func() *string { s := uuid.NewString(); return &s }()
 	}
-
-	return brandmwcli.CreateBrand(ctx, &brandmwpb.BrandReq{
+	if err := brandmwcli.CreateBrand(ctx, &brandmwpb.BrandReq{
 		EntID: h.EntID,
 		Name:  h.Name,
 		Logo:  h.Logo,
-	})
+	}); err != nil {
+		return nil, err
+	}
+	return h.GetBrand(ctx)
 }

@@ -18,8 +18,6 @@ type Handler struct {
 	Limit  int32
 }
 
-const leastStrLen = 3
-
 func NewHandler(ctx context.Context, options ...func(context.Context, *Handler) error) (*Handler, error) {
 	handler := &Handler{}
 	for _, opt := range options {
@@ -67,7 +65,7 @@ func WithName(s *string, must bool) func(context.Context, *Handler) error {
 			}
 			return nil
 		}
-		if len(*s) < leastStrLen {
+		if len(*s) < 3 {
 			return fmt.Errorf("invalid name")
 		}
 		h.Name = s
@@ -83,8 +81,7 @@ func WithLogo(s *string, must bool) func(context.Context, *Handler) error {
 			}
 			return nil
 		}
-		const leastStrLen = 3
-		if len(*s) < leastStrLen {
+		if len(*s) < 3 {
 			return fmt.Errorf("invalid logo")
 		}
 		h.Logo = s
