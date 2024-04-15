@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 
+	appfee "github.com/NpoolPlatform/good-gateway/api/app/fee"
 	appgood "github.com/NpoolPlatform/good-gateway/api/app/good"
 	"github.com/NpoolPlatform/good-gateway/api/app/good/comment"
 	default1 "github.com/NpoolPlatform/good-gateway/api/app/good/default"
@@ -41,6 +42,7 @@ func Register(server grpc.ServiceRegistrar) {
 	history.Register(server)
 	score.Register(server)
 	appgood.Register(server)
+	appfee.Register(server)
 	default1.Register(server)
 	topmost.Register(server)
 	topmostgood.Register(server)
@@ -83,6 +85,9 @@ func RegisterGateway(mux *runtime.ServeMux, endpoint string, opts []grpc.DialOpt
 		return err
 	}
 	if err := appgood.RegisterGateway(mux, endpoint, opts); err != nil {
+		return err
+	}
+	if err := appfee.RegisterGateway(mux, endpoint, opts); err != nil {
 		return err
 	}
 	if err := default1.RegisterGateway(mux, endpoint, opts); err != nil {
