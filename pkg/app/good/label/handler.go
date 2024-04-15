@@ -15,7 +15,7 @@ import (
 type Handler struct {
 	ID    *uint32
 	EntID *string
-	appgoodcommon.CheckHandler
+	appgoodcommon.AppGoodCheckHandler
 	Icon         *string
 	IconBgColor  *string
 	Label        *types.GoodLabel
