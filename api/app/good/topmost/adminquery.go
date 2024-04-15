@@ -13,33 +13,33 @@ import (
 	npool "github.com/NpoolPlatform/message/npool/good/gw/v1/app/good/topmost"
 )
 
-func (s *Server) GetTopMosts(ctx context.Context, in *npool.GetTopMostsRequest) (*npool.GetTopMostsResponse, error) {
+func (s *Server) AdminGetTopMosts(ctx context.Context, in *npool.AdminGetTopMostsRequest) (*npool.AdminGetTopMostsResponse, error) {
 	handler, err := topmost1.NewHandler(
 		ctx,
-		topmost1.WithAppID(&in.AppID, true),
+		topmost1.WithAppID(&in.TargetAppID, true),
 		topmost1.WithOffset(in.Offset),
 		topmost1.WithLimit(in.Limit),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(
-			"GetTopMosts",
+			"AdminGetTopMosts",
 			"In", in,
 			"Error", err,
 		)
-		return &npool.GetTopMostsResponse{}, status.Error(codes.Aborted, err.Error())
+		return &npool.AdminGetTopMostsResponse{}, status.Error(codes.Aborted, err.Error())
 	}
 
 	infos, total, err := handler.GetTopMosts(ctx)
 	if err != nil {
 		logger.Sugar().Errorw(
-			"GetTopMosts",
+			"AdminGetTopMosts",
 			"In", in,
 			"Error", err,
 		)
-		return &npool.GetTopMostsResponse{}, status.Error(codes.Aborted, err.Error())
+		return &npool.AdminGetTopMostsResponse{}, status.Error(codes.Aborted, err.Error())
 	}
 
-	return &npool.GetTopMostsResponse{
+	return &npool.AdminGetTopMostsResponse{
 		Infos: infos,
 		Total: total,
 	}, nil
