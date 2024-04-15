@@ -14,7 +14,7 @@ import (
 type Handler struct {
 	ID    *uint32
 	EntID *string
-	appgoodcommon.CheckHandler
+	appgoodcommon.AppGoodCheckHandler
 	TopMostID    *string
 	UnitPrice    *string
 	DisplayIndex *uint32
@@ -109,7 +109,7 @@ func WithTopMostID(id *string, must bool) func(context.Context, *Handler) error 
 	}
 }
 
-func WithDisplayIndex(n *uint32) func(context.Context, *Handler) error {
+func WithDisplayIndex(n *uint32, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		h.DisplayIndex = n
 		return nil

@@ -13,35 +13,35 @@ import (
 	npool "github.com/NpoolPlatform/message/npool/good/gw/v1/app/good/topmost/good"
 )
 
-func (s *Server) UpdateTopMostGood(ctx context.Context, in *npool.UpdateTopMostGoodRequest) (*npool.UpdateTopMostGoodResponse, error) {
+func (s *Server) AdminUpdateTopMostGood(ctx context.Context, in *npool.AdminUpdateTopMostGoodRequest) (*npool.AdminUpdateTopMostGoodResponse, error) {
 	handler, err := topmostgood1.NewHandler(
 		ctx,
 		topmostgood1.WithID(&in.ID, true),
 		topmostgood1.WithEntID(&in.EntID, true),
-		topmostgood1.WithAppID(&in.AppID, true),
+		topmostgood1.WithAppID(&in.TargetAppID, true),
 		topmostgood1.WithUnitPrice(in.UnitPrice, false),
 		topmostgood1.WithDisplayIndex(in.Index, false),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(
-			"UpdateTopMostGood",
+			"AdminUpdateTopMostGood",
 			"In", in,
 			"Error", err,
 		)
-		return &npool.UpdateTopMostGoodResponse{}, status.Error(codes.Aborted, err.Error())
+		return &npool.AdminUpdateTopMostGoodResponse{}, status.Error(codes.Aborted, err.Error())
 	}
 
 	info, err := handler.UpdateTopMostGood(ctx)
 	if err != nil {
 		logger.Sugar().Errorw(
-			"UpdateTopMostGood",
+			"AdminUpdateTopMostGood",
 			"In", in,
 			"Error", err,
 		)
-		return &npool.UpdateTopMostGoodResponse{}, status.Error(codes.Aborted, err.Error())
+		return &npool.AdminUpdateTopMostGoodResponse{}, status.Error(codes.Aborted, err.Error())
 	}
 
-	return &npool.UpdateTopMostGoodResponse{
+	return &npool.AdminUpdateTopMostGoodResponse{
 		Info: info,
 	}, nil
 }

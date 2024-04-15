@@ -13,33 +13,33 @@ import (
 	npool "github.com/NpoolPlatform/message/npool/good/gw/v1/app/good/topmost/good"
 )
 
-func (s *Server) GetTopMostGoods(ctx context.Context, in *npool.GetTopMostGoodsRequest) (*npool.GetTopMostGoodsResponse, error) {
+func (s *Server) AdminGetTopMostGoods(ctx context.Context, in *npool.AdminGetTopMostGoodsRequest) (*npool.AdminGetTopMostGoodsResponse, error) {
 	handler, err := topmostgood1.NewHandler(
 		ctx,
-		topmostgood1.WithAppID(&in.AppID, true),
+		topmostgood1.WithAppID(&in.TargetAppID, true),
 		topmostgood1.WithOffset(in.Offset),
 		topmostgood1.WithLimit(in.Limit),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(
-			"GetTopMostGoods",
+			"AdminGetTopMostGoods",
 			"In", in,
 			"Error", err,
 		)
-		return &npool.GetTopMostGoodsResponse{}, status.Error(codes.Aborted, err.Error())
+		return &npool.AdminGetTopMostGoodsResponse{}, status.Error(codes.Aborted, err.Error())
 	}
 
 	infos, total, err := handler.GetTopMostGoods(ctx)
 	if err != nil {
 		logger.Sugar().Errorw(
-			"GetTopMostGoods",
+			"AdminGetTopMostGoods",
 			"In", in,
 			"Error", err,
 		)
-		return &npool.GetTopMostGoodsResponse{}, status.Error(codes.Aborted, err.Error())
+		return &npool.AdminGetTopMostGoodsResponse{}, status.Error(codes.Aborted, err.Error())
 	}
 
-	return &npool.GetTopMostGoodsResponse{
+	return &npool.AdminGetTopMostGoodsResponse{
 		Infos: infos,
 		Total: total,
 	}, nil
