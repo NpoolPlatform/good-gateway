@@ -1,4 +1,4 @@
-package deviceinfo
+package devicetype
 
 import (
 	"context"
@@ -13,10 +13,9 @@ type Handler struct {
 	ID               *uint32
 	EntID            *string
 	Type             *string
-	Manufacturer     *string
+	ManufacturerID   *string
 	PowerConsumption *uint32
 	ShipmentAt       *uint32
-	Posters          []string
 	Offset           int32
 	Limit            int32
 }
@@ -77,19 +76,18 @@ func WithType(s *string, must bool) func(context.Context, *Handler) error {
 	}
 }
 
-func WithManufacturer(s *string, must bool) func(context.Context, *Handler) error {
+func WithManufacturerID(s *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if s == nil {
 			if must {
-				return fmt.Errorf("invalid manufacturer")
+				return fmt.Errorf("invalid manufacturerid")
 			}
 			return nil
 		}
-		const leastManufacturerLen = 3
-		if len(*s) < leastManufacturerLen {
-			return fmt.Errorf("invalid manufacturer")
+		if _, err := uuid.Parse(*s); err != nil {
+			return err
 		}
-		h.Manufacturer = s
+		h.ManufacturerID = s
 		return nil
 	}
 }
@@ -116,13 +114,6 @@ func WithShipmentAt(n *uint32, must bool) func(context.Context, *Handler) error 
 			return nil
 		}
 		h.ShipmentAt = n
-		return nil
-	}
-}
-
-func WithPosters(ss []string, must bool) func(context.Context, *Handler) error {
-	return func(ctx context.Context, h *Handler) error {
-		h.Posters = ss
 		return nil
 	}
 }

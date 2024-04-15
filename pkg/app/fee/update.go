@@ -8,8 +8,21 @@ import (
 	appfeemwpb "github.com/NpoolPlatform/message/npool/good/mw/v1/app/fee"
 )
 
+type updateHandler struct {
+	*checkHandler
+}
+
 func (h *Handler) UpdateAppFee(ctx context.Context) (*npool.AppFee, error) {
 	if err := h.CheckAppGood(ctx); err != nil {
+		return nil, err
+	}
+
+	handler := &updateHandler{
+		checkHandler: &checkHandler{
+			Handler: h,
+		},
+	}
+	if err := handler.checkAppFee(ctx); err != nil {
 		return nil, err
 	}
 

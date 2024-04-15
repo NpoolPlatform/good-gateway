@@ -9,18 +9,18 @@ import (
 	"github.com/google/uuid"
 )
 
-func (h *Handler) CreateDeviceInfo(ctx context.Context) (*devicetypemwpb.DeviceInfo, error) {
-	id := uuid.NewString()
+func (h *Handler) CreateDeviceType(ctx context.Context) (*devicetypemwpb.DeviceType, error) {
 	if h.EntID == nil {
-		h.EntID = &id
+		h.EntID = func() *string { s := uuid.NewString(); return &s }()
 	}
-
-	return devicetypemwcli.CreateDeviceInfo(ctx, &devicetypemwpb.DeviceInfoReq{
+	if err := devicetypemwcli.CreateDeviceType(ctx, &devicetypemwpb.DeviceTypeReq{
 		EntID:            h.EntID,
 		Type:             h.Type,
-		Manufacturer:     h.Manufacturer,
+		ManufacturerID:   h.ManufacturerID,
 		PowerConsumption: h.PowerConsumption,
 		ShipmentAt:       h.ShipmentAt,
-		Posters:          h.Posters,
-	})
+	}); err != nil {
+		return nil, err
+	}
+	return h.GetDeviceType(ctx)
 }

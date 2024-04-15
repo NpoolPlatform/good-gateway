@@ -10,8 +10,8 @@ import (
 	devicetypemwpb "github.com/NpoolPlatform/message/npool/good/mw/v1/device"
 )
 
-func (h *Handler) UpdateDeviceInfo(ctx context.Context) (*devicetypemwpb.DeviceInfo, error) {
-	info, err := devicetypemwcli.GetDeviceInfoOnly(ctx, &devicetypemwpb.Conds{
+func (h *Handler) UpdateDeviceType(ctx context.Context) (*devicetypemwpb.DeviceType, error) {
+	info, err := devicetypemwcli.GetDeviceTypeOnly(ctx, &devicetypemwpb.Conds{
 		ID:    &basetypes.Uint32Val{Op: cruder.EQ, Value: *h.ID},
 		EntID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.EntID},
 	})
@@ -22,7 +22,7 @@ func (h *Handler) UpdateDeviceInfo(ctx context.Context) (*devicetypemwpb.DeviceI
 		return nil, fmt.Errorf("invalid devicetype")
 	}
 
-	return devicetypemwcli.UpdateDeviceInfo(ctx, &devicetypemwpb.DeviceInfoReq{
+	return devicetypemwcli.UpdateDeviceType(ctx, &devicetypemwpb.DeviceTypeReq{
 		ID:               h.ID,
 		Type:             h.Type,
 		Manufacturer:     h.Manufacturer,
