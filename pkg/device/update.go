@@ -2,32 +2,33 @@ package devicetype
 
 import (
 	"context"
-	"fmt"
 
 	devicetypemwcli "github.com/NpoolPlatform/good-middleware/pkg/client/device"
-	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
-	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 	devicetypemwpb "github.com/NpoolPlatform/message/npool/good/mw/v1/device"
 )
 
+type updateHandler struct {
+	*checkHandler
+}
+
 func (h *Handler) UpdateDeviceType(ctx context.Context) (*devicetypemwpb.DeviceType, error) {
-	info, err := devicetypemwcli.GetDeviceTypeOnly(ctx, &devicetypemwpb.Conds{
-		ID:    &basetypes.Uint32Val{Op: cruder.EQ, Value: *h.ID},
-		EntID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.EntID},
-	})
-	if err != nil {
+	handler := &updateHandler{
+		checkHandler: &checkHandler{
+			Handler: h,
+		},
+	}
+	if err := handler.checkDeviceType(ctx); err != nil {
 		return nil, err
 	}
-	if info == nil {
-		return nil, fmt.Errorf("invalid devicetype")
-	}
 
-	return devicetypemwcli.UpdateDeviceType(ctx, &devicetypemwpb.DeviceTypeReq{
+	if err := devicetypemwcli.UpdateDeviceType(ctx, &devicetypemwpb.DeviceTypeReq{
 		ID:               h.ID,
 		Type:             h.Type,
-		Manufacturer:     h.Manufacturer,
+		ManufacturerID:   h.ManufacturerID,
 		PowerConsumption: h.PowerConsumption,
 		ShipmentAt:       h.ShipmentAt,
-		Posters:          h.Posters,
-	})
+	}); err != nil {
+		return nil, err
+	}
+	return h.GetDeviceType(ctx)
 }

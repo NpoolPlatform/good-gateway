@@ -2,25 +2,31 @@ package devicetype
 
 import (
 	"context"
-	"fmt"
 
 	devicetypemwcli "github.com/NpoolPlatform/good-middleware/pkg/client/device"
-	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
-	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 	devicetypemwpb "github.com/NpoolPlatform/message/npool/good/mw/v1/device"
 )
 
+type deleteHandler struct {
+	*checkHandler
+}
+
 func (h *Handler) DeleteDeviceType(ctx context.Context) (*devicetypemwpb.DeviceType, error) {
-	info, err := devicetypemwcli.GetDeviceTypeOnly(ctx, &devicetypemwpb.Conds{
-		ID:    &basetypes.Uint32Val{Op: cruder.EQ, Value: *h.ID},
-		EntID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.EntID},
-	})
+	handler := &deleteHandler{
+		checkHandler: &checkHandler{
+			Handler: h,
+		},
+	}
+	if err := handler.checkDeviceType(ctx); err != nil {
+		return nil, err
+	}
+
+	info, err := h.GetDeviceType(ctx)
 	if err != nil {
 		return nil, err
 	}
-	if info == nil {
-		return nil, fmt.Errorf("invalid devicetype")
+	if err := devicetypemwcli.DeleteDeviceType(ctx, h.ID, h.EntID); err != nil {
+		return nil, err
 	}
-
-	return devicetypemwcli.DeleteDeviceType(ctx, *h.ID)
+	return info, nil
 }
