@@ -17,7 +17,7 @@ import (
 type Handler struct {
 	ID    *uint32
 	EntID *string
-	appgoodcommon.CheckHandler
+	appgoodcommon.AppGoodCheckHandler
 	OrderID      *string
 	Content      *string
 	ReplyToID    *string
