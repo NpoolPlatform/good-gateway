@@ -14,7 +14,7 @@ import (
 type Handler struct {
 	ID    *uint32
 	EntID *string
-	appgoodcommon.CheckHandler
+	appgoodcommon.AppGoodCheckHandler
 	Description *string
 	Index       *uint32
 	Offset      int32
