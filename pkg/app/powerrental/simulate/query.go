@@ -27,7 +27,7 @@ func (h *queryHandler) getApps(ctx context.Context) (err error) {
 		}
 		return
 	}())
-	return nil
+	return err
 }
 
 func (h *queryHandler) formalize() {

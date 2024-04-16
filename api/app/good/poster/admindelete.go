@@ -12,7 +12,6 @@ import (
 	npool "github.com/NpoolPlatform/message/npool/good/gw/v1/app/good/poster"
 )
 
-//nolint
 func (s *Server) AdminDeletePoster(ctx context.Context, in *npool.AdminDeletePosterRequest) (*npool.AdminDeletePosterResponse, error) {
 	handler, err := poster1.NewHandler(
 		ctx,

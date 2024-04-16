@@ -104,7 +104,7 @@ func WithPoster(s *string, must bool) func(context.Context, *Handler) error {
 			}
 			return nil
 		}
-		if len(*s) < 10 {
+		if len(*s) < 10 { //nolint
 			return fmt.Errorf("invalid poster")
 		}
 		h.Poster = s

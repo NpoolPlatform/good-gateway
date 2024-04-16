@@ -12,7 +12,7 @@ type deleteHandler struct {
 }
 
 func (h *Handler) DeleteScore(ctx context.Context) (*npool.Score, error) {
-	handler := &updateHandler{
+	handler := &deleteHandler{
 		checkHandler: &checkHandler{
 			Handler: h,
 		},

@@ -104,7 +104,7 @@ func WithDescription(s *string, must bool) func(context.Context, *Handler) error
 			}
 			return nil
 		}
-		if len(*s) < 10 {
+		if len(*s) < 10 { //nolint
 			return fmt.Errorf("invalid description")
 		}
 		h.Description = s

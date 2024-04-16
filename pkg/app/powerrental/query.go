@@ -28,9 +28,10 @@ func (h *queryHandler) getApps(ctx context.Context) (err error) {
 		}
 		return
 	}())
-	return nil
+	return err
 }
 
+//nolint:funlen
 func (h *queryHandler) formalize() {
 	for _, appPowerRental := range h.appPowerRentals {
 		info := &npool.AppPowerRental{
@@ -117,7 +118,7 @@ func (h *queryHandler) formalize() {
 			TotalRewardAmount:    appPowerRental.TotalRewardAmount,
 			LastUnitRewardAmount: appPowerRental.LastUnitRewardAmount,
 
-			// TODO: expand coin infomation
+			// TODO: expand coin information
 			GoodCoins:     appPowerRental.GoodCoins,
 			Descriptions:  appPowerRental.Descriptions,
 			Posters:       appPowerRental.Posters,

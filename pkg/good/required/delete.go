@@ -12,7 +12,7 @@ type deleteHandler struct {
 }
 
 func (h *Handler) DeleteRequired(ctx context.Context) (*requiredmwpb.Required, error) {
-	handler := &updateHandler{
+	handler := &deleteHandler{
 		checkHandler: &checkHandler{
 			Handler: h,
 		},

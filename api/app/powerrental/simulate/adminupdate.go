@@ -1,4 +1,3 @@
-//nolint:dupl
 package simulate
 
 import (

@@ -141,7 +141,7 @@ func WithMessage(s *string, must bool) func(context.Context, *Handler) error {
 			}
 			return nil
 		}
-		if len(*s) < 20 {
+		if len(*s) < 20 { //nolint
 			return fmt.Errorf("invalid message")
 		}
 		h.Message = s

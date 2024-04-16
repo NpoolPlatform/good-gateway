@@ -1,3 +1,4 @@
+//nolint:dupl
 package displaycolor
 
 import (
@@ -12,7 +13,6 @@ import (
 	npool "github.com/NpoolPlatform/message/npool/good/gw/v1/app/good/display/color"
 )
 
-//nolint
 func (s *Server) UpdateDisplayColor(ctx context.Context, in *npool.UpdateDisplayColorRequest) (*npool.UpdateDisplayColorResponse, error) {
 	handler, err := displaycolor1.NewHandler(
 		ctx,

@@ -12,7 +12,6 @@ import (
 	npool "github.com/NpoolPlatform/message/npool/good/gw/v1/app/good/description"
 )
 
-//nolint
 func (s *Server) AdminDeleteDescription(ctx context.Context, in *npool.AdminDeleteDescriptionRequest) (*npool.AdminDeleteDescriptionResponse, error) {
 	handler, err := description1.NewHandler(
 		ctx,

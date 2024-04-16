@@ -12,7 +12,6 @@ import (
 	npool "github.com/NpoolPlatform/message/npool/good/gw/v1/app/good/label"
 )
 
-//nolint
 func (s *Server) AdminDeleteLabel(ctx context.Context, in *npool.AdminDeleteLabelRequest) (*npool.AdminDeleteLabelResponse, error) {
 	handler, err := label1.NewHandler(
 		ctx,

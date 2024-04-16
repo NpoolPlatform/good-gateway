@@ -13,7 +13,7 @@ import (
 type Handler struct {
 	ID    *uint32
 	EntID *string
-	appgoodcommon.CheckHandler
+	appgoodcommon.AppGoodCheckHandler
 	MainAppGoodID     *string
 	RequiredAppGoodID *string
 	Must              *bool
@@ -72,6 +72,22 @@ func WithAppID(id *string, must bool) func(context.Context, *Handler) error {
 			return err
 		}
 		h.AppID = id
+		return nil
+	}
+}
+
+func WithAppGoodID(id *string, must bool) func(context.Context, *Handler) error {
+	return func(ctx context.Context, h *Handler) error {
+		if id == nil {
+			if must {
+				return fmt.Errorf("invalid appgoodid")
+			}
+			return nil
+		}
+		if _, err := uuid.Parse(*id); err != nil {
+			return err
+		}
+		h.AppGoodID = id
 		return nil
 	}
 }

@@ -29,7 +29,7 @@ func (h *queryHandler) getApps(ctx context.Context) (err error) {
 		}
 		return
 	}())
-	return nil
+	return err
 }
 
 func (h *queryHandler) getUsers(ctx context.Context) (err error) {
@@ -39,7 +39,7 @@ func (h *queryHandler) getUsers(ctx context.Context) (err error) {
 		}
 		return
 	}())
-	return nil
+	return err
 }
 
 func (h *queryHandler) formalize() {

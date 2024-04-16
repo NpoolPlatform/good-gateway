@@ -14,8 +14,6 @@ type Handler struct {
 	Limit  int32
 }
 
-const leastStrLen = 3
-
 func NewHandler(ctx context.Context, options ...func(context.Context, *Handler) error) (*Handler, error) {
 	handler := &Handler{}
 	for _, opt := range options {

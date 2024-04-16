@@ -14,6 +14,7 @@ import (
 	"github.com/NpoolPlatform/good-gateway/api/app/good/like"
 	"github.com/NpoolPlatform/good-gateway/api/app/good/poster"
 	"github.com/NpoolPlatform/good-gateway/api/app/good/recommend"
+	appgoodrequired "github.com/NpoolPlatform/good-gateway/api/app/good/required"
 	"github.com/NpoolPlatform/good-gateway/api/app/good/score"
 	"github.com/NpoolPlatform/good-gateway/api/app/good/topmost"
 	topmostconstraint "github.com/NpoolPlatform/good-gateway/api/app/good/topmost/constraint"
@@ -53,6 +54,7 @@ func Register(server grpc.ServiceRegistrar) {
 	poster.Register(server)
 	recommend.Register(server)
 	required.Register(server)
+	appgoodrequired.Register(server)
 	history.Register(server)
 	score.Register(server)
 	appgood.Register(server)
@@ -67,7 +69,7 @@ func Register(server grpc.ServiceRegistrar) {
 	apppowerrentalsimulate.Register(server)
 }
 
-//nolint:gocyclo
+//nolint:gocyclo,funlen
 func RegisterGateway(mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) error {
 	if err := v1.RegisterGatewayHandlerFromEndpoint(context.Background(), mux, endpoint, opts); err != nil {
 		return err
@@ -109,6 +111,9 @@ func RegisterGateway(mux *runtime.ServeMux, endpoint string, opts []grpc.DialOpt
 		return err
 	}
 	if err := required.RegisterGateway(mux, endpoint, opts); err != nil {
+		return err
+	}
+	if err := appgoodrequired.RegisterGateway(mux, endpoint, opts); err != nil {
 		return err
 	}
 	if err := history.RegisterGateway(mux, endpoint, opts); err != nil {

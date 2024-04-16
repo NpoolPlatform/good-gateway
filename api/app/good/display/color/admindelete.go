@@ -12,7 +12,6 @@ import (
 	npool "github.com/NpoolPlatform/message/npool/good/gw/v1/app/good/display/color"
 )
 
-//nolint
 func (s *Server) AdminDeleteDisplayColor(ctx context.Context, in *npool.AdminDeleteDisplayColorRequest) (*npool.AdminDeleteDisplayColorResponse, error) {
 	handler, err := displaycolor1.NewHandler(
 		ctx,

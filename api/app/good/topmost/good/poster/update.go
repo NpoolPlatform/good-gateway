@@ -1,3 +1,4 @@
+//nolint:dupl
 package poster
 
 import (
@@ -12,7 +13,6 @@ import (
 	npool "github.com/NpoolPlatform/message/npool/good/gw/v1/app/good/topmost/good/poster"
 )
 
-//nolint
 func (s *Server) UpdatePoster(ctx context.Context, in *npool.UpdatePosterRequest) (*npool.UpdatePosterResponse, error) {
 	handler, err := poster1.NewHandler(
 		ctx,

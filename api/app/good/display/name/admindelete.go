@@ -12,7 +12,6 @@ import (
 	npool "github.com/NpoolPlatform/message/npool/good/gw/v1/app/good/display/name"
 )
 
-//nolint
 func (s *Server) AdminDeleteDisplayName(ctx context.Context, in *npool.AdminDeleteDisplayNameRequest) (*npool.AdminDeleteDisplayNameResponse, error) {
 	handler, err := displayname1.NewHandler(
 		ctx,

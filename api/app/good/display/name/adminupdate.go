@@ -1,3 +1,4 @@
+//nolint:dupl
 package displayname
 
 import (
@@ -12,7 +13,6 @@ import (
 	npool "github.com/NpoolPlatform/message/npool/good/gw/v1/app/good/display/name"
 )
 
-//nolint
 func (s *Server) AdminUpdateDisplayName(ctx context.Context, in *npool.AdminUpdateDisplayNameRequest) (*npool.AdminUpdateDisplayNameResponse, error) {
 	handler, err := displayname1.NewHandler(
 		ctx,

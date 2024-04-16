@@ -1,3 +1,4 @@
+//nolint:dupl
 package description
 
 import (
@@ -12,7 +13,6 @@ import (
 	npool "github.com/NpoolPlatform/message/npool/good/gw/v1/app/good/description"
 )
 
-//nolint
 func (s *Server) UpdateDescription(ctx context.Context, in *npool.UpdateDescriptionRequest) (*npool.UpdateDescriptionResponse, error) {
 	handler, err := description1.NewHandler(
 		ctx,

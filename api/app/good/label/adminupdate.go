@@ -1,3 +1,4 @@
+//nolint:dupl
 package label
 
 import (
@@ -12,7 +13,6 @@ import (
 	npool "github.com/NpoolPlatform/message/npool/good/gw/v1/app/good/label"
 )
 
-//nolint
 func (s *Server) AdminUpdateLabel(ctx context.Context, in *npool.AdminUpdateLabelRequest) (*npool.AdminUpdateLabelResponse, error) {
 	handler, err := label1.NewHandler(
 		ctx,

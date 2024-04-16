@@ -193,7 +193,7 @@ func WithScore(s *string, must bool) func(context.Context, *Handler) error {
 			return err
 		}
 		if score.Cmp(decimal.NewFromInt(0)) < 0 ||
-			score.Cmp(decimal.NewFromInt(5)) > 0 {
+			score.Cmp(decimal.NewFromInt(5)) > 0 { //nolint
 			return fmt.Errorf("invalid score")
 		}
 		h.Score = s

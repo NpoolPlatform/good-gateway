@@ -98,15 +98,6 @@ func WithAppGoodID(id *string, must bool) func(context.Context, *Handler) error 
 
 func WithPoster(s *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
-		if s == nil {
-			if must {
-				return fmt.Errorf("invalid poster")
-			}
-			return nil
-		}
-		if len(*s) < 10 {
-			return fmt.Errorf("invalid poster")
-		}
 		h.Poster = s
 		return nil
 	}
