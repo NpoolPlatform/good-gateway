@@ -13,33 +13,33 @@ import (
 	npool "github.com/NpoolPlatform/message/npool/good/gw/v1/good/required"
 )
 
-func (s *Server) CreateRequired(ctx context.Context, in *npool.CreateRequiredRequest) (*npool.CreateRequiredResponse, error) {
+func (s *Server) AdminCreateRequired(ctx context.Context, in *npool.AdminCreateRequiredRequest) (*npool.AdminCreateRequiredResponse, error) {
 	handler, err := required1.NewHandler(
 		ctx,
 		required1.WithMainGoodID(&in.MainGoodID, true),
 		required1.WithRequiredGoodID(&in.RequiredGoodID, true),
-		required1.WithMust(&in.Must, true),
+		required1.WithMust(in.Must, false),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(
-			"CreateRequired",
+			"AdminCreateRequired",
 			"In", in,
 			"Error", err,
 		)
-		return &npool.CreateRequiredResponse{}, status.Error(codes.Aborted, err.Error())
+		return &npool.AdminCreateRequiredResponse{}, status.Error(codes.Aborted, err.Error())
 	}
 
 	info, err := handler.CreateRequired(ctx)
 	if err != nil {
 		logger.Sugar().Errorw(
-			"CreateRequired",
+			"AdminCreateRequired",
 			"In", in,
 			"Error", err,
 		)
-		return &npool.CreateRequiredResponse{}, status.Error(codes.Aborted, err.Error())
+		return &npool.AdminCreateRequiredResponse{}, status.Error(codes.Aborted, err.Error())
 	}
 
-	return &npool.CreateRequiredResponse{
+	return &npool.AdminCreateRequiredResponse{
 		Info: info,
 	}, nil
 }

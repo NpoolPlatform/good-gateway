@@ -12,7 +12,7 @@ import (
 	npool "github.com/NpoolPlatform/message/npool/good/gw/v1/good/required"
 )
 
-func (s *Server) DeleteRequired(ctx context.Context, in *npool.DeleteRequiredRequest) (*npool.DeleteRequiredResponse, error) {
+func (s *Server) AdminDeleteRequired(ctx context.Context, in *npool.AdminDeleteRequiredRequest) (*npool.AdminDeleteRequiredResponse, error) {
 	handler, err := required1.NewHandler(
 		ctx,
 		required1.WithID(&in.ID, true),
@@ -20,24 +20,24 @@ func (s *Server) DeleteRequired(ctx context.Context, in *npool.DeleteRequiredReq
 	)
 	if err != nil {
 		logger.Sugar().Errorw(
-			"DeleteRequired",
+			"AdminDeleteRequired",
 			"In", in,
 			"Error", err,
 		)
-		return &npool.DeleteRequiredResponse{}, status.Error(codes.Aborted, err.Error())
+		return &npool.AdminDeleteRequiredResponse{}, status.Error(codes.Aborted, err.Error())
 	}
 
 	info, err := handler.DeleteRequired(ctx)
 	if err != nil {
 		logger.Sugar().Errorw(
-			"DeleteRequired",
+			"AdminDeleteRequired",
 			"In", in,
 			"Error", err,
 		)
-		return &npool.DeleteRequiredResponse{}, status.Error(codes.Aborted, err.Error())
+		return &npool.AdminDeleteRequiredResponse{}, status.Error(codes.Aborted, err.Error())
 	}
 
-	return &npool.DeleteRequiredResponse{
+	return &npool.AdminDeleteRequiredResponse{
 		Info: info,
 	}, nil
 }

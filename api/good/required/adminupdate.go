@@ -13,33 +13,33 @@ import (
 	npool "github.com/NpoolPlatform/message/npool/good/gw/v1/good/required"
 )
 
-func (s *Server) UpdateRequired(ctx context.Context, in *npool.UpdateRequiredRequest) (*npool.UpdateRequiredResponse, error) {
+func (s *Server) AdminUpdateRequired(ctx context.Context, in *npool.AdminUpdateRequiredRequest) (*npool.AdminUpdateRequiredResponse, error) {
 	handler, err := required1.NewHandler(
 		ctx,
 		required1.WithID(&in.ID, true),
 		required1.WithEntID(&in.EntID, true),
-		required1.WithMust(&in.Must, true),
+		required1.WithMust(in.Must, false),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(
-			"UpdateRequired",
+			"AdminUpdateRequired",
 			"In", in,
 			"Error", err,
 		)
-		return &npool.UpdateRequiredResponse{}, status.Error(codes.Aborted, err.Error())
+		return &npool.AdminUpdateRequiredResponse{}, status.Error(codes.Aborted, err.Error())
 	}
 
 	info, err := handler.UpdateRequired(ctx)
 	if err != nil {
 		logger.Sugar().Errorw(
-			"UpdateRequired",
+			"AdminUpdateRequired",
 			"In", in,
 			"Error", err,
 		)
-		return &npool.UpdateRequiredResponse{}, status.Error(codes.Aborted, err.Error())
+		return &npool.AdminUpdateRequiredResponse{}, status.Error(codes.Aborted, err.Error())
 	}
 
-	return &npool.UpdateRequiredResponse{
+	return &npool.AdminUpdateRequiredResponse{
 		Info: info,
 	}, nil
 }
