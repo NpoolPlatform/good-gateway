@@ -118,6 +118,22 @@ func WithGoodID(id *string, must bool) func(context.Context, *Handler) error {
 	}
 }
 
+func WithAppGoodID(id *string, must bool) func(context.Context, *Handler) error {
+	return func(ctx context.Context, h *Handler) error {
+		if id == nil {
+			if must {
+				return fmt.Errorf("invalid appgoodid")
+			}
+			return nil
+		}
+		if _, err := uuid.Parse(*id); err != nil {
+			return err
+		}
+		h.AppGoodID = id
+		return nil
+	}
+}
+
 func WithPurchasable(b *bool, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		h.Purchasable = b
