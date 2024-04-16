@@ -12,7 +12,7 @@ import (
 	npool "github.com/NpoolPlatform/message/npool/good/gw/v1/vender/location"
 )
 
-func (s *Server) UpdateLocation(ctx context.Context, in *npool.UpdateLocationRequest) (*npool.UpdateLocationResponse, error) {
+func (s *Server) AdminUpdateLocation(ctx context.Context, in *npool.AdminUpdateLocationRequest) (*npool.AdminUpdateLocationResponse, error) {
 	handler, err := location1.NewHandler(
 		ctx,
 		location1.WithID(&in.ID, true),
@@ -25,24 +25,24 @@ func (s *Server) UpdateLocation(ctx context.Context, in *npool.UpdateLocationReq
 	)
 	if err != nil {
 		logger.Sugar().Errorw(
-			"UpdateLocation",
+			"AdminUpdateLocation",
 			"In", in,
 			"Error", err,
 		)
-		return &npool.UpdateLocationResponse{}, status.Error(codes.Aborted, err.Error())
+		return &npool.AdminUpdateLocationResponse{}, status.Error(codes.Aborted, err.Error())
 	}
 
 	info, err := handler.UpdateLocation(ctx)
 	if err != nil {
 		logger.Sugar().Errorw(
-			"UpdateLocation",
+			"AdminUpdateLocation",
 			"In", in,
 			"Error", err,
 		)
-		return &npool.UpdateLocationResponse{}, status.Error(codes.Aborted, err.Error())
+		return &npool.AdminUpdateLocationResponse{}, status.Error(codes.Aborted, err.Error())
 	}
 
-	return &npool.UpdateLocationResponse{
+	return &npool.AdminUpdateLocationResponse{
 		Info: info,
 	}, nil
 }

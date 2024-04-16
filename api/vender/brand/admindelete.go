@@ -13,32 +13,32 @@ import (
 	npool "github.com/NpoolPlatform/message/npool/good/gw/v1/vender/brand"
 )
 
-func (s *Server) CreateBrand(ctx context.Context, in *npool.CreateBrandRequest) (*npool.CreateBrandResponse, error) {
+func (s *Server) AdminDeleteBrand(ctx context.Context, in *npool.AdminDeleteBrandRequest) (*npool.AdminDeleteBrandResponse, error) {
 	handler, err := brand1.NewHandler(
 		ctx,
-		brand1.WithName(&in.Name, true),
-		brand1.WithLogo(&in.Logo, true),
+		brand1.WithID(&in.ID, true),
+		brand1.WithEntID(&in.EntID, true),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(
-			"CreateBrand",
+			"AdminDeleteBrand",
 			"In", in,
 			"Error", err,
 		)
-		return &npool.CreateBrandResponse{}, status.Error(codes.Aborted, err.Error())
+		return &npool.AdminDeleteBrandResponse{}, status.Error(codes.Aborted, err.Error())
 	}
 
-	info, err := handler.CreateBrand(ctx)
+	info, err := handler.DeleteBrand(ctx)
 	if err != nil {
 		logger.Sugar().Errorw(
-			"CreateBrand",
+			"AdminDeleteBrand",
 			"In", in,
 			"Error", err,
 		)
-		return &npool.CreateBrandResponse{}, status.Error(codes.Aborted, err.Error())
+		return &npool.AdminDeleteBrandResponse{}, status.Error(codes.Aborted, err.Error())
 	}
 
-	return &npool.CreateBrandResponse{
+	return &npool.AdminDeleteBrandResponse{
 		Info: info,
 	}, nil
 }

@@ -12,7 +12,7 @@ import (
 	npool "github.com/NpoolPlatform/message/npool/good/gw/v1/vender/location"
 )
 
-func (s *Server) DeleteLocation(ctx context.Context, in *npool.DeleteLocationRequest) (*npool.DeleteLocationResponse, error) {
+func (s *Server) AdminDeleteLocation(ctx context.Context, in *npool.AdminDeleteLocationRequest) (*npool.AdminDeleteLocationResponse, error) {
 	handler, err := location1.NewHandler(
 		ctx,
 		location1.WithID(&in.ID, true),
@@ -20,24 +20,24 @@ func (s *Server) DeleteLocation(ctx context.Context, in *npool.DeleteLocationReq
 	)
 	if err != nil {
 		logger.Sugar().Errorw(
-			"DeleteLocation",
+			"AdminDeleteLocation",
 			"In", in,
 			"Error", err,
 		)
-		return &npool.DeleteLocationResponse{}, status.Error(codes.Aborted, err.Error())
+		return &npool.AdminDeleteLocationResponse{}, status.Error(codes.Aborted, err.Error())
 	}
 
 	info, err := handler.DeleteLocation(ctx)
 	if err != nil {
 		logger.Sugar().Errorw(
-			"DeleteLocation",
+			"AdminDeleteLocation",
 			"In", in,
 			"Error", err,
 		)
-		return &npool.DeleteLocationResponse{}, status.Error(codes.Aborted, err.Error())
+		return &npool.AdminDeleteLocationResponse{}, status.Error(codes.Aborted, err.Error())
 	}
 
-	return &npool.DeleteLocationResponse{
+	return &npool.AdminDeleteLocationResponse{
 		Info: info,
 	}, nil
 }

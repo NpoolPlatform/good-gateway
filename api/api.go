@@ -7,11 +7,20 @@ import (
 	appgood "github.com/NpoolPlatform/good-gateway/api/app/good"
 	"github.com/NpoolPlatform/good-gateway/api/app/good/comment"
 	default1 "github.com/NpoolPlatform/good-gateway/api/app/good/default"
+	"github.com/NpoolPlatform/good-gateway/api/app/good/description"
+	displaycolor "github.com/NpoolPlatform/good-gateway/api/app/good/display/color"
+	displayname "github.com/NpoolPlatform/good-gateway/api/app/good/display/name"
+	"github.com/NpoolPlatform/good-gateway/api/app/good/label"
 	"github.com/NpoolPlatform/good-gateway/api/app/good/like"
+	"github.com/NpoolPlatform/good-gateway/api/app/good/poster"
 	"github.com/NpoolPlatform/good-gateway/api/app/good/recommend"
 	"github.com/NpoolPlatform/good-gateway/api/app/good/score"
 	"github.com/NpoolPlatform/good-gateway/api/app/good/topmost"
+	topmostconstraint "github.com/NpoolPlatform/good-gateway/api/app/good/topmost/constraint"
 	topmostgood "github.com/NpoolPlatform/good-gateway/api/app/good/topmost/good"
+	topmostgoodconstraint "github.com/NpoolPlatform/good-gateway/api/app/good/topmost/good/constraint"
+	topmostgoodposter "github.com/NpoolPlatform/good-gateway/api/app/good/topmost/good/poster"
+	topmostposter "github.com/NpoolPlatform/good-gateway/api/app/good/topmost/poster"
 	apppowerrentalsimulate "github.com/NpoolPlatform/good-gateway/api/app/powerrental/simulate"
 	devicetype "github.com/NpoolPlatform/good-gateway/api/device"
 	"github.com/NpoolPlatform/good-gateway/api/good"
@@ -36,7 +45,12 @@ func Register(server grpc.ServiceRegistrar) {
 	location.Register(server)
 	good.Register(server)
 	comment.Register(server)
+	description.Register(server)
+	displayname.Register(server)
+	displaycolor.Register(server)
 	like.Register(server)
+	label.Register(server)
+	poster.Register(server)
 	recommend.Register(server)
 	required.Register(server)
 	history.Register(server)
@@ -45,7 +59,11 @@ func Register(server grpc.ServiceRegistrar) {
 	appfee.Register(server)
 	default1.Register(server)
 	topmost.Register(server)
+	topmostconstraint.Register(server)
+	topmostposter.Register(server)
 	topmostgood.Register(server)
+	topmostgoodconstraint.Register(server)
+	topmostgoodposter.Register(server)
 	apppowerrentalsimulate.Register(server)
 }
 
@@ -69,7 +87,22 @@ func RegisterGateway(mux *runtime.ServeMux, endpoint string, opts []grpc.DialOpt
 	if err := comment.RegisterGateway(mux, endpoint, opts); err != nil {
 		return err
 	}
+	if err := description.RegisterGateway(mux, endpoint, opts); err != nil {
+		return err
+	}
+	if err := displayname.RegisterGateway(mux, endpoint, opts); err != nil {
+		return err
+	}
+	if err := displaycolor.RegisterGateway(mux, endpoint, opts); err != nil {
+		return err
+	}
 	if err := like.RegisterGateway(mux, endpoint, opts); err != nil {
+		return err
+	}
+	if err := label.RegisterGateway(mux, endpoint, opts); err != nil {
+		return err
+	}
+	if err := poster.RegisterGateway(mux, endpoint, opts); err != nil {
 		return err
 	}
 	if err := recommend.RegisterGateway(mux, endpoint, opts); err != nil {
@@ -96,7 +129,19 @@ func RegisterGateway(mux *runtime.ServeMux, endpoint string, opts []grpc.DialOpt
 	if err := topmost.RegisterGateway(mux, endpoint, opts); err != nil {
 		return err
 	}
+	if err := topmostconstraint.RegisterGateway(mux, endpoint, opts); err != nil {
+		return err
+	}
+	if err := topmostposter.RegisterGateway(mux, endpoint, opts); err != nil {
+		return err
+	}
 	if err := topmostgood.RegisterGateway(mux, endpoint, opts); err != nil {
+		return err
+	}
+	if err := topmostgoodconstraint.RegisterGateway(mux, endpoint, opts); err != nil {
+		return err
+	}
+	if err := topmostgoodposter.RegisterGateway(mux, endpoint, opts); err != nil {
 		return err
 	}
 	if err := apppowerrentalsimulate.RegisterGateway(mux, endpoint, opts); err != nil {

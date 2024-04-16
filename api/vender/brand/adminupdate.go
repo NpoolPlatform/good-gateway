@@ -12,7 +12,7 @@ import (
 	npool "github.com/NpoolPlatform/message/npool/good/gw/v1/vender/brand"
 )
 
-func (s *Server) UpdateBrand(ctx context.Context, in *npool.UpdateBrandRequest) (*npool.UpdateBrandResponse, error) {
+func (s *Server) AdminUpdateBrand(ctx context.Context, in *npool.AdminUpdateBrandRequest) (*npool.AdminUpdateBrandResponse, error) {
 	handler, err := brand1.NewHandler(
 		ctx,
 		brand1.WithID(&in.ID, true),
@@ -22,24 +22,24 @@ func (s *Server) UpdateBrand(ctx context.Context, in *npool.UpdateBrandRequest) 
 	)
 	if err != nil {
 		logger.Sugar().Errorw(
-			"UpdateBrand",
+			"AdminUpdateBrand",
 			"In", in,
 			"Error", err,
 		)
-		return &npool.UpdateBrandResponse{}, status.Error(codes.Aborted, err.Error())
+		return &npool.AdminUpdateBrandResponse{}, status.Error(codes.Aborted, err.Error())
 	}
 
 	info, err := handler.UpdateBrand(ctx)
 	if err != nil {
 		logger.Sugar().Errorw(
-			"UpdateBrand",
+			"AdminUpdateBrand",
 			"In", in,
 			"Error", err,
 		)
-		return &npool.UpdateBrandResponse{}, status.Error(codes.Aborted, err.Error())
+		return &npool.AdminUpdateBrandResponse{}, status.Error(codes.Aborted, err.Error())
 	}
 
-	return &npool.UpdateBrandResponse{
+	return &npool.AdminUpdateBrandResponse{
 		Info: info,
 	}, nil
 }
