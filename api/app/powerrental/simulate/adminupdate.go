@@ -13,33 +13,35 @@ import (
 	npool "github.com/NpoolPlatform/message/npool/good/gw/v1/app/powerrental/simulate"
 )
 
-func (s *Server) DeleteSimulate(ctx context.Context, in *npool.DeleteSimulateRequest) (*npool.DeleteSimulateResponse, error) {
+func (s *Server) AdminUpdateSimulate(ctx context.Context, in *npool.AdminUpdateSimulateRequest) (*npool.AdminUpdateSimulateResponse, error) {
 	handler, err := simulate1.NewHandler(
 		ctx,
 		simulate1.WithID(&in.ID, true),
 		simulate1.WithEntID(&in.EntID, true),
-		simulate1.WithAppID(&in.AppID, true),
+		simulate1.WithAppID(&in.TargetAppID, true),
+		simulate1.WithOrderUnits(in.OrderUnits, false),
+		simulate1.WithOrderDuration(in.OrderDuration, false),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(
-			"DeleteSimulate",
+			"AdminUpdateSimulate",
 			"In", in,
 			"Error", err,
 		)
-		return &npool.DeleteSimulateResponse{}, status.Error(codes.Aborted, err.Error())
+		return &npool.AdminUpdateSimulateResponse{}, status.Error(codes.Aborted, err.Error())
 	}
 
-	info, err := handler.DeleteSimulate(ctx)
+	info, err := handler.UpdateSimulate(ctx)
 	if err != nil {
 		logger.Sugar().Errorw(
-			"DeleteSimulate",
+			"AdminUpdateSimulate",
 			"In", in,
 			"Error", err,
 		)
-		return &npool.DeleteSimulateResponse{}, status.Error(codes.Aborted, err.Error())
+		return &npool.AdminUpdateSimulateResponse{}, status.Error(codes.Aborted, err.Error())
 	}
 
-	return &npool.DeleteSimulateResponse{
+	return &npool.AdminUpdateSimulateResponse{
 		Info: info,
 	}, nil
 }

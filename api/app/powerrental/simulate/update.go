@@ -19,8 +19,8 @@ func (s *Server) UpdateSimulate(ctx context.Context, in *npool.UpdateSimulateReq
 		simulate1.WithID(&in.ID, true),
 		simulate1.WithEntID(&in.EntID, true),
 		simulate1.WithAppID(&in.AppID, true),
-		simulate1.WithFixedOrderUnits(in.FixedOrderUnits, false),
-		simulate1.WithFixedOrderDuration(in.FixedOrderDuration, false),
+		simulate1.WithOrderUnits(in.OrderUnits, false),
+		simulate1.WithOrderDuration(in.OrderDuration, false),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(
@@ -42,39 +42,6 @@ func (s *Server) UpdateSimulate(ctx context.Context, in *npool.UpdateSimulateReq
 	}
 
 	return &npool.UpdateSimulateResponse{
-		Info: info,
-	}, nil
-}
-
-func (s *Server) UpdateNSimulate(ctx context.Context, in *npool.UpdateNSimulateRequest) (*npool.UpdateNSimulateResponse, error) {
-	handler, err := simulate1.NewHandler(
-		ctx,
-		simulate1.WithID(&in.ID, true),
-		simulate1.WithEntID(&in.EntID, true),
-		simulate1.WithAppID(&in.TargetAppID, true),
-		simulate1.WithFixedOrderUnits(in.FixedOrderUnits, false),
-		simulate1.WithFixedOrderDuration(in.FixedOrderDuration, false),
-	)
-	if err != nil {
-		logger.Sugar().Errorw(
-			"UpdateNSimulate",
-			"In", in,
-			"Error", err,
-		)
-		return &npool.UpdateNSimulateResponse{}, status.Error(codes.Aborted, err.Error())
-	}
-
-	info, err := handler.UpdateSimulate(ctx)
-	if err != nil {
-		logger.Sugar().Errorw(
-			"UpdateNSimulate",
-			"In", in,
-			"Error", err,
-		)
-		return &npool.UpdateNSimulateResponse{}, status.Error(codes.Aborted, err.Error())
-	}
-
-	return &npool.UpdateNSimulateResponse{
 		Info: info,
 	}, nil
 }
