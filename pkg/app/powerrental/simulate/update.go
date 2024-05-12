@@ -23,10 +23,10 @@ func (h *Handler) UpdateSimulate(ctx context.Context) (*npool.Simulate, error) {
 	}
 
 	if err := simulatemwcli.UpdateSimulate(ctx, &simulatemwpb.SimulateReq{
-		ID:            h.ID,
-		EntID:         h.EntID,
-		OrderUnits:    h.OrderUnits,
-		OrderDuration: h.OrderDuration,
+		ID:                   h.ID,
+		EntID:                h.EntID,
+		OrderUnits:           h.OrderUnits,
+		OrderDurationSeconds: h.OrderDurationSeconds,
 	}); err != nil {
 		return nil, err
 	}

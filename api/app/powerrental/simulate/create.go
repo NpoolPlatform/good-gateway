@@ -18,7 +18,7 @@ func (s *Server) CreateSimulate(ctx context.Context, in *npool.CreateSimulateReq
 		simulate1.WithAppID(&in.AppID, true),
 		simulate1.WithAppGoodID(&in.AppGoodID, true),
 		simulate1.WithOrderUnits(&in.OrderUnits, true),
-		simulate1.WithOrderDuration(&in.OrderDuration, true),
+		simulate1.WithOrderDurationSeconds(&in.OrderDurationSeconds, true),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(

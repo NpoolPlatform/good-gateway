@@ -10,13 +10,13 @@ import (
 
 func (h *Handler) CreateAppFee(ctx context.Context) (*npool.AppFee, error) {
 	if err := appfeemwcli.CreateFee(ctx, &appfeemwpb.FeeReq{
-		AppID:            h.AppID,
-		GoodID:           h.GoodID,
-		ProductPage:      h.ProductPage,
-		Name:             h.Name,
-		Banner:           h.Banner,
-		UnitValue:        h.UnitValue,
-		MinOrderDuration: h.MinOrderDuration,
+		AppID:                   h.AppID,
+		GoodID:                  h.GoodID,
+		ProductPage:             h.ProductPage,
+		Name:                    h.Name,
+		Banner:                  h.Banner,
+		UnitValue:               h.UnitValue,
+		MinOrderDurationSeconds: h.MinOrderDurationSeconds,
 	}); err != nil {
 		return nil, err
 	}

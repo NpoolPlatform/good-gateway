@@ -36,20 +36,20 @@ func (h *queryHandler) formalize() {
 			continue
 		}
 		h.infos = append(h.infos, &npool.AppFee{
-			ID:               fee.ID,
-			EntID:            fee.EntID,
-			AppID:            fee.AppID,
-			AppName:          app.Name,
-			GoodID:           fee.GoodID,
-			GoodName:         fee.Name,
-			AppGoodID:        fee.AppGoodID,
-			AppGoodName:      fee.Name,
-			ProductPage:      fee.ProductPage,
-			Banner:           fee.Banner,
-			UnitValue:        fee.UnitValue,
-			MinOrderDuration: fee.MinOrderDuration,
-			CreatedAt:        fee.CreatedAt,
-			UpdatedAt:        fee.UpdatedAt,
+			ID:                      fee.ID,
+			EntID:                   fee.EntID,
+			AppID:                   fee.AppID,
+			AppName:                 app.Name,
+			GoodID:                  fee.GoodID,
+			GoodName:                fee.Name,
+			AppGoodID:               fee.AppGoodID,
+			AppGoodName:             fee.Name,
+			ProductPage:             fee.ProductPage,
+			Banner:                  fee.Banner,
+			UnitValue:               fee.UnitValue,
+			MinOrderDurationSeconds: fee.MinOrderDurationSeconds,
+			CreatedAt:               fee.CreatedAt,
+			UpdatedAt:               fee.UpdatedAt,
 		})
 	}
 }

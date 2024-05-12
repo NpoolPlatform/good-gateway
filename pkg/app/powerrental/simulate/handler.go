@@ -15,10 +15,10 @@ type Handler struct {
 	ID    *uint32
 	EntID *string
 	appgoodcommon.AppGoodCheckHandler
-	OrderUnits    *string
-	OrderDuration *uint32
-	Offset        int32
-	Limit         int32
+	OrderUnits           *string
+	OrderDurationSeconds *uint32
+	Offset               int32
+	Limit                int32
 }
 
 func NewHandler(ctx context.Context, options ...func(context.Context, *Handler) error) (*Handler, error) {
@@ -112,15 +112,18 @@ func WithOrderUnits(amount *string, must bool) func(context.Context, *Handler) e
 	}
 }
 
-func WithOrderDuration(duration *uint32, must bool) func(context.Context, *Handler) error {
+func WithOrderDurationSeconds(duration *uint32, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if duration == nil {
 			if must {
-				return fmt.Errorf("invalid duration")
+				return fmt.Errorf("invalid durationseconds")
 			}
 			return nil
 		}
-		h.OrderDuration = duration
+		if *duration == 0 {
+			return fmt.Errorf("invalid durationseconds")
+		}
+		h.OrderDurationSeconds = duration
 		return nil
 	}
 }

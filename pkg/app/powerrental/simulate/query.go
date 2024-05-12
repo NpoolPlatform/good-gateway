@@ -33,18 +33,18 @@ func (h *queryHandler) getApps(ctx context.Context) (err error) {
 func (h *queryHandler) formalize() {
 	for _, simulate := range h.simulates {
 		info := &npool.Simulate{
-			ID:            simulate.ID,
-			EntID:         simulate.EntID,
-			AppID:         simulate.AppID,
-			GoodID:        simulate.GoodID,
-			GoodName:      simulate.GoodName,
-			AppGoodID:     simulate.AppGoodID,
-			AppGoodName:   simulate.AppGoodName,
-			OrderUnits:    simulate.OrderUnits,
-			OrderDuration: simulate.OrderDuration,
-			GoodCoins:     simulate.GoodCoins,
-			CreatedAt:     simulate.CreatedAt,
-			UpdatedAt:     simulate.UpdatedAt,
+			ID:                   simulate.ID,
+			EntID:                simulate.EntID,
+			AppID:                simulate.AppID,
+			GoodID:               simulate.GoodID,
+			GoodName:             simulate.GoodName,
+			AppGoodID:            simulate.AppGoodID,
+			AppGoodName:          simulate.AppGoodName,
+			OrderUnits:           simulate.OrderUnits,
+			OrderDurationSeconds: simulate.OrderDurationSeconds,
+			GoodCoins:            simulate.GoodCoins,
+			CreatedAt:            simulate.CreatedAt,
+			UpdatedAt:            simulate.UpdatedAt,
 		}
 
 		app, ok := h.apps[simulate.AppID]

@@ -27,14 +27,14 @@ func (h *Handler) UpdateAppFee(ctx context.Context) (*npool.AppFee, error) {
 	}
 
 	if err := appfeemwcli.UpdateFee(ctx, &appfeemwpb.FeeReq{
-		ID:               h.ID,
-		EntID:            h.EntID,
-		AppGoodID:        h.AppGoodID,
-		ProductPage:      h.ProductPage,
-		Name:             h.Name,
-		Banner:           h.Banner,
-		UnitValue:        h.UnitValue,
-		MinOrderDuration: h.MinOrderDuration,
+		ID:                      h.ID,
+		EntID:                   h.EntID,
+		AppGoodID:               h.AppGoodID,
+		ProductPage:             h.ProductPage,
+		Name:                    h.Name,
+		Banner:                  h.Banner,
+		UnitValue:               h.UnitValue,
+		MinOrderDurationSeconds: h.MinOrderDurationSeconds,
 	}); err != nil {
 		return nil, err
 	}

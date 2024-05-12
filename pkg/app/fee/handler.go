@@ -16,13 +16,13 @@ type Handler struct {
 	ID    *uint32
 	EntID *string
 	appgoodcommon.AppGoodCheckHandler
-	ProductPage      *string
-	Name             *string
-	Banner           *string
-	UnitValue        *string
-	MinOrderDuration *uint32
-	Offset           int32
-	Limit            int32
+	ProductPage             *string
+	Name                    *string
+	Banner                  *string
+	UnitValue               *string
+	MinOrderDurationSeconds *uint32
+	Offset                  int32
+	Limit                   int32
 }
 
 func NewHandler(ctx context.Context, options ...func(context.Context, *Handler) error) (*Handler, error) {
@@ -166,18 +166,18 @@ func WithUnitValue(s *string, must bool) func(context.Context, *Handler) error {
 	}
 }
 
-func WithMinOrderDuration(u *uint32, must bool) func(context.Context, *Handler) error {
+func WithMinOrderDurationSeconds(u *uint32, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if u == nil {
 			if must {
-				return fmt.Errorf("invalid minorderduration")
+				return fmt.Errorf("invalid minorderdurationseconds")
 			}
 			return nil
 		}
 		if *u == 0 {
-			return fmt.Errorf("invalid minorderduration")
+			return fmt.Errorf("invalid minorderdurationseconds")
 		}
-		h.MinOrderDuration = u
+		h.MinOrderDurationSeconds = u
 		return nil
 	}
 }
