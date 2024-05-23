@@ -19,7 +19,7 @@ func (s *Server) AdminCreateFee(ctx context.Context, in *npool.AdminCreateFeeReq
 		fee1.WithName(&in.Name, true),
 		fee1.WithSettlementType(&in.SettlementType, true),
 		fee1.WithUnitValue(&in.UnitValue, true),
-		fee1.WithDurationType(&in.DurationType, true),
+		fee1.WithDurationDisplayType(&in.DurationDisplayType, true),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(

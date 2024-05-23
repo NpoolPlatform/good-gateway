@@ -22,7 +22,7 @@ func (s *Server) AdminUpdateFee(ctx context.Context, in *npool.AdminUpdateFeeReq
 		fee1.WithName(in.Name, false),
 		fee1.WithSettlementType(in.SettlementType, false),
 		fee1.WithUnitValue(in.UnitValue, false),
-		fee1.WithDurationType(in.DurationType, false),
+		fee1.WithDurationDisplayType(in.DurationDisplayType, false),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(

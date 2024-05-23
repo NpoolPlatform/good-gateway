@@ -16,13 +16,13 @@ type Handler struct {
 	ID    *uint32
 	EntID *string
 	goodcommon.GoodCheckHandler
-	GoodType       *types.GoodType
-	Name           *string
-	SettlementType *types.GoodSettlementType
-	UnitValue      *string
-	DurationType   *types.GoodDurationType
-	Offset         int32
-	Limit          int32
+	GoodType            *types.GoodType
+	Name                *string
+	SettlementType      *types.GoodSettlementType
+	UnitValue           *string
+	DurationDisplayType *types.GoodDurationType
+	Offset              int32
+	Limit               int32
 }
 
 func NewHandler(ctx context.Context, options ...func(context.Context, *Handler) error) (*Handler, error) {
@@ -120,7 +120,7 @@ func WithUnitValue(s *string, must bool) func(context.Context, *Handler) error {
 	}
 }
 
-func WithDurationType(e *types.GoodDurationType, must bool) func(context.Context, *Handler) error {
+func WithDurationDisplayType(e *types.GoodDurationType, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if e == nil {
 			if must {
@@ -136,7 +136,7 @@ func WithDurationType(e *types.GoodDurationType, must bool) func(context.Context
 		default:
 			return fmt.Errorf("invalid durationtype")
 		}
-		h.DurationType = e
+		h.DurationDisplayType = e
 		return nil
 	}
 }

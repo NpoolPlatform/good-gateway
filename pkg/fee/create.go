@@ -17,13 +17,13 @@ func (h *Handler) CreateFee(ctx context.Context) (*feemwpb.Fee, error) {
 		h.GoodID = func() *string { s := uuid.NewString(); return &s }()
 	}
 	if err := feemwcli.CreateFee(ctx, &feemwpb.FeeReq{
-		EntID:          h.EntID,
-		GoodID:         h.GoodID,
-		GoodType:       h.GoodType,
-		Name:           h.Name,
-		SettlementType: h.SettlementType,
-		UnitValue:      h.UnitValue,
-		DurationType:   h.DurationType,
+		EntID:               h.EntID,
+		GoodID:              h.GoodID,
+		GoodType:            h.GoodType,
+		Name:                h.Name,
+		SettlementType:      h.SettlementType,
+		UnitValue:           h.UnitValue,
+		DurationDisplayType: h.DurationDisplayType,
 	}); err != nil {
 		return nil, err
 	}
