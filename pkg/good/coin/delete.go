@@ -4,14 +4,14 @@ import (
 	"context"
 
 	goodcoinmwcli "github.com/NpoolPlatform/good-middleware/pkg/client/good/coin"
-	goodcoinmwpb "github.com/NpoolPlatform/message/npool/good/mw/v1/good/coin"
+	npool "github.com/NpoolPlatform/message/npool/good/gw/v1/good/coin"
 )
 
 type deleteHandler struct {
 	*checkHandler
 }
 
-func (h *Handler) DeleteGoodCoin(ctx context.Context) (*goodcoinmwpb.GoodCoin, error) {
+func (h *Handler) DeleteGoodCoin(ctx context.Context) (*npool.GoodCoin, error) {
 	handler := &deleteHandler{
 		checkHandler: &checkHandler{
 			Handler: h,

@@ -29,6 +29,7 @@ import (
 	"github.com/NpoolPlatform/good-gateway/api/good"
 	"github.com/NpoolPlatform/good-gateway/api/good/required"
 	"github.com/NpoolPlatform/good-gateway/api/good/reward/history"
+	powerrental "github.com/NpoolPlatform/good-gateway/api/powerrental"
 	"github.com/NpoolPlatform/good-gateway/api/vender/brand"
 	"github.com/NpoolPlatform/good-gateway/api/vender/location"
 
@@ -62,6 +63,7 @@ func Register(server grpc.ServiceRegistrar) {
 	appgood.Register(server)
 	appfee.Register(server)
 	fee.Register(server)
+	powerrental.Register(server)
 	default1.Register(server)
 	topmost.Register(server)
 	topmostconstraint.Register(server)
@@ -130,6 +132,9 @@ func RegisterGateway(mux *runtime.ServeMux, endpoint string, opts []grpc.DialOpt
 		return err
 	}
 	if err := fee.RegisterGateway(mux, endpoint, opts); err != nil {
+		return err
+	}
+	if err := powerrental.RegisterGateway(mux, endpoint, opts); err != nil {
 		return err
 	}
 	if err := appfee.RegisterGateway(mux, endpoint, opts); err != nil {

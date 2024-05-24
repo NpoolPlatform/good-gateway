@@ -3,13 +3,15 @@ package goodcoin
 import (
 	"context"
 
+	wlog "github.com/NpoolPlatform/go-service-framework/pkg/wlog"
 	goodcoinmwcli "github.com/NpoolPlatform/good-middleware/pkg/client/good/coin"
+	npool "github.com/NpoolPlatform/message/npool/good/gw/v1/good/coin"
 	goodcoinmwpb "github.com/NpoolPlatform/message/npool/good/mw/v1/good/coin"
 
 	"github.com/google/uuid"
 )
 
-func (h *Handler) CreateGoodCoin(ctx context.Context) (*goodcoinmwpb.GoodCoin, error) {
+func (h *Handler) CreateGoodCoin(ctx context.Context) (*npool.GoodCoin, error) {
 	if h.EntID == nil {
 		h.EntID = func() *string { s := uuid.NewString(); return &s }()
 	}
@@ -20,7 +22,7 @@ func (h *Handler) CreateGoodCoin(ctx context.Context) (*goodcoinmwpb.GoodCoin, e
 		Main:       h.Main,
 		Index:      h.Index,
 	}); err != nil {
-		return nil, err
+		return nil, wlog.WrapError(err)
 	}
 	return h.GetGoodCoin(ctx)
 }

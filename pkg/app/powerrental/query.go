@@ -10,7 +10,9 @@ import (
 	appmwpb "github.com/NpoolPlatform/message/npool/appuser/mw/v1/app"
 	types "github.com/NpoolPlatform/message/npool/basetypes/good/v1"
 	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
+	coinmwpb "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin"
 	npool "github.com/NpoolPlatform/message/npool/good/gw/v1/app/powerrental"
+	goodcoingwpb "github.com/NpoolPlatform/message/npool/good/gw/v1/good/coin"
 	apppowerrentalmwpb "github.com/NpoolPlatform/message/npool/good/mw/v1/app/powerrental"
 )
 
@@ -19,12 +21,25 @@ type queryHandler struct {
 	appPowerRentals []*apppowerrentalmwpb.PowerRental
 	infos           []*npool.AppPowerRental
 	apps            map[string]*appmwpb.App
+	coins           map[string]*coinmwpb.Coin
 }
 
 func (h *queryHandler) getApps(ctx context.Context) (err error) {
 	h.apps, err = goodgwcommon.GetApps(ctx, func() (appIDs []string) {
 		for _, appPowerRental := range h.appPowerRentals {
 			appIDs = append(appIDs, appPowerRental.AppID)
+		}
+		return
+	}())
+	return err
+}
+
+func (h *queryHandler) getCoins(ctx context.Context) (err error) {
+	h.coins, err = goodgwcommon.GetCoins(ctx, func() (coinTypeIDs []string) {
+		for _, appPowerRental := range h.appPowerRentals {
+			for _, goodCoin := range appPowerRental.GoodCoins {
+				coinTypeIDs = append(coinTypeIDs, goodCoin.CoinTypeID)
+			}
 		}
 		return
 	}())
@@ -118,8 +133,24 @@ func (h *queryHandler) formalize() {
 			TotalRewardAmount:    appPowerRental.TotalRewardAmount,
 			LastUnitRewardAmount: appPowerRental.LastUnitRewardAmount,
 
-			// TODO: expand coin information
-			GoodCoins:     appPowerRental.GoodCoins,
+			GoodCoins: func() (coins []*goodcoingwpb.GoodCoinInfo) {
+				for _, goodCoin := range appPowerRental.GoodCoins {
+					coin, ok := h.coins[goodCoin.CoinTypeID]
+					if !ok {
+						continue
+					}
+					coins = append(coins, &goodcoingwpb.GoodCoinInfo{
+						CoinTypeID: goodCoin.CoinTypeID,
+						CoinName:   coin.Name,
+						CoinUnit:   coin.Unit,
+						CoinENV:    coin.ENV,
+						CoinLogo:   coin.Logo,
+						Main:       goodCoin.Main,
+						Index:      goodCoin.Index,
+					})
+				}
+				return
+			}(),
 			Descriptions:  appPowerRental.Descriptions,
 			Posters:       appPowerRental.Posters,
 			DisplayNames:  appPowerRental.DisplayNames,
@@ -160,6 +191,9 @@ func (h *Handler) GetPowerRental(ctx context.Context) (*npool.AppPowerRental, er
 	if err := handler.getApps(ctx); err != nil {
 		return nil, err
 	}
+	if err := handler.getCoins(ctx); err != nil {
+		return nil, err
+	}
 
 	handler.formalize()
 	if len(handler.infos) == 0 {
@@ -187,6 +221,9 @@ func (h *Handler) GetPowerRentals(ctx context.Context) ([]*npool.AppPowerRental,
 	}
 
 	if err := handler.getApps(ctx); err != nil {
+		return nil, 0, err
+	}
+	if err := handler.getCoins(ctx); err != nil {
 		return nil, 0, err
 	}
 
