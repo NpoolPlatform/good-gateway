@@ -13,6 +13,7 @@ import (
 	coinmwpb "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin"
 	npool "github.com/NpoolPlatform/message/npool/good/gw/v1/app/powerrental"
 	goodcoingwpb "github.com/NpoolPlatform/message/npool/good/gw/v1/good/coin"
+	goodcoinrewardgwpb "github.com/NpoolPlatform/message/npool/good/gw/v1/good/coin/reward"
 	apppowerrentalmwpb "github.com/NpoolPlatform/message/npool/good/mw/v1/app/powerrental"
 )
 
@@ -128,10 +129,29 @@ func (h *queryHandler) formalize() {
 			RecommendCount: appPowerRental.RecommendCount,
 			CommentCount:   appPowerRental.CommentCount,
 
-			LastRewardAt:         appPowerRental.LastRewardAt,
-			LastRewardAmount:     appPowerRental.LastRewardAmount,
-			TotalRewardAmount:    appPowerRental.TotalRewardAmount,
-			LastUnitRewardAmount: appPowerRental.LastUnitRewardAmount,
+			LastRewardAt: appPowerRental.LastRewardAt,
+			Rewards: func() (rewards []*goodcoinrewardgwpb.RewardInfo) {
+				for _, reward := range appPowerRental.Rewards {
+					coin, ok := h.coins[reward.CoinTypeID]
+					if !ok {
+						continue
+					}
+					rewards = append(rewards, &goodcoinrewardgwpb.RewardInfo{
+						CoinTypeID:            reward.CoinTypeID,
+						CoinName:              coin.Name,
+						CoinUnit:              coin.Unit,
+						CoinENV:               coin.ENV,
+						CoinLogo:              coin.Logo,
+						RewardTID:             reward.RewardTID,
+						NextRewardStartAmount: reward.NextRewardStartAmount,
+						LastRewardAmount:      reward.LastRewardAmount,
+						LastUnitRewardAmount:  reward.LastUnitRewardAmount,
+						TotalRewardAmount:     reward.TotalRewardAmount,
+						MainCoin:              reward.MainCoin,
+					})
+				}
+				return
+			}(),
 
 			GoodCoins: func() (coins []*goodcoingwpb.GoodCoinInfo) {
 				for _, goodCoin := range appPowerRental.GoodCoins {

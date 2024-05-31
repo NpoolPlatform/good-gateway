@@ -8,6 +8,7 @@ import (
 	powerrentalmwcli "github.com/NpoolPlatform/good-middleware/pkg/client/powerrental"
 	coinmwpb "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin"
 	goodcoingwpb "github.com/NpoolPlatform/message/npool/good/gw/v1/good/coin"
+	goodcoinrewardgwpb "github.com/NpoolPlatform/message/npool/good/gw/v1/good/coin/reward"
 	npool "github.com/NpoolPlatform/message/npool/good/gw/v1/powerrental"
 	powerrentalmwpb "github.com/NpoolPlatform/message/npool/good/mw/v1/powerrental"
 )
@@ -78,13 +79,30 @@ func (h *queryHandler) formalize() {
 			Sold:         powerRental.GoodSold,
 			AppReserved:  powerRental.GoodAppReserved,
 
-			RewardState:           powerRental.RewardState,
-			LastRewardAt:          powerRental.LastRewardAt,
-			RewardTID:             powerRental.RewardTID,
-			NextRewardStartAmount: powerRental.NextRewardStartAmount,
-			LastRewardAmount:      powerRental.LastRewardAmount,
-			LastUnitRewardAmount:  powerRental.LastUnitRewardAmount,
-			TotalRewardAmount:     powerRental.TotalRewardAmount,
+			RewardState:  powerRental.RewardState,
+			LastRewardAt: powerRental.LastRewardAt,
+			Rewards: func() (rewards []*goodcoinrewardgwpb.RewardInfo) {
+				for _, reward := range powerRental.Rewards {
+					coin, ok := h.coins[reward.CoinTypeID]
+					if !ok {
+						continue
+					}
+					rewards = append(rewards, &goodcoinrewardgwpb.RewardInfo{
+						CoinTypeID:            reward.CoinTypeID,
+						CoinName:              coin.Name,
+						CoinUnit:              coin.Unit,
+						CoinENV:               coin.ENV,
+						CoinLogo:              coin.Logo,
+						RewardTID:             reward.RewardTID,
+						NextRewardStartAmount: reward.NextRewardStartAmount,
+						LastRewardAmount:      reward.LastRewardAmount,
+						LastUnitRewardAmount:  reward.LastUnitRewardAmount,
+						TotalRewardAmount:     reward.TotalRewardAmount,
+						MainCoin:              reward.MainCoin,
+					})
+				}
+				return
+			}(),
 
 			GoodCoins: func() (coins []*goodcoingwpb.GoodCoinInfo) {
 				for _, goodCoin := range powerRental.GoodCoins {

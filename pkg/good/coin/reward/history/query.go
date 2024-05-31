@@ -3,10 +3,10 @@ package history
 import (
 	"context"
 
-	historymwcli "github.com/NpoolPlatform/good-middleware/pkg/client/good/reward/history"
+	historymwcli "github.com/NpoolPlatform/good-middleware/pkg/client/good/coin/reward/history"
 	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
-	historymwpb "github.com/NpoolPlatform/message/npool/good/mw/v1/good/reward/history"
+	historymwpb "github.com/NpoolPlatform/message/npool/good/mw/v1/good/coin/reward/history"
 )
 
 func (h *Handler) GetHistories(ctx context.Context) ([]*historymwpb.History, uint32, error) {

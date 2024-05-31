@@ -3,13 +3,13 @@ package history
 import (
 	"context"
 
-	history1 "github.com/NpoolPlatform/good-gateway/pkg/good/reward/history"
+	history1 "github.com/NpoolPlatform/good-gateway/pkg/good/coin/reward/history"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
-	npool "github.com/NpoolPlatform/message/npool/good/gw/v1/good/reward/history"
+	npool "github.com/NpoolPlatform/message/npool/good/gw/v1/good/coin/reward/history"
 )
 
 func (s *Server) GetHistories(ctx context.Context, in *npool.GetHistoriesRequest) (*npool.GetHistoriesResponse, error) {
