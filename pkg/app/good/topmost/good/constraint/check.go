@@ -4,10 +4,10 @@ import (
 	"context"
 	"fmt"
 
-	topmostconstraintmwcli "github.com/NpoolPlatform/good-middleware/pkg/client/app/good/topmost/constraint"
+	topmostgoodconstraintmwcli "github.com/NpoolPlatform/good-middleware/pkg/client/app/good/topmost/good/constraint"
 	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
-	topmostconstraintmwpb "github.com/NpoolPlatform/message/npool/good/mw/v1/app/good/topmost/constraint"
+	topmostgoodconstraintmwpb "github.com/NpoolPlatform/message/npool/good/mw/v1/app/good/topmost/good/constraint"
 )
 
 type checkHandler struct {
@@ -15,7 +15,7 @@ type checkHandler struct {
 }
 
 func (h *checkHandler) checkConstraint(ctx context.Context) error {
-	exist, err := topmostconstraintmwcli.ExistTopMostConstraintConds(ctx, &topmostconstraintmwpb.Conds{
+	exist, err := topmostgoodconstraintmwcli.ExistTopMostGoodConstraintConds(ctx, &topmostgoodconstraintmwpb.Conds{
 		ID:    &basetypes.Uint32Val{Op: cruder.EQ, Value: *h.ID},
 		EntID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.EntID},
 		AppID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID},
@@ -24,7 +24,7 @@ func (h *checkHandler) checkConstraint(ctx context.Context) error {
 		return err
 	}
 	if !exist {
-		return fmt.Errorf("invalid topmostconstraint")
+		return fmt.Errorf("invalid topmostgoodconstraint")
 	}
 	return nil
 }
