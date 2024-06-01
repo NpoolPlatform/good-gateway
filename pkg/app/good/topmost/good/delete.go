@@ -3,6 +3,7 @@ package topmostgood
 import (
 	"context"
 
+	wlog "github.com/NpoolPlatform/go-service-framework/pkg/wlog"
 	topmostgoodmwcli "github.com/NpoolPlatform/good-middleware/pkg/client/app/good/topmost/good"
 	npool "github.com/NpoolPlatform/message/npool/good/gw/v1/app/good/topmost/good"
 )
@@ -18,10 +19,17 @@ func (h *Handler) DeleteTopMostGood(ctx context.Context) (*npool.TopMostGood, er
 		},
 	}
 	if err := handler.checkTopMostGood(ctx); err != nil {
-		return nil, err
+		return nil, wlog.WrapError(err)
+	}
+	info, err := h.GetTopMostGood(ctx)
+	if err != nil {
+		return nil, wlog.WrapError(err)
+	}
+	if info == nil {
+		return nil, wlog.Errorf("invalid topmostgood")
 	}
 	if err := topmostgoodmwcli.DeleteTopMostGood(ctx, h.ID, h.EntID); err != nil {
-		return nil, err
+		return nil, wlog.WrapError(err)
 	}
-	return h.GetTopMostGood(ctx)
+	return info, nil
 }
