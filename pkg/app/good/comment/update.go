@@ -18,7 +18,12 @@ func (h *Handler) UpdateComment(ctx context.Context) (*npool.Comment, error) {
 			Handler: h,
 		},
 	}
-	if err := handler.CheckUser(ctx); err != nil {
+	if h.UserID != nil {
+		if err := handler.CheckUserWithUserID(ctx, *h.UserID); err != nil {
+			return nil, err
+		}
+	}
+	if err := handler.CheckUserWithUserID(ctx, *h.CommentUserID); err != nil {
 		return nil, err
 	}
 	if err := handler.checkUserComment(ctx); err != nil {

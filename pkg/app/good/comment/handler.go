@@ -18,16 +18,16 @@ type Handler struct {
 	ID    *uint32
 	EntID *string
 	appgoodcommon.AppGoodCheckHandler
-	OrderID      *string
-	Content      *string
-	ReplyToID    *string
-	Anonymous    *bool
-	Score        *string
-	Hide         *bool
-	HideReason   *types.GoodCommentHideReason
-	TargetUserID *string
-	Offset       int32
-	Limit        int32
+	OrderID       *string
+	Content       *string
+	ReplyToID     *string
+	Anonymous     *bool
+	Score         *string
+	Hide          *bool
+	HideReason    *types.GoodCommentHideReason
+	CommentUserID *string
+	Offset        int32
+	Limit         int32
 }
 
 func NewHandler(ctx context.Context, options ...func(context.Context, *Handler) error) (*Handler, error) {
@@ -228,7 +228,7 @@ func WithHideReason(e *types.GoodCommentHideReason, must bool) func(context.Cont
 	}
 }
 
-func WithTargetUserID(id *string, must bool) func(context.Context, *Handler) error {
+func WithCommentUserID(id *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if id == nil {
 			if must {
@@ -239,7 +239,7 @@ func WithTargetUserID(id *string, must bool) func(context.Context, *Handler) err
 		if _, err := uuid.Parse(*id); err != nil {
 			return err
 		}
-		h.TargetUserID = id
+		h.CommentUserID = id
 		return nil
 	}
 }

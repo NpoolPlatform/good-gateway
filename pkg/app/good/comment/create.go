@@ -22,7 +22,7 @@ func (h *Handler) CreateComment(ctx context.Context) (*npool.Comment, error) {
 			Handler: h,
 		},
 	}
-	if err := handler.CheckUser(ctx); err != nil {
+	if err := handler.CheckUserWithUserID(ctx, *h.CommentUserID); err != nil {
 		return nil, err
 	}
 	if err := handler.CheckAppGood(ctx); err != nil {
@@ -40,7 +40,7 @@ func (h *Handler) CreateComment(ctx context.Context) (*npool.Comment, error) {
 
 	if err := commentmwcli.CreateComment(ctx, &commentmwpb.CommentReq{
 		EntID:         h.EntID,
-		UserID:        h.UserID,
+		UserID:        h.CommentUserID,
 		AppGoodID:     h.AppGoodID,
 		OrderID:       h.OrderID,
 		Content:       h.Content,

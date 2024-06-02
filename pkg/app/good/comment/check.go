@@ -20,7 +20,7 @@ func (h *checkHandler) checkOrder(ctx context.Context) error {
 	conds := &ordermwpb.Conds{
 		AppID:     &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID},
 		AppGoodID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppGoodID},
-		UserID:    &basetypes.StringVal{Op: cruder.EQ, Value: *h.UserID},
+		UserID:    &basetypes.StringVal{Op: cruder.EQ, Value: *h.CommentUserID},
 	}
 	if h.OrderID != nil {
 		conds.EntID = &basetypes.StringVal{Op: cruder.EQ, Value: *h.OrderID}
@@ -37,14 +37,10 @@ func (h *checkHandler) checkOrder(ctx context.Context) error {
 
 func (h *checkHandler) checkUserComment(ctx context.Context) error {
 	conds := &commentmwpb.Conds{
-		ID:    &basetypes.Uint32Val{Op: cruder.EQ, Value: *h.ID},
-		EntID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.EntID},
-		AppID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID},
-	}
-	if h.TargetUserID != nil {
-		conds.UserID = &basetypes.StringVal{Op: cruder.EQ, Value: *h.TargetUserID}
-	} else {
-		conds.UserID = &basetypes.StringVal{Op: cruder.EQ, Value: *h.UserID}
+		ID:     &basetypes.Uint32Val{Op: cruder.EQ, Value: *h.ID},
+		EntID:  &basetypes.StringVal{Op: cruder.EQ, Value: *h.EntID},
+		AppID:  &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID},
+		UserID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.CommentUserID},
 	}
 	exist, err := commentmwcli.ExistCommentConds(ctx, conds)
 	if err != nil {

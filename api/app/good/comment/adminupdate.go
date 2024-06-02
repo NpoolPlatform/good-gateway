@@ -19,7 +19,7 @@ func (s *Server) AdminUpdateComment(ctx context.Context, in *npool.AdminUpdateCo
 		comment1.WithID(&in.ID, true),
 		comment1.WithEntID(&in.EntID, true),
 		comment1.WithAppID(&in.TargetAppID, true),
-		comment1.WithTargetUserID(&in.TargetUserID, true),
+		comment1.WithCommentUserID(&in.TargetUserID, true),
 		comment1.WithHide(in.Hide, false),
 		comment1.WithHideReason(in.HideReason, false),
 	)

@@ -19,7 +19,7 @@ func (s *Server) UpdateComment(ctx context.Context, in *npool.UpdateCommentReque
 		comment1.WithID(&in.ID, true),
 		comment1.WithEntID(&in.EntID, true),
 		comment1.WithAppID(&in.AppID, true),
-		comment1.WithUserID(&in.UserID, true),
+		comment1.WithCommentUserID(&in.UserID, true),
 		comment1.WithContent(in.Content, false),
 		comment1.WithAnonymous(in.Anonymous, false),
 	)
@@ -54,7 +54,7 @@ func (s *Server) UpdateUserComment(ctx context.Context, in *npool.UpdateUserComm
 		comment1.WithID(&in.ID, true),
 		comment1.WithEntID(&in.EntID, true),
 		comment1.WithAppID(&in.AppID, true),
-		comment1.WithTargetUserID(&in.TargetUserID, true),
+		comment1.WithCommentUserID(&in.TargetUserID, true),
 		comment1.WithHide(in.Hide, false),
 		comment1.WithHideReason(in.HideReason, false),
 	)

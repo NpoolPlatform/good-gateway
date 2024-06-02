@@ -19,7 +19,7 @@ func (s *Server) DeleteComment(ctx context.Context, in *npool.DeleteCommentReque
 		comment1.WithID(&in.ID, true),
 		comment1.WithEntID(&in.EntID, true),
 		comment1.WithAppID(&in.AppID, true),
-		comment1.WithTargetUserID(&in.UserID, true),
+		comment1.WithCommentUserID(&in.UserID, true),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(
@@ -51,7 +51,7 @@ func (s *Server) DeleteUserComment(ctx context.Context, in *npool.DeleteUserComm
 		comment1.WithID(&in.ID, true),
 		comment1.WithEntID(&in.EntID, true),
 		comment1.WithAppID(&in.AppID, true),
-		comment1.WithTargetUserID(&in.TargetUserID, true),
+		comment1.WithCommentUserID(&in.TargetUserID, true),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(

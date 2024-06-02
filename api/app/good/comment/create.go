@@ -16,7 +16,7 @@ func (s *Server) CreateComment(ctx context.Context, in *npool.CreateCommentReque
 	handler, err := comment1.NewHandler(
 		ctx,
 		comment1.WithAppID(&in.AppID, true),
-		comment1.WithUserID(&in.UserID, true),
+		comment1.WithCommentUserID(&in.UserID, true),
 		comment1.WithAppGoodID(&in.AppGoodID, true),
 		comment1.WithOrderID(in.OrderID, false),
 		comment1.WithContent(&in.Content, true),

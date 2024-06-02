@@ -19,7 +19,7 @@ func (s *Server) AdminDeleteComment(ctx context.Context, in *npool.AdminDeleteCo
 		comment1.WithID(&in.ID, true),
 		comment1.WithEntID(&in.EntID, true),
 		comment1.WithAppID(&in.TargetAppID, true),
-		comment1.WithTargetUserID(&in.TargetUserID, true),
+		comment1.WithCommentUserID(&in.TargetUserID, true),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(
