@@ -6,9 +6,14 @@ import (
 	appfeemwcli "github.com/NpoolPlatform/good-middleware/pkg/client/app/fee"
 	npool "github.com/NpoolPlatform/message/npool/good/gw/v1/app/fee"
 	appfeemwpb "github.com/NpoolPlatform/message/npool/good/mw/v1/app/fee"
+
+	"github.com/google/uuid"
 )
 
 func (h *Handler) CreateAppFee(ctx context.Context) (*npool.AppFee, error) {
+	if h.AppGoodID == nil {
+		h.AppGoodID = func() *string { s := uuid.NewString(); return &s }()
+	}
 	if err := appfeemwcli.CreateFee(ctx, &appfeemwpb.FeeReq{
 		AppID:                   h.AppID,
 		GoodID:                  h.GoodID,
