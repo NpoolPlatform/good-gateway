@@ -12,6 +12,35 @@ import (
 	npool "github.com/NpoolPlatform/message/npool/good/gw/v1/fee"
 )
 
+func (s *Server) GetFee(ctx context.Context, in *npool.GetFeeRequest) (*npool.GetFeeResponse, error) {
+	handler, err := fee1.NewHandler(
+		ctx,
+		fee1.WithGoodID(&in.GoodID, true),
+	)
+	if err != nil {
+		logger.Sugar().Errorw(
+			"GetFee",
+			"In", in,
+			"Error", err,
+		)
+		return &npool.GetFeeResponse{}, status.Error(codes.Aborted, err.Error())
+	}
+
+	info, err := handler.GetFee(ctx)
+	if err != nil {
+		logger.Sugar().Errorw(
+			"GetFee",
+			"In", in,
+			"Error", err,
+		)
+		return &npool.GetFeeResponse{}, status.Error(codes.Aborted, err.Error())
+	}
+
+	return &npool.GetFeeResponse{
+		Info: info,
+	}, nil
+}
+
 func (s *Server) GetFees(ctx context.Context, in *npool.GetFeesRequest) (*npool.GetFeesResponse, error) {
 	handler, err := fee1.NewHandler(
 		ctx,
