@@ -17,6 +17,7 @@ func (s *Server) AdminDeleteFee(ctx context.Context, in *npool.AdminDeleteFeeReq
 		ctx,
 		fee1.WithID(&in.ID, true),
 		fee1.WithEntID(&in.EntID, true),
+		fee1.WithGoodID(&in.GoodID, true),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(
