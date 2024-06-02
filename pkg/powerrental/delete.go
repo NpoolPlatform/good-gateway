@@ -9,6 +9,12 @@ import (
 )
 
 func (h *Handler) DeletePowerRental(ctx context.Context) (*npool.PowerRental, error) {
+	handler := &checkHandler{
+		Handler: h,
+	}
+	if err := handler.checkPowerRental(ctx); err != nil {
+		return nil, wlog.WrapError(err)
+	}
 	info, err := h.GetPowerRental(ctx)
 	if err != nil {
 		return nil, wlog.WrapError(err)
