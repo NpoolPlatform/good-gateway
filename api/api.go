@@ -27,6 +27,7 @@ import (
 	devicetype "github.com/NpoolPlatform/good-gateway/api/device"
 	fee "github.com/NpoolPlatform/good-gateway/api/fee"
 	"github.com/NpoolPlatform/good-gateway/api/good"
+	goodcoin "github.com/NpoolPlatform/good-gateway/api/good/coin"
 	"github.com/NpoolPlatform/good-gateway/api/good/coin/reward/history"
 	"github.com/NpoolPlatform/good-gateway/api/good/required"
 	powerrental "github.com/NpoolPlatform/good-gateway/api/powerrental"
@@ -73,6 +74,7 @@ func Register(server grpc.ServiceRegistrar) {
 	topmostgoodposter.Register(server)
 	apppowerrentalsimulate.Register(server)
 	apppowerrental.Register(server)
+	goodcoin.Register(server)
 }
 
 //nolint:gocyclo,funlen
@@ -165,6 +167,9 @@ func RegisterGateway(mux *runtime.ServeMux, endpoint string, opts []grpc.DialOpt
 		return err
 	}
 	if err := apppowerrental.RegisterGateway(mux, endpoint, opts); err != nil {
+		return err
+	}
+	if err := goodcoin.RegisterGateway(mux, endpoint, opts); err != nil {
 		return err
 	}
 	return nil
