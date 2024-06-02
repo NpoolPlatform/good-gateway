@@ -3,6 +3,7 @@ package displayname
 import (
 	"context"
 
+	wlog "github.com/NpoolPlatform/go-service-framework/pkg/wlog"
 	appgooddisplaynamemwcli "github.com/NpoolPlatform/good-middleware/pkg/client/app/good/display/name"
 	npool "github.com/NpoolPlatform/message/npool/good/gw/v1/app/good/display/name"
 )
@@ -18,11 +19,19 @@ func (h *Handler) DeleteDisplayName(ctx context.Context) (*npool.DisplayName, er
 		},
 	}
 	if err := handler.checkDisplayName(ctx); err != nil {
-		return nil, err
+		return nil, wlog.WrapError(err)
+	}
+
+	info, err := h.GetDisplayName(ctx)
+	if err != nil {
+		return nil, wlog.WrapError(err)
+	}
+	if info == nil {
+		return nil, wlog.Errorf("invalid displayname")
 	}
 
 	if err := appgooddisplaynamemwcli.DeleteDisplayName(ctx, h.ID, h.EntID); err != nil {
-		return nil, err
+		return nil, wlog.WrapError(err)
 	}
-	return h.GetDisplayName(ctx)
+	return info, nil
 }

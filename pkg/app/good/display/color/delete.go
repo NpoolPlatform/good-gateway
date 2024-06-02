@@ -3,6 +3,7 @@ package displaycolor
 import (
 	"context"
 
+	wlog "github.com/NpoolPlatform/go-service-framework/pkg/wlog"
 	appgooddisplaycolormwcli "github.com/NpoolPlatform/good-middleware/pkg/client/app/good/display/color"
 	npool "github.com/NpoolPlatform/message/npool/good/gw/v1/app/good/display/color"
 )
@@ -18,11 +19,19 @@ func (h *Handler) DeleteDisplayColor(ctx context.Context) (*npool.DisplayColor, 
 		},
 	}
 	if err := handler.checkDisplayColor(ctx); err != nil {
-		return nil, err
+		return nil, wlog.WrapError(err)
+	}
+
+	info, err := h.GetDisplayColor(ctx)
+	if err != nil {
+		return nil, wlog.WrapError(err)
+	}
+	if info == nil {
+		return nil, wlog.Errorf("invalid displaycolor")
 	}
 
 	if err := appgooddisplaycolormwcli.DeleteDisplayColor(ctx, h.ID, h.EntID); err != nil {
-		return nil, err
+		return nil, wlog.WrapError(err)
 	}
-	return h.GetDisplayColor(ctx)
+	return info, nil
 }
