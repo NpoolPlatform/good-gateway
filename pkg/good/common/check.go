@@ -14,9 +14,9 @@ type GoodCheckHandler struct {
 	GoodID *string
 }
 
-func (h *GoodCheckHandler) CheckGood(ctx context.Context) error {
+func (h *GoodCheckHandler) CheckGoodWithGoodID(ctx context.Context, goodID string) error {
 	exist, err := goodmwcli.ExistGoodConds(ctx, &goodmwpb.Conds{
-		EntID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.GoodID},
+		EntID: &basetypes.StringVal{Op: cruder.EQ, Value: goodID},
 	})
 	if err != nil {
 		return err
@@ -25,4 +25,8 @@ func (h *GoodCheckHandler) CheckGood(ctx context.Context) error {
 		return fmt.Errorf("invalid good")
 	}
 	return nil
+}
+
+func (h *GoodCheckHandler) CheckGood(ctx context.Context) error {
+	return h.CheckGoodWithGoodID(ctx, *h.GoodID)
 }

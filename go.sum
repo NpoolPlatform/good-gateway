@@ -56,12 +56,12 @@ github.com/NpoolPlatform/chain-middleware v0.0.0-20231020114413-49166aeb1ec8 h1:
 github.com/NpoolPlatform/chain-middleware v0.0.0-20231020114413-49166aeb1ec8/go.mod h1:WdxtPO8aHFOAciBq0oi1lspIiIr4c83cqyQOEVjFe6o=
 github.com/NpoolPlatform/go-service-framework v0.0.0-20240510075442-89278cb5cf47 h1:17FyjOnXXioSqcM4L7qa0ML/L2a0LEIODPiGTtDYR3o=
 github.com/NpoolPlatform/go-service-framework v0.0.0-20240510075442-89278cb5cf47/go.mod h1:8ZqSAAL4eLX/09HLWwDzQY0fMORy8nqHj3kwiUHEyS4=
-github.com/NpoolPlatform/good-middleware v0.0.0-20240601092820-05e7189ee7f9 h1:pqLA5kzmXr2IQz20DGyDaulAxBpxWdmDO0wFssq1Cgo=
-github.com/NpoolPlatform/good-middleware v0.0.0-20240601092820-05e7189ee7f9/go.mod h1:8KIEWHpCqE4QyoUmcK6bTgsePwssudp9Vi1nRg67dWE=
+github.com/NpoolPlatform/good-middleware v0.0.0-20240602094500-dadd2e9a29dd h1:xmR1bhKOH1gWxH7nRM22gSYZOVpP41pAof+rDTf0M7s=
+github.com/NpoolPlatform/good-middleware v0.0.0-20240602094500-dadd2e9a29dd/go.mod h1:itBwz7dRhc40FHtRMgcriUJr5b6/R92o/FO0i1eBXGg=
 github.com/NpoolPlatform/libent-cruder v0.0.0-20240323085036-7679b4818ce7 h1:MFVwhO6TBiPw8t9u/oe5WzRgoPbH1XjSWF8ZuEnVN5M=
 github.com/NpoolPlatform/libent-cruder v0.0.0-20240323085036-7679b4818ce7/go.mod h1:EXCihQpRNNyWaPu1IphiZFLTyyUK/CJMZdW4My7y48Q=
-github.com/NpoolPlatform/message v0.0.0-20240602092824-bf4068c006e7 h1:qsF1GXogpGHKdOpx2V24WQBrxg1S49Od3Y9zqoM2jbM=
-github.com/NpoolPlatform/message v0.0.0-20240602092824-bf4068c006e7/go.mod h1:PxJpF0vSSOke+NJskbRBRQ2fK2K3SRe8zaEja+GxSHk=
+github.com/NpoolPlatform/message v0.0.0-20240602094727-6bcf07ab1487 h1:fyIe+EOaCkcDI+CacOe0qUW5Lh4BPi5oVhmmY/B2MIg=
+github.com/NpoolPlatform/message v0.0.0-20240602094727-6bcf07ab1487/go.mod h1:PxJpF0vSSOke+NJskbRBRQ2fK2K3SRe8zaEja+GxSHk=
 github.com/NpoolPlatform/order-middleware v0.0.0-20240529091527-dac9c323fa78 h1:I3y/daX07wk4TyqxVoqv1bCMdJyDwlbWzQ1m7SXKLVs=
 github.com/NpoolPlatform/order-middleware v0.0.0-20240529091527-dac9c323fa78/go.mod h1:ldn75pRXt6XtmS9bFfIJZYfu1N1QCyJrIT5qThD/4C8=
 github.com/OneOfOne/xxhash v1.2.2 h1:KMrpdQIwFcEqXDklaen+P1axHaj9BSKzvpUUfnHldSE=
