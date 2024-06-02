@@ -12,11 +12,47 @@ import (
 	npool "github.com/NpoolPlatform/message/npool/good/gw/v1/app/good/like"
 )
 
+func (s *Server) GetMyLikes(ctx context.Context, in *npool.GetMyLikesRequest) (*npool.GetMyLikesResponse, error) {
+	handler, err := like1.NewHandler(
+		ctx,
+		like1.WithAppID(&in.AppID, true),
+		like1.WithUserID(&in.UserID, true),
+		like1.WithGoodID(in.GoodID, false),
+		like1.WithAppGoodID(in.AppGoodID, false),
+		like1.WithOffset(in.Offset),
+		like1.WithLimit(in.Limit),
+	)
+	if err != nil {
+		logger.Sugar().Errorw(
+			"GetMyLikes",
+			"In", in,
+			"Error", err,
+		)
+		return &npool.GetMyLikesResponse{}, status.Error(codes.Aborted, err.Error())
+	}
+
+	infos, total, err := handler.GetLikes(ctx)
+	if err != nil {
+		logger.Sugar().Errorw(
+			"GetMyLikes",
+			"In", in,
+			"Error", err,
+		)
+		return &npool.GetMyLikesResponse{}, status.Error(codes.Aborted, err.Error())
+	}
+
+	return &npool.GetMyLikesResponse{
+		Infos: infos,
+		Total: total,
+	}, nil
+}
+
 func (s *Server) GetLikes(ctx context.Context, in *npool.GetLikesRequest) (*npool.GetLikesResponse, error) {
 	handler, err := like1.NewHandler(
 		ctx,
 		like1.WithAppID(&in.AppID, true),
-		like1.WithUserID(in.UserID, false),
+		like1.WithUserID(in.TargetUserID, false),
+		like1.WithGoodID(in.GoodID, false),
 		like1.WithAppGoodID(in.AppGoodID, false),
 		like1.WithOffset(in.Offset),
 		like1.WithLimit(in.Limit),

@@ -95,6 +95,22 @@ func WithUserID(id *string, must bool) func(context.Context, *Handler) error {
 	}
 }
 
+func WithGoodID(id *string, must bool) func(context.Context, *Handler) error {
+	return func(ctx context.Context, h *Handler) error {
+		if id == nil {
+			if must {
+				return fmt.Errorf("invalid goodid")
+			}
+			return nil
+		}
+		if _, err := uuid.Parse(*id); err != nil {
+			return err
+		}
+		h.GoodID = id
+		return nil
+	}
+}
+
 func WithAppGoodID(id *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if id == nil {
