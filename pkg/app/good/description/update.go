@@ -13,10 +13,6 @@ type updateHandler struct {
 }
 
 func (h *Handler) UpdateDescription(ctx context.Context) (*npool.Description, error) {
-	if err := h.CheckAppGood(ctx); err != nil {
-		return nil, err
-	}
-
 	handler := &updateHandler{
 		checkHandler: &checkHandler{
 			Handler: h,
