@@ -3,11 +3,13 @@ package recommend
 import (
 	"context"
 
+	wlog "github.com/NpoolPlatform/go-service-framework/pkg/wlog"
 	recommendmwcli "github.com/NpoolPlatform/good-middleware/pkg/client/app/good/recommend"
 	npool "github.com/NpoolPlatform/message/npool/good/gw/v1/app/good/recommend"
 	recommendmwpb "github.com/NpoolPlatform/message/npool/good/mw/v1/app/good/recommend"
 
 	"github.com/google/uuid"
+	"github.com/shopspring/decimal"
 )
 
 func (h *Handler) CreateRecommend(ctx context.Context) (*npool.Recommend, error) {
@@ -17,6 +19,17 @@ func (h *Handler) CreateRecommend(ctx context.Context) (*npool.Recommend, error)
 
 	if h.EntID == nil {
 		h.EntID = func() *string { s := uuid.NewString(); return &s }()
+	}
+
+	if h.RecommendIndex != nil {
+		maxRecommendIndex := decimal.RequireFromString("10.0")
+		score, err := decimal.NewFromString(*h.RecommendIndex)
+		if err != nil {
+			return nil, err
+		}
+		if score.GreaterThan(maxRecommendIndex) || score.LessThan(decimal.NewFromInt(0)) {
+			return nil, wlog.Errorf("invalid recommendindex")
+		}
 	}
 
 	if err := recommendmwcli.CreateRecommend(ctx, &recommendmwpb.RecommendReq{
