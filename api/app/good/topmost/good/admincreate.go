@@ -20,7 +20,7 @@ func (s *Server) AdminCreateTopMostGood(ctx context.Context, in *npool.AdminCrea
 		topmostgood1.WithTopMostID(&in.TopMostID, true),
 		topmostgood1.WithAppGoodID(&in.AppGoodID, true),
 		topmostgood1.WithUnitPrice(in.UnitPrice, true),
-		topmostgood1.WithDisplayIndex(in.Index, false),
+		topmostgood1.WithDisplayIndex(in.DisplayIndex, false),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(

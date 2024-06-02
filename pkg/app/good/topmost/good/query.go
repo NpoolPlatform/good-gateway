@@ -44,7 +44,7 @@ func (h *queryHandler) formalize() {
 			TopMostType:    good.TopMostType,
 			TopMostTitle:   good.TopMostTitle,
 			TopMostMessage: good.TopMostMessage,
-			Index:          good.DisplayIndex,
+			DisplayIndex:   good.DisplayIndex,
 			UnitPrice:      good.UnitPrice,
 			CreatedAt:      good.CreatedAt,
 			UpdatedAt:      good.UpdatedAt,

@@ -20,7 +20,7 @@ func (s *Server) UpdateTopMostGood(ctx context.Context, in *npool.UpdateTopMostG
 		topmostgood1.WithEntID(&in.EntID, true),
 		topmostgood1.WithAppID(&in.AppID, true),
 		topmostgood1.WithUnitPrice(in.UnitPrice, false),
-		topmostgood1.WithDisplayIndex(in.Index, false),
+		topmostgood1.WithDisplayIndex(in.DisplayIndex, false),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(

@@ -19,7 +19,7 @@ func (s *Server) CreateTopMostGood(ctx context.Context, in *npool.CreateTopMostG
 		topmostgood1.WithTopMostID(&in.TopMostID, true),
 		topmostgood1.WithAppGoodID(&in.AppGoodID, true),
 		topmostgood1.WithUnitPrice(&in.UnitPrice, true),
-		topmostgood1.WithDisplayIndex(in.Index, false),
+		topmostgood1.WithDisplayIndex(in.DisplayIndex, false),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(
