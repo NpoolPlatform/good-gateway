@@ -3,6 +3,7 @@ package appfee
 import (
 	"context"
 
+	wlog "github.com/NpoolPlatform/go-service-framework/pkg/wlog"
 	goodgwcommon "github.com/NpoolPlatform/good-gateway/pkg/common"
 	appfeemwcli "github.com/NpoolPlatform/good-middleware/pkg/client/app/fee"
 	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
@@ -57,14 +58,17 @@ func (h *queryHandler) formalize() {
 func (h *Handler) GetAppFee(ctx context.Context) (*npool.AppFee, error) {
 	info, err := appfeemwcli.GetFee(ctx, *h.AppGoodID)
 	if err != nil {
-		return nil, err
+		return nil, wlog.WrapError(err)
+	}
+	if info == nil {
+		return nil, wlog.Errorf("invalid fee")
 	}
 	handler := &queryHandler{
 		Handler: h,
 		fees:    []*appfeemwpb.Fee{info},
 	}
 	if err := handler.getApps(ctx); err != nil {
-		return nil, err
+		return nil, wlog.WrapError(err)
 	}
 	handler.formalize()
 	return handler.infos[0], nil
@@ -75,14 +79,17 @@ func (h *Handler) GetAppFees(ctx context.Context) ([]*npool.AppFee, uint32, erro
 		AppID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID},
 	}, h.Offset, h.Limit)
 	if err != nil {
-		return nil, 0, err
+		return nil, 0, wlog.WrapError(err)
+	}
+	if len(infos) == 0 {
+		return nil, 0, nil
 	}
 	handler := &queryHandler{
 		Handler: h,
 		fees:    infos,
 	}
 	if err := handler.getApps(ctx); err != nil {
-		return nil, 0, err
+		return nil, 0, wlog.WrapError(err)
 	}
 	handler.formalize()
 	return handler.infos, total, nil
