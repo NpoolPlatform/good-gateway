@@ -2,9 +2,9 @@ package comment
 
 import (
 	"context"
-	"fmt"
 
 	appmwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/app"
+	wlog "github.com/NpoolPlatform/go-service-framework/pkg/wlog"
 	appgoodcommon "github.com/NpoolPlatform/good-gateway/pkg/app/good/common"
 	constant "github.com/NpoolPlatform/good-middleware/pkg/const"
 	types "github.com/NpoolPlatform/message/npool/basetypes/good/v1"
@@ -44,7 +44,7 @@ func WithID(id *uint32, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if id == nil {
 			if must {
-				return fmt.Errorf("invalid id")
+				return wlog.Errorf("invalid id")
 			}
 			return nil
 		}
@@ -57,12 +57,12 @@ func WithEntID(id *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if id == nil {
 			if must {
-				return fmt.Errorf("invalid id")
+				return wlog.Errorf("invalid id")
 			}
 			return nil
 		}
 		if _, err := uuid.Parse(*id); err != nil {
-			return err
+			return wlog.WrapError(err)
 		}
 		h.EntID = id
 		return nil
@@ -73,16 +73,16 @@ func WithAppID(id *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if id == nil {
 			if must {
-				return fmt.Errorf("invalid appid")
+				return wlog.Errorf("invalid appid")
 			}
 			return nil
 		}
 		exist, err := appmwcli.ExistApp(ctx, *id)
 		if err != nil {
-			return err
+			return wlog.WrapError(err)
 		}
 		if !exist {
-			return fmt.Errorf("invalid app")
+			return wlog.Errorf("invalid app")
 		}
 		h.AppID = id
 		return nil
@@ -93,12 +93,12 @@ func WithUserID(id *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if id == nil {
 			if must {
-				return fmt.Errorf("invalid userid")
+				return wlog.Errorf("invalid userid")
 			}
 			return nil
 		}
 		if _, err := uuid.Parse(*id); err != nil {
-			return err
+			return wlog.WrapError(err)
 		}
 		h.UserID = id
 		return nil
@@ -109,12 +109,12 @@ func WithAppGoodID(id *string, must bool) func(context.Context, *Handler) error 
 	return func(ctx context.Context, h *Handler) error {
 		if id == nil {
 			if must {
-				return fmt.Errorf("invalid appgoodid")
+				return wlog.Errorf("invalid appgoodid")
 			}
 			return nil
 		}
 		if _, err := uuid.Parse(*id); err != nil {
-			return err
+			return wlog.WrapError(err)
 		}
 		h.AppGoodID = id
 		return nil
@@ -125,16 +125,16 @@ func WithOrderID(id *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if id == nil {
 			if must {
-				return fmt.Errorf("invalid orderid")
+				return wlog.Errorf("invalid orderid")
 			}
 			return nil
 		}
 		exist, err := ordermwcli.ExistOrder(ctx, *id)
 		if err != nil {
-			return err
+			return wlog.WrapError(err)
 		}
 		if !exist {
-			return fmt.Errorf("invalid order")
+			return wlog.Errorf("invalid order")
 		}
 		h.OrderID = id
 		return nil
@@ -146,12 +146,12 @@ func WithContent(s *string, must bool) func(context.Context, *Handler) error {
 		const leastContentLen = 10
 		if s == nil {
 			if must {
-				return fmt.Errorf("invalid content")
+				return wlog.Errorf("invalid content")
 			}
 			return nil
 		}
 		if len(*s) < leastContentLen {
-			return fmt.Errorf("invalid content")
+			return wlog.Errorf("invalid content")
 		}
 		h.Content = s
 		return nil
@@ -162,12 +162,12 @@ func WithReplyToID(id *string, must bool) func(context.Context, *Handler) error 
 	return func(ctx context.Context, h *Handler) error {
 		if id == nil {
 			if must {
-				return fmt.Errorf("invalid replytoid")
+				return wlog.Errorf("invalid replytoid")
 			}
 			return nil
 		}
 		if _, err := uuid.Parse(*id); err != nil {
-			return err
+			return wlog.WrapError(err)
 		}
 		h.ReplyToID = id
 		return nil
@@ -185,16 +185,17 @@ func WithScore(s *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if s == nil {
 			if must {
-				return fmt.Errorf("invalid score")
+				return wlog.Errorf("invalid score")
 			}
+			return nil
 		}
 		score, err := decimal.NewFromString(*s)
 		if err != nil {
-			return err
+			return wlog.WrapError(err)
 		}
 		if score.Cmp(decimal.NewFromInt(0)) < 0 ||
 			score.Cmp(decimal.NewFromInt(5)) > 0 { //nolint
-			return fmt.Errorf("invalid score")
+			return wlog.Errorf("invalid score")
 		}
 		h.Score = s
 		return nil
@@ -212,7 +213,7 @@ func WithHideReason(e *types.GoodCommentHideReason, must bool) func(context.Cont
 	return func(ctx context.Context, h *Handler) error {
 		if e == nil {
 			if must {
-				return fmt.Errorf("invalid hidereason")
+				return wlog.Errorf("invalid hidereason")
 			}
 			return nil
 		}
@@ -221,7 +222,7 @@ func WithHideReason(e *types.GoodCommentHideReason, must bool) func(context.Cont
 		case types.GoodCommentHideReason_GoodCommentHideByNotThisGood:
 		case types.GoodCommentHideReason_GoodCommentHideByFalseDescription:
 		default:
-			return fmt.Errorf("invalid hidereason")
+			return wlog.Errorf("invalid hidereason")
 		}
 		h.HideReason = e
 		return nil
@@ -232,12 +233,12 @@ func WithCommentUserID(id *string, must bool) func(context.Context, *Handler) er
 	return func(ctx context.Context, h *Handler) error {
 		if id == nil {
 			if must {
-				return fmt.Errorf("invalid targetuserid")
+				return wlog.Errorf("invalid targetuserid")
 			}
 			return nil
 		}
 		if _, err := uuid.Parse(*id); err != nil {
-			return err
+			return wlog.WrapError(err)
 		}
 		h.CommentUserID = id
 		return nil

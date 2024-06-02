@@ -3,6 +3,7 @@ package comment
 import (
 	"context"
 
+	wlog "github.com/NpoolPlatform/go-service-framework/pkg/wlog"
 	commentmwcli "github.com/NpoolPlatform/good-middleware/pkg/client/app/good/comment"
 	npool "github.com/NpoolPlatform/message/npool/good/gw/v1/app/good/comment"
 	commentmwpb "github.com/NpoolPlatform/message/npool/good/mw/v1/app/good/comment"
@@ -23,13 +24,13 @@ func (h *Handler) CreateComment(ctx context.Context) (*npool.Comment, error) {
 		},
 	}
 	if err := handler.CheckUserWithUserID(ctx, *h.CommentUserID); err != nil {
-		return nil, err
+		return nil, wlog.WrapError(err)
 	}
 	if err := handler.CheckAppGood(ctx); err != nil {
-		return nil, err
+		return nil, wlog.WrapError(err)
 	}
 	if err := handler.checkOrder(ctx); err != nil {
-		return nil, err
+		return nil, wlog.WrapError(err)
 	}
 
 	if h.EntID == nil {
@@ -50,7 +51,7 @@ func (h *Handler) CreateComment(ctx context.Context) (*npool.Comment, error) {
 		TrialUser:     &handler.trialUser,
 		Score:         h.Score,
 	}); err != nil {
-		return nil, err
+		return nil, wlog.WrapError(err)
 	}
 
 	return h.GetComment(ctx)

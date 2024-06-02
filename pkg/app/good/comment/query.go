@@ -2,8 +2,8 @@ package comment
 
 import (
 	"context"
-	"fmt"
 
+	wlog "github.com/NpoolPlatform/go-service-framework/pkg/wlog"
 	goodgwcommon "github.com/NpoolPlatform/good-gateway/pkg/common"
 	commentmwcli "github.com/NpoolPlatform/good-middleware/pkg/client/app/good/comment"
 	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
@@ -31,7 +31,7 @@ func (h *queryHandler) getApps(ctx context.Context) (err error) {
 		}
 		return
 	}())
-	return err
+	return wlog.WrapError(err)
 }
 
 func (h *queryHandler) getUsers(ctx context.Context) (err error) {
@@ -41,7 +41,7 @@ func (h *queryHandler) getUsers(ctx context.Context) (err error) {
 		}
 		return
 	}())
-	return err
+	return wlog.WrapError(err)
 }
 
 func (h *queryHandler) formalize() {
@@ -99,10 +99,10 @@ func (h *queryHandler) formalize() {
 func (h *Handler) GetComment(ctx context.Context) (*npool.Comment, error) {
 	comment, err := commentmwcli.GetComment(ctx, *h.EntID)
 	if err != nil {
-		return nil, err
+		return nil, wlog.WrapError(err)
 	}
 	if comment == nil {
-		return nil, fmt.Errorf("invalid comment")
+		return nil, wlog.Errorf("invalid comment")
 	}
 
 	handler := &queryHandler{
@@ -114,10 +114,10 @@ func (h *Handler) GetComment(ctx context.Context) (*npool.Comment, error) {
 		users:    map[string]*usermwpb.User{},
 	}
 	if err := handler.getApps(ctx); err != nil {
-		return nil, err
+		return nil, wlog.WrapError(err)
 	}
 	if err := handler.getUsers(ctx); err != nil {
-		return nil, err
+		return nil, wlog.WrapError(err)
 	}
 
 	handler.formalize()
@@ -138,7 +138,7 @@ func (h *Handler) GetComments(ctx context.Context) ([]*npool.Comment, uint32, er
 	}
 	if h.UserID != nil {
 		if err := handler.CheckUser(ctx); err != nil {
-			return nil, 0, fmt.Errorf("invalid user")
+			return nil, 0, wlog.Errorf("invalid user")
 		}
 	}
 
