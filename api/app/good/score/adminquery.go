@@ -16,6 +16,7 @@ func (s *Server) AdminGetScores(ctx context.Context, in *npool.AdminGetScoresReq
 	handler, err := score1.NewHandler(
 		ctx,
 		score1.WithAppID(&in.TargetAppID, true),
+		score1.WithGoodID(in.GoodID, false),
 		score1.WithAppGoodID(in.AppGoodID, false),
 		score1.WithOffset(in.Offset),
 		score1.WithLimit(in.Limit),
