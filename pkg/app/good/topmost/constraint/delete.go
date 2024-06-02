@@ -19,7 +19,7 @@ func (h *Handler) DeleteConstraint(ctx context.Context) (*npool.TopMostConstrain
 		},
 	}
 	if err := handler.checkConstraint(ctx); err != nil {
-		return nil, err
+		return nil, wlog.WrapError(err)
 	}
 
 	info, err := h.GetConstraint(ctx)
@@ -31,7 +31,7 @@ func (h *Handler) DeleteConstraint(ctx context.Context) (*npool.TopMostConstrain
 	}
 
 	if err := topmostconstraintmwcli.DeleteTopMostConstraint(ctx, h.ID, h.EntID); err != nil {
-		return nil, err
+		return nil, wlog.WrapError(err)
 	}
 	return info, nil
 }
