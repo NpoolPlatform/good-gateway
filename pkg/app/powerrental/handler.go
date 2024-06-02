@@ -3,8 +3,8 @@ package powerrental
 
 import (
 	"context"
-	"fmt"
 
+	wlog "github.com/NpoolPlatform/go-service-framework/pkg/wlog"
 	appgoodcommon "github.com/NpoolPlatform/good-gateway/pkg/app/good/common"
 	constant "github.com/NpoolPlatform/good-gateway/pkg/const"
 	types "github.com/NpoolPlatform/message/npool/basetypes/good/v1"
@@ -43,6 +43,7 @@ type Handler struct {
 	SaleMode                *types.GoodSaleMode
 	FixedDuration           *bool
 	PackageWithRequireds    *bool
+	StartMode               *types.GoodStartMode
 
 	Offset int32
 	Limit  int32
@@ -62,7 +63,7 @@ func WithID(id *uint32, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if id == nil {
 			if must {
-				return fmt.Errorf("invalid id")
+				return wlog.Errorf("invalid id")
 			}
 			return nil
 		}
@@ -75,12 +76,12 @@ func WithEntID(id *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if id == nil {
 			if must {
-				return fmt.Errorf("invalid id")
+				return wlog.Errorf("invalid id")
 			}
 			return nil
 		}
 		if _, err := uuid.Parse(*id); err != nil {
-			return err
+			return wlog.WrapError(err)
 		}
 		h.EntID = id
 		return nil
@@ -91,12 +92,12 @@ func WithAppID(id *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if id == nil {
 			if must {
-				return fmt.Errorf("invalid appid")
+				return wlog.Errorf("invalid appid")
 			}
 			return nil
 		}
 		if err := h.CheckAppWithAppID(ctx, *id); err != nil {
-			return err
+			return wlog.WrapError(err)
 		}
 		h.AppID = id
 		return nil
@@ -107,12 +108,12 @@ func WithGoodID(id *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if id == nil {
 			if must {
-				return fmt.Errorf("invalid goodid")
+				return wlog.Errorf("invalid goodid")
 			}
 			return nil
 		}
 		if _, err := uuid.Parse(*id); err != nil {
-			return err
+			return wlog.WrapError(err)
 		}
 		h.GoodID = id
 		return nil
@@ -123,12 +124,12 @@ func WithAppGoodID(id *string, must bool) func(context.Context, *Handler) error 
 	return func(ctx context.Context, h *Handler) error {
 		if id == nil {
 			if must {
-				return fmt.Errorf("invalid appgoodid")
+				return wlog.Errorf("invalid appgoodid")
 			}
 			return nil
 		}
 		if _, err := uuid.Parse(*id); err != nil {
-			return err
+			return wlog.WrapError(err)
 		}
 		h.AppGoodID = id
 		return nil
@@ -174,12 +175,12 @@ func WithName(s *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if s == nil {
 			if must {
-				return fmt.Errorf("invalid name")
+				return wlog.Errorf("invalid name")
 			}
 			return nil
 		}
 		if len(*s) < 3 {
-			return fmt.Errorf("invalid name")
+			return wlog.Errorf("invalid name")
 		}
 		h.Name = s
 		return nil
@@ -204,7 +205,7 @@ func WithServiceStartAt(u *uint32, must bool) func(context.Context, *Handler) er
 	return func(ctx context.Context, h *Handler) error {
 		if u == nil {
 			if must {
-				return fmt.Errorf("invalid servicestartat")
+				return wlog.Errorf("invalid servicestartat")
 			}
 			return nil
 		}
@@ -217,7 +218,7 @@ func WithCancelMode(e *types.CancelMode, must bool) func(context.Context, *Handl
 	return func(ctx context.Context, h *Handler) error {
 		if e == nil {
 			if must {
-				return fmt.Errorf("invalid cancelmode")
+				return wlog.Errorf("invalid cancelmode")
 			}
 			return nil
 		}
@@ -226,7 +227,7 @@ func WithCancelMode(e *types.CancelMode, must bool) func(context.Context, *Handl
 		case types.CancelMode_CancellableBeforeStart:
 		case types.CancelMode_CancellableBeforeBenefit:
 		default:
-			return fmt.Errorf("invalid cancelmode")
+			return wlog.Errorf("invalid cancelmode")
 		}
 		h.CancelMode = e
 		return nil
@@ -251,12 +252,12 @@ func WithMinOrderAmount(s *string, must bool) func(context.Context, *Handler) er
 	return func(ctx context.Context, h *Handler) error {
 		if s == nil {
 			if must {
-				return fmt.Errorf("invalid minorderamount")
+				return wlog.Errorf("invalid minorderamount")
 			}
 			return nil
 		}
 		if _, err := decimal.NewFromString(*s); err != nil {
-			return err
+			return wlog.WrapError(err)
 		}
 		h.MinOrderAmount = s
 		return nil
@@ -267,16 +268,16 @@ func WithMaxOrderAmount(s *string, must bool) func(context.Context, *Handler) er
 	return func(ctx context.Context, h *Handler) error {
 		if s == nil {
 			if must {
-				return fmt.Errorf("invalid maxorderamount")
+				return wlog.Errorf("invalid maxorderamount")
 			}
 			return nil
 		}
 		amount, err := decimal.NewFromString(*s)
 		if err != nil {
-			return err
+			return wlog.WrapError(err)
 		}
 		if amount.Cmp(decimal.NewFromInt(0)) <= 0 {
-			return fmt.Errorf("invalid maxorderamount")
+			return wlog.Errorf("invalid maxorderamount")
 		}
 		h.MaxOrderAmount = s
 		return nil
@@ -287,16 +288,16 @@ func WithMaxUserAmount(s *string, must bool) func(context.Context, *Handler) err
 	return func(ctx context.Context, h *Handler) error {
 		if s == nil {
 			if must {
-				return fmt.Errorf("invalid maxuseramount")
+				return wlog.Errorf("invalid maxuseramount")
 			}
 			return nil
 		}
 		amount, err := decimal.NewFromString(*s)
 		if err != nil {
-			return err
+			return wlog.WrapError(err)
 		}
 		if amount.Cmp(decimal.NewFromInt(0)) <= 0 {
-			return fmt.Errorf("invalid maxuseramount")
+			return wlog.Errorf("invalid maxuseramount")
 		}
 		h.MaxUserAmount = s
 		return nil
@@ -321,16 +322,16 @@ func WithUnitPrice(s *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if s == nil {
 			if must {
-				return fmt.Errorf("invalid unitprice")
+				return wlog.Errorf("invalid unitprice")
 			}
 			return nil
 		}
 		amount, err := decimal.NewFromString(*s)
 		if err != nil {
-			return err
+			return wlog.WrapError(err)
 		}
 		if amount.Cmp(decimal.NewFromInt(0)) <= 0 {
-			return fmt.Errorf("invalid unitprice")
+			return wlog.Errorf("invalid unitprice")
 		}
 		h.UnitPrice = s
 		return nil
@@ -355,7 +356,7 @@ func WithSaleMode(e *types.GoodSaleMode, must bool) func(context.Context, *Handl
 	return func(ctx context.Context, h *Handler) error {
 		if e == nil {
 			if must {
-				return fmt.Errorf("invalid salemode")
+				return wlog.Errorf("invalid salemode")
 			}
 			return nil
 		}
@@ -365,7 +366,7 @@ func WithSaleMode(e *types.GoodSaleMode, must bool) func(context.Context, *Handl
 		case types.GoodSaleMode_GoodSaleModeMainnetPresaleScratch:
 		case types.GoodSaleMode_GoodSaleModeTestnetPresale:
 		default:
-			return fmt.Errorf("invalid salemode")
+			return wlog.Errorf("invalid salemode")
 		}
 		h.SaleMode = e
 		return nil
@@ -382,6 +383,28 @@ func WithFixedDuration(b *bool, must bool) func(context.Context, *Handler) error
 func WithPackageWithRequireds(b *bool, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		h.PackageWithRequireds = b
+		return nil
+	}
+}
+
+func WithStartMode(e *types.GoodStartMode, must bool) func(context.Context, *Handler) error {
+	return func(ctx context.Context, h *Handler) error {
+		if e == nil {
+			if must {
+				return wlog.Errorf("invalid startmode")
+			}
+			return nil
+		}
+		switch *e {
+		case types.GoodStartMode_GoodStartModeTBD:
+		case types.GoodStartMode_GoodStartModeConfirmed:
+		case types.GoodStartMode_GoodStartModeNextDay:
+		case types.GoodStartMode_GoodStartModeInstantly:
+		case types.GoodStartMode_GoodStartModePreset:
+		default:
+			return wlog.Errorf("invalid startmode")
+		}
+		h.StartMode = e
 		return nil
 	}
 }

@@ -81,7 +81,7 @@ func (h *queryHandler) formalize() {
 			BenefitType:          appPowerRental.BenefitType,
 			GoodName:             appPowerRental.GoodName,
 			ServiceStartAt:       appPowerRental.AppGoodServiceStartAt,
-			StartMode:            appPowerRental.GoodStartMode,
+			GoodStartMode:        appPowerRental.GoodStartMode,
 			TestOnly:             appPowerRental.TestOnly,
 			BenefitIntervalHours: appPowerRental.BenefitIntervalHours,
 			GoodPurchasable:      appPowerRental.GoodPurchasable,
@@ -109,6 +109,7 @@ func (h *queryHandler) formalize() {
 			SaleMode:                     appPowerRental.SaleMode,
 			FixedDuration:                appPowerRental.FixedDuration,
 			PackageWithRequireds:         appPowerRental.PackageWithRequireds,
+			AppGoodStartMode:             appPowerRental.AppGoodStartMode,
 
 			GoodStockID:      appPowerRental.GoodStockID,
 			GoodTotal:        appPowerRental.GoodTotal,

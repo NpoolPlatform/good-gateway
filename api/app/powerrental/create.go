@@ -42,6 +42,7 @@ func (s *Server) CreateAppPowerRental(ctx context.Context, in *npool.CreateAppPo
 		powerrental1.WithSaleMode(&in.SaleMode, true),
 		powerrental1.WithFixedDuration(in.FixedDuration, false),
 		powerrental1.WithPackageWithRequireds(in.PackageWithRequireds, false),
+		powerrental1.WithStartMode(in.StartMode, false),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(

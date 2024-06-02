@@ -10,6 +10,8 @@ import (
 	"github.com/google/uuid"
 )
 
+// TODO: check start mode with power rental start mode
+
 func (h *Handler) CreatePowerRental(ctx context.Context) (*npool.AppPowerRental, error) {
 	if h.EntID == nil {
 		h.EntID = func() *string { s := uuid.NewString(); return &s }()
@@ -45,6 +47,7 @@ func (h *Handler) CreatePowerRental(ctx context.Context) (*npool.AppPowerRental,
 		SaleMode:                     h.SaleMode,
 		FixedDuration:                h.FixedDuration,
 		PackageWithRequireds:         h.PackageWithRequireds,
+		StartMode:                    h.StartMode,
 	}); err != nil {
 		return nil, err
 	}

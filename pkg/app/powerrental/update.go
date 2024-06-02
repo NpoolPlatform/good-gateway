@@ -8,6 +8,8 @@ import (
 	apppowerrentalmwpb "github.com/NpoolPlatform/message/npool/good/mw/v1/app/powerrental"
 )
 
+// TODO: check start mode with power rental start mode
+
 type updateHandler struct {
 	*checkHandler
 }
@@ -48,6 +50,7 @@ func (h *Handler) UpdatePowerRental(ctx context.Context) (*npool.AppPowerRental,
 		SaleMode:                     h.SaleMode,
 		FixedDuration:                h.FixedDuration,
 		PackageWithRequireds:         h.PackageWithRequireds,
+		StartMode:                    h.StartMode,
 	}); err != nil {
 		return nil, err
 	}
