@@ -6,6 +6,7 @@ import (
 
 	appmwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/app"
 	appgoodcommon "github.com/NpoolPlatform/good-gateway/pkg/app/good/common"
+	goodgwcommon "github.com/NpoolPlatform/good-gateway/pkg/common"
 	constant "github.com/NpoolPlatform/good-middleware/pkg/const"
 
 	"github.com/google/uuid"
@@ -14,6 +15,7 @@ import (
 type Handler struct {
 	ID    *uint32
 	EntID *string
+	goodgwcommon.CoinCheckHandler
 	appgoodcommon.AppGoodCheckHandler
 	Offset int32
 	Limit  int32
@@ -74,6 +76,22 @@ func WithAppID(id *string, must bool) func(context.Context, *Handler) error {
 			return fmt.Errorf("invalid app")
 		}
 		h.AppID = id
+		return nil
+	}
+}
+
+func WithCoinTypeID(id *string, must bool) func(context.Context, *Handler) error {
+	return func(ctx context.Context, h *Handler) error {
+		if id == nil {
+			if must {
+				return fmt.Errorf("invalid cointypeid")
+			}
+			return nil
+		}
+		if err := h.CheckCoinWithCoinTypeID(ctx, *id); err != nil {
+			return err
+		}
+		h.CoinTypeID = id
 		return nil
 	}
 }

@@ -18,8 +18,9 @@ func (h *Handler) CreateDefault(ctx context.Context) (*npool.Default, error) {
 		h.EntID = func() *string { s := uuid.NewString(); return &s }()
 	}
 	if err := defaultmwcli.CreateDefault(ctx, &defaultmwpb.DefaultReq{
-		EntID:     h.EntID,
-		AppGoodID: h.AppGoodID,
+		EntID:      h.EntID,
+		CoinTypeID: h.CoinTypeID,
+		AppGoodID:  h.AppGoodID,
 	}); err != nil {
 		return nil, err
 	}

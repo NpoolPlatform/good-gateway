@@ -16,6 +16,7 @@ func (s *Server) CreateDefault(ctx context.Context, in *npool.CreateDefaultReque
 	handler, err := default1.NewHandler(
 		ctx,
 		default1.WithAppID(&in.AppID, true),
+		default1.WithCoinTypeID(&in.CoinTypeID, true),
 		default1.WithAppGoodID(&in.AppGoodID, true),
 	)
 	if err != nil {
