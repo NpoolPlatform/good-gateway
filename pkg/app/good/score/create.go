@@ -30,7 +30,7 @@ func (h *Handler) CreateScore(ctx context.Context) (*npool.Score, error) {
 		if err != nil {
 			return nil, err
 		}
-		if score.Cmp(maxScore) > 0 {
+		if score.GreaterThan(maxScore) || score.LessThan(decimal.NewFromInt(0)) {
 			return nil, fmt.Errorf("invalid score")
 		}
 	}
