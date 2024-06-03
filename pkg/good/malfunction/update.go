@@ -1,31 +1,37 @@
-package required
+package malfunction
 
 import (
 	"context"
 
-	requiredmwcli "github.com/NpoolPlatform/good-middleware/pkg/client/good/required"
-	requiredmwpb "github.com/NpoolPlatform/message/npool/good/mw/v1/good/required"
+	malfunctionmwcli "github.com/NpoolPlatform/good-middleware/pkg/client/good/malfunction"
+	npool "github.com/NpoolPlatform/message/npool/good/gw/v1/good/malfunction"
+	malfunctionmwpb "github.com/NpoolPlatform/message/npool/good/mw/v1/good/malfunction"
 )
 
 type updateHandler struct {
 	*checkHandler
 }
 
-func (h *Handler) UpdateRequired(ctx context.Context) (*requiredmwpb.Required, error) {
+func (h *Handler) UpdateMalfunction(ctx context.Context) (*npool.Malfunction, error) {
 	handler := &updateHandler{
 		checkHandler: &checkHandler{
 			Handler: h,
 		},
 	}
-	if err := handler.checkRequired(ctx); err != nil {
+	if err := handler.checkMalfunction(ctx); err != nil {
 		return nil, err
 	}
 
-	if err := requiredmwcli.UpdateRequired(ctx, &requiredmwpb.RequiredReq{
-		ID:   h.ID,
-		Must: h.Must,
+	if err := malfunctionmwcli.UpdateMalfunction(ctx, &malfunctionmwpb.MalfunctionReq{
+		ID:                h.ID,
+		EntID:             h.EntID,
+		Title:             h.Title,
+		Message:           h.Message,
+		StartAt:           h.StartAt,
+		DurationSeconds:   h.DurationSeconds,
+		CompensateSeconds: h.CompensateSeconds,
 	}); err != nil {
 		return nil, err
 	}
-	return h.GetRequired(ctx)
+	return h.GetMalfunction(ctx)
 }

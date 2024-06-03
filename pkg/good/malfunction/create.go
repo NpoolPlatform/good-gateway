@@ -1,25 +1,29 @@
-package required
+package malfunction
 
 import (
 	"context"
 
-	requiredmwcli "github.com/NpoolPlatform/good-middleware/pkg/client/good/required"
-	requiredmwpb "github.com/NpoolPlatform/message/npool/good/mw/v1/good/required"
+	malfunctionmwcli "github.com/NpoolPlatform/good-middleware/pkg/client/good/malfunction"
+	npool "github.com/NpoolPlatform/message/npool/good/gw/v1/good/malfunction"
+	malfunctionmwpb "github.com/NpoolPlatform/message/npool/good/mw/v1/good/malfunction"
 
 	"github.com/google/uuid"
 )
 
-func (h *Handler) CreateRequired(ctx context.Context) (*requiredmwpb.Required, error) {
+func (h *Handler) CreateMalfunction(ctx context.Context) (*npool.Malfunction, error) {
 	if h.EntID == nil {
 		h.EntID = func() *string { s := uuid.NewString(); return &s }()
 	}
-	if err := requiredmwcli.CreateRequired(ctx, &requiredmwpb.RequiredReq{
-		EntID:          h.EntID,
-		MainGoodID:     h.MainGoodID,
-		RequiredGoodID: h.RequiredGoodID,
-		Must:           h.Must,
+	if err := malfunctionmwcli.CreateMalfunction(ctx, &malfunctionmwpb.MalfunctionReq{
+		EntID:             h.EntID,
+		GoodID:            h.GoodID,
+		Title:             h.Title,
+		Message:           h.Message,
+		StartAt:           h.StartAt,
+		DurationSeconds:   h.DurationSeconds,
+		CompensateSeconds: h.CompensateSeconds,
 	}); err != nil {
 		return nil, err
 	}
-	return h.GetRequired(ctx)
+	return h.GetMalfunction(ctx)
 }

@@ -31,6 +31,7 @@ import (
 	"github.com/NpoolPlatform/good-gateway/api/good"
 	goodcoin "github.com/NpoolPlatform/good-gateway/api/good/coin"
 	"github.com/NpoolPlatform/good-gateway/api/good/coin/reward/history"
+	malfunction "github.com/NpoolPlatform/good-gateway/api/good/malfunction"
 	"github.com/NpoolPlatform/good-gateway/api/good/required"
 	powerrental "github.com/NpoolPlatform/good-gateway/api/powerrental"
 	"github.com/NpoolPlatform/good-gateway/api/vender/brand"
@@ -79,6 +80,7 @@ func Register(server grpc.ServiceRegistrar) {
 	apppowerrentalsimulate.Register(server)
 	apppowerrental.Register(server)
 	goodcoin.Register(server)
+	malfunction.Register(server)
 }
 
 //nolint:gocyclo,funlen
@@ -180,6 +182,9 @@ func RegisterGateway(mux *runtime.ServeMux, endpoint string, opts []grpc.DialOpt
 		return err
 	}
 	if err := goodcoin.RegisterGateway(mux, endpoint, opts); err != nil {
+		return err
+	}
+	if err := malfunction.RegisterGateway(mux, endpoint, opts); err != nil {
 		return err
 	}
 	return nil
