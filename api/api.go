@@ -25,6 +25,8 @@ import (
 	apppowerrental "github.com/NpoolPlatform/good-gateway/api/app/powerrental"
 	apppowerrentalsimulate "github.com/NpoolPlatform/good-gateway/api/app/powerrental/simulate"
 	devicetype "github.com/NpoolPlatform/good-gateway/api/device"
+	manufacturer "github.com/NpoolPlatform/good-gateway/api/device/manufacturer"
+	deviceposter "github.com/NpoolPlatform/good-gateway/api/device/poster"
 	fee "github.com/NpoolPlatform/good-gateway/api/fee"
 	"github.com/NpoolPlatform/good-gateway/api/good"
 	goodcoin "github.com/NpoolPlatform/good-gateway/api/good/coin"
@@ -46,6 +48,8 @@ type Server struct {
 func Register(server grpc.ServiceRegistrar) {
 	v1.RegisterGatewayServer(server, &Server{})
 	devicetype.Register(server)
+	manufacturer.Register(server)
+	deviceposter.Register(server)
 	brand.Register(server)
 	location.Register(server)
 	good.Register(server)
@@ -83,6 +87,12 @@ func RegisterGateway(mux *runtime.ServeMux, endpoint string, opts []grpc.DialOpt
 		return err
 	}
 	if err := devicetype.RegisterGateway(mux, endpoint, opts); err != nil {
+		return err
+	}
+	if err := manufacturer.RegisterGateway(mux, endpoint, opts); err != nil {
+		return err
+	}
+	if err := deviceposter.RegisterGateway(mux, endpoint, opts); err != nil {
 		return err
 	}
 	if err := brand.RegisterGateway(mux, endpoint, opts); err != nil {
