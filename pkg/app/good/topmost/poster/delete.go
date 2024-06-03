@@ -34,5 +34,4 @@ func (h *Handler) DeletePoster(ctx context.Context) (*npool.Poster, error) {
 		return nil, wlog.WrapError(err)
 	}
 	return info, nil
-
 }
