@@ -1,3 +1,4 @@
+//nolint:dupl
 package default1
 
 import (
@@ -17,6 +18,7 @@ func (s *Server) AdminCreateDefault(ctx context.Context, in *npool.AdminCreateDe
 		ctx,
 		default1.WithAppID(&in.TargetAppID, true),
 		default1.WithAppGoodID(&in.AppGoodID, true),
+		default1.WithCoinTypeID(&in.CoinTypeID, true),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(
