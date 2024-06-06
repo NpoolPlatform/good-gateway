@@ -30,8 +30,22 @@ func (h *queryHandler) getCompensateOrderNumbers(ctx context.Context) (err error
 }
 
 func (h *queryHandler) formalize() {
-	for _, info := range h.infos {
-		info.CompensatedOrders = h.compensateOrderNumbers[info.EntID]
+	for _, info := range h.malfunctions {
+		h.infos = append(h.infos, &npool.Malfunction{
+			ID:                info.ID,
+			EntID:             info.EntID,
+			GoodID:            info.GoodID,
+			GoodType:          info.GoodType,
+			GoodName:          info.GoodName,
+			Title:             info.Title,
+			Message:           info.Message,
+			StartAt:           info.StartAt,
+			DurationSeconds:   info.DurationSeconds,
+			CompensateSeconds: info.CompensateSeconds,
+			CompensatedOrders: h.compensateOrderNumbers[info.EntID],
+			CreatedAt:         info.CreatedAt,
+			UpdatedAt:         info.UpdatedAt,
+		})
 	}
 }
 
