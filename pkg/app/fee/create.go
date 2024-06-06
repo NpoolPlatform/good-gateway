@@ -17,6 +17,7 @@ func (h *Handler) CreateAppFee(ctx context.Context) (*npool.AppFee, error) {
 	if err := appfeemwcli.CreateFee(ctx, &appfeemwpb.FeeReq{
 		AppID:                   h.AppID,
 		GoodID:                  h.GoodID,
+		AppGoodID:               h.AppGoodID,
 		ProductPage:             h.ProductPage,
 		Name:                    h.Name,
 		Banner:                  h.Banner,
