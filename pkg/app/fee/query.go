@@ -63,6 +63,9 @@ func (h *Handler) GetAppFee(ctx context.Context) (*npool.AppFee, error) {
 	if info == nil {
 		return nil, wlog.Errorf("invalid fee")
 	}
+	if info.AppID != *h.AppID {
+		return nil, wlog.Errorf("permission denied")
+	}
 	handler := &queryHandler{
 		Handler: h,
 		fees:    []*appfeemwpb.Fee{info},
