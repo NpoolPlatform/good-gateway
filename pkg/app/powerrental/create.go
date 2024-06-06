@@ -19,6 +19,9 @@ func (h *Handler) CreatePowerRental(ctx context.Context) (*npool.AppPowerRental,
 	if h.AppGoodID == nil {
 		h.AppGoodID = func() *string { s := uuid.NewString(); return &s }()
 	}
+	if h.FixedDuration != nil && (*h.FixedDuration && h.MaxOrderDurationSeconds == nil) {
+		h.MaxOrderDurationSeconds = h.MinOrderDurationSeconds
+	}
 	if err := apppowerrentalmwcli.CreatePowerRental(ctx, &apppowerrentalmwpb.PowerRentalReq{
 		EntID:                        h.EntID,
 		AppID:                        h.AppID,
