@@ -23,9 +23,10 @@ func (h *Handler) UpdateTopMostGood(ctx context.Context) (*npool.TopMostGood, er
 	}
 
 	if err := topmostgoodmwcli.UpdateTopMostGood(ctx, &topmostgoodmwpb.TopMostGoodReq{
-		ID:        h.ID,
-		EntID:     h.EntID,
-		UnitPrice: h.UnitPrice,
+		ID:           h.ID,
+		EntID:        h.EntID,
+		UnitPrice:    h.UnitPrice,
+		DisplayIndex: h.DisplayIndex,
 	}); err != nil {
 		return nil, err
 	}
