@@ -256,8 +256,12 @@ func WithMinOrderAmount(s *string, must bool) func(context.Context, *Handler) er
 			}
 			return nil
 		}
-		if _, err := decimal.NewFromString(*s); err != nil {
+		amount, err := decimal.NewFromString(*s)
+		if err != nil {
 			return wlog.WrapError(err)
+		}
+		if amount.Cmp(decimal.NewFromInt(0)) < 0 {
+			return wlog.Errorf("invalid maxorderamount")
 		}
 		h.MinOrderAmount = s
 		return nil
