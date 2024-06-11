@@ -4,10 +4,10 @@ import (
 	"context"
 	"fmt"
 
-	appgoodpostermwcli "github.com/NpoolPlatform/good-middleware/pkg/client/app/good/poster"
+	devicepostermwcli "github.com/NpoolPlatform/good-middleware/pkg/client/device/poster"
 	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
-	appgoodpostermwpb "github.com/NpoolPlatform/message/npool/good/mw/v1/app/good/poster"
+	devicepostermwpb "github.com/NpoolPlatform/message/npool/good/mw/v1/device/poster"
 )
 
 type checkHandler struct {
@@ -15,7 +15,7 @@ type checkHandler struct {
 }
 
 func (h *checkHandler) checkPoster(ctx context.Context) error {
-	exist, err := appgoodpostermwcli.ExistPosterConds(ctx, &appgoodpostermwpb.Conds{
+	exist, err := devicepostermwcli.ExistPosterConds(ctx, &devicepostermwpb.Conds{
 		ID:    &basetypes.Uint32Val{Op: cruder.EQ, Value: *h.ID},
 		EntID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.EntID},
 	})
