@@ -3,6 +3,7 @@ package powerrental
 import (
 	"context"
 
+	wlog "github.com/NpoolPlatform/go-service-framework/pkg/wlog"
 	apppowerrentalmwcli "github.com/NpoolPlatform/good-middleware/pkg/client/app/powerrental"
 	npool "github.com/NpoolPlatform/message/npool/good/gw/v1/app/powerrental"
 	apppowerrentalmwpb "github.com/NpoolPlatform/message/npool/good/mw/v1/app/powerrental"
@@ -19,7 +20,10 @@ func (h *Handler) CreatePowerRental(ctx context.Context) (*npool.AppPowerRental,
 	if h.AppGoodID == nil {
 		h.AppGoodID = func() *string { s := uuid.NewString(); return &s }()
 	}
-	if h.FixedDuration != nil && (*h.FixedDuration && h.MaxOrderDurationSeconds == nil) {
+	if h.FixedDuration != nil && *h.FixedDuration {
+		if h.MaxOrderDurationSeconds != nil && *h.MinOrderDurationSeconds != *h.MaxOrderDurationSeconds {
+			return nil, wlog.Errorf("invalid maxorderdurationseconds")
+		}
 		h.MaxOrderDurationSeconds = h.MinOrderDurationSeconds
 	}
 	if err := apppowerrentalmwcli.CreatePowerRental(ctx, &apppowerrentalmwpb.PowerRentalReq{
