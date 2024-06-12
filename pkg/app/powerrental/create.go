@@ -20,7 +20,7 @@ func (h *Handler) CreatePowerRental(ctx context.Context) (*npool.AppPowerRental,
 	if h.AppGoodID == nil {
 		h.AppGoodID = func() *string { s := uuid.NewString(); return &s }()
 	}
-	if h.FixedDuration != nil && *h.FixedDuration {
+	if h.FixedDuration == nil || *h.FixedDuration {
 		if h.MaxOrderDurationSeconds != nil && *h.MinOrderDurationSeconds != *h.MaxOrderDurationSeconds {
 			return nil, wlog.Errorf("invalid maxorderdurationseconds")
 		}
