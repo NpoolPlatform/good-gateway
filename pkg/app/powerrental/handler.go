@@ -261,7 +261,7 @@ func WithMinOrderAmount(s *string, must bool) func(context.Context, *Handler) er
 			return wlog.WrapError(err)
 		}
 		if amount.Cmp(decimal.NewFromInt(0)) < 0 {
-			return wlog.Errorf("invalid maxorderamount")
+			return wlog.Errorf("invalid minorderamount")
 		}
 		h.MinOrderAmount = s
 		return nil
