@@ -1,8 +1,10 @@
+//nolint
 package migrator
 
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"time"
 
@@ -11,10 +13,17 @@ import (
 	constant "github.com/NpoolPlatform/go-service-framework/pkg/mysql/const"
 	redis2 "github.com/NpoolPlatform/go-service-framework/pkg/redis"
 	servicename "github.com/NpoolPlatform/good-gateway/pkg/servicename"
-	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
+	"github.com/NpoolPlatform/good-middleware/pkg/db"
+	"github.com/NpoolPlatform/good-middleware/pkg/db/ent"
 
+	entappgooddescription "github.com/NpoolPlatform/good-middleware/pkg/db/ent/appgooddescription"
+	entappgooddisplaycolor "github.com/NpoolPlatform/good-middleware/pkg/db/ent/appgooddisplaycolor"
+	entappgooddisplayname "github.com/NpoolPlatform/good-middleware/pkg/db/ent/appgooddisplayname"
+	entappgoodlabel "github.com/NpoolPlatform/good-middleware/pkg/db/ent/appgoodlabel"
+	entappgoodposter "github.com/NpoolPlatform/good-middleware/pkg/db/ent/appgoodposter"
+
+	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 	"github.com/google/uuid"
-	"github.com/shopspring/decimal"
 )
 
 const (
@@ -69,155 +78,216 @@ func open(hostname string) (conn *sql.DB, err error) {
 	return conn, nil
 }
 
-//nolint
-func migrateGoodOrder(ctx context.Context, conn *sql.DB) error {
-	// Get goods
-	type good struct {
+func migrateDescriptions(ctx context.Context, tx *ent.Tx) error {
+	descriptions, err := tx.AppGoodDescription.Query().Where(entappgooddescription.DeletedAt(0)).All(ctx)
+	if err != nil {
+		return err
+	}
+	if len(descriptions) > 0 {
+		logger.Sugar().Warnw("appgooddescriptions is not empty")
+		return nil
+	}
+
+	rows, err := tx.QueryContext(ctx, "select ent_id,descriptions from app_goods where deleted_at = 0")
+	if err != nil {
+		return err
+	}
+
+	type Description struct {
 		EntID        uuid.UUID
-		Unit         string
-		UnitAmount   decimal.Decimal
-		DurationDays uint32
-		Price        decimal.Decimal
+		Descriptions string
 	}
-	result, err := conn.ExecContext(
-		ctx,
-		"update good_manager.goods set price='0' where price is NULL",
-	)
-	if err != nil {
-		return err
-	}
-	if _, err := result.RowsAffected(); err != nil {
-		return err
-	}
-	result, err = conn.ExecContext(
-		ctx,
-		"update good_manager.goods set start_mode='GoodStartModePreset' where start_mode='GoodStartModeConfirmed'",
-	)
-	if err != nil {
-		return err
-	}
-	if _, err := result.RowsAffected(); err != nil {
-		return err
-	}
-	rows, err := conn.QueryContext(
-		ctx,
-		"select ent_id,duration_days,unit,unit_amount,price from good_manager.goods",
-	)
-	if err != nil {
-		return err
-	}
-	goods := map[uuid.UUID]*good{}
 	for rows.Next() {
-		g := &good{}
-		if err := rows.Scan(&g.EntID, &g.DurationDays, &g.Unit, &g.UnitAmount, &g.Price); err != nil {
+		des := &Description{}
+		if err := rows.Scan(&des.EntID, &des.Descriptions); err != nil {
 			return err
 		}
-		goods[g.EntID] = g
+		var descriptions []string
+		if err := json.Unmarshal([]byte(des.Descriptions), &descriptions); err != nil {
+			return err
+		}
+		for idx, description := range descriptions {
+			if _, err := tx.
+				AppGoodDescription.
+				Create().
+				SetAppGoodID(des.EntID).
+				SetDescription(description).
+				SetIndex(uint8(idx)).
+				Save(ctx); err != nil {
+				return err
+			}
+		}
 	}
-	_, err = conn.ExecContext(
-		ctx,
-		"update good_manager.app_goods set user_purchase_limit='0' where user_purchase_limit is NULL",
-	)
+	return nil
+}
+
+func migrateDisplayColors(ctx context.Context, tx *ent.Tx) error {
+	colors, err := tx.AppGoodDisplayColor.Query().Where(entappgooddisplaycolor.DeletedAt(0)).All(ctx)
 	if err != nil {
 		return err
 	}
-	for goodID, g := range goods {
-		unitPrice := g.Price.Div(decimal.NewFromInt(365)) //nolint
-		_, err := conn.ExecContext(
-			ctx,
-			fmt.Sprintf(
-				"update good_manager.goods set unit_price='%v' where ent_id='%v' and unit_price is NULL and price is not NULL",
-				unitPrice,
-				goodID,
-			),
-		)
-		if err != nil {
-			return err
-		}
-		_, err = conn.ExecContext(
-			ctx,
-			fmt.Sprintf(
-				"update good_manager.goods set quantity_unit='%v',quantity_unit_amount='%v' where ent_id='%v' and quantity_unit_amount is NULL and unit_amount is not NULL",
-				g.Unit,
-				g.UnitAmount,
-				goodID,
-			),
-		)
-		if err != nil {
-			return err
-		}
+	if len(colors) > 0 {
+		logger.Sugar().Warnw("appgooddisplaycolors is not empty")
+		return nil
 	}
-	// Get app goods
-	type appGood struct {
-		EntID             uuid.UUID
-		PurchaseLimit     int32
-		UserPurchaseLimit decimal.Decimal
-		GoodID            uuid.UUID
-		DurationDays      uint32
-	}
-	rows, err = conn.QueryContext(
-		ctx,
-		"select ent_id,purchase_limit,user_purchase_limit,good_id from good_manager.app_goods where price is not NULL",
-	)
+
+	rows, err := tx.QueryContext(ctx, "select ent_id,display_colors from app_goods where deleted_at = 0")
 	if err != nil {
 		return err
 	}
-	appGoods := map[uuid.UUID]*appGood{}
+
+	type DisplayColor struct {
+		EntID         uuid.UUID
+		DisplayColors string
+	}
 	for rows.Next() {
-		ag := &appGood{
-			DurationDays: 365,
-		}
-		if err := rows.Scan(&ag.EntID, &ag.PurchaseLimit, &ag.UserPurchaseLimit, &ag.GoodID); err != nil {
+		displayColor := &DisplayColor{}
+		if err := rows.Scan(&displayColor.EntID, &displayColor.DisplayColors); err != nil {
 			return err
 		}
-		if g, ok := goods[ag.GoodID]; ok {
-			ag.DurationDays = g.DurationDays
+		var colors []string
+		if err := json.Unmarshal([]byte(displayColor.DisplayColors), &colors); err != nil {
+			return err
 		}
-		appGoods[ag.EntID] = ag
+		for idx, color := range colors {
+			if _, err := tx.
+				AppGoodDisplayColor.
+				Create().
+				SetAppGoodID(displayColor.EntID).
+				SetColor(color).
+				SetIndex(uint8(idx)).
+				Save(ctx); err != nil {
+				return err
+			}
+		}
 	}
-	// Update orders
-	for appGoodID, ag := range appGoods {
-		result, err := conn.ExecContext(
-			ctx,
-			fmt.Sprintf(
-				"update order_manager.orders set duration=%v where app_good_id='%v' and duration=0",
-				ag.DurationDays,
-				appGoodID,
-			),
-		)
-		if err != nil {
+	return nil
+}
+
+func migrateDisplayNames(ctx context.Context, tx *ent.Tx) error {
+	names, err := tx.AppGoodDisplayName.Query().Where(entappgooddisplayname.DeletedAt(0)).All(ctx)
+	if err != nil {
+		return err
+	}
+	if len(names) > 0 {
+		logger.Sugar().Warnw("appgooddisplaynames is not empty")
+		return nil
+	}
+
+	rows, err := tx.QueryContext(ctx, "select ent_id,display_names from app_goods where deleted_at = 0")
+	if err != nil {
+		return err
+	}
+
+	type DisplayName struct {
+		EntID        uuid.UUID
+		DisplayNames string
+	}
+	for rows.Next() {
+		displayName := &DisplayName{}
+		if err := rows.Scan(&displayName.EntID, &displayName.DisplayNames); err != nil {
 			return err
 		}
-		_, err = result.RowsAffected()
-		if err != nil {
+		var names []string
+		if err := json.Unmarshal([]byte(displayName.DisplayNames), &names); err != nil {
 			return err
 		}
-		unitPrice := decimal.NewFromInt(0)
-		packagePrice := decimal.NewFromInt(0)
-		g, ok := goods[ag.GoodID]
-		if ok {
-			unitPrice = g.Price.Div(decimal.NewFromInt(365)) //nolint
-			packagePrice = g.Price
+		for idx, name := range names {
+			if _, err := tx.
+				AppGoodDisplayName.
+				Create().
+				SetAppGoodID(displayName.EntID).
+				SetName(name).
+				SetIndex(uint8(idx)).
+				Save(ctx); err != nil {
+				return err
+			}
 		}
-		result, err = conn.ExecContext(
-			ctx,
-			fmt.Sprintf(
-				"update good_manager.app_goods set min_order_amount='0.1',max_order_amount='%v',max_user_amount='%v',min_order_duration='%v',max_order_duration='%v',unit_price='%v',package_price='%v' where ent_id='%v' and unit_price is NULL and price is not NULL", //nolint
-				ag.PurchaseLimit,
-				ag.UserPurchaseLimit,
-				ag.DurationDays,
-				ag.DurationDays,
-				unitPrice,
-				packagePrice,
-				appGoodID,
-			),
-		)
-		if err != nil {
+	}
+	return nil
+}
+
+func migratePosters(ctx context.Context, tx *ent.Tx) error {
+	posters, err := tx.AppGoodPoster.Query().Where(entappgoodposter.DeletedAt(0)).All(ctx)
+	if err != nil {
+		return err
+	}
+	if len(posters) > 0 {
+		logger.Sugar().Warnw("appgoodposters is not empty")
+		return nil
+	}
+
+	rows, err := tx.QueryContext(ctx, "select app_good_id,posters from extra_infos where deleted_at = 0")
+	if err != nil {
+		return err
+	}
+
+	type Poster struct {
+		AppGoodID uuid.UUID
+		Posters   string
+	}
+	for rows.Next() {
+		poster := &Poster{}
+		if err := rows.Scan(&poster.AppGoodID, &poster.Posters); err != nil {
 			return err
 		}
-		_, err = result.RowsAffected()
-		if err != nil {
+		var posters []string
+		if err := json.Unmarshal([]byte(poster.Posters), &posters); err != nil {
 			return err
+		}
+		for idx, pos := range posters {
+			if _, err := tx.
+				AppGoodPoster.
+				Create().
+				SetAppGoodID(poster.AppGoodID).
+				SetPoster(pos).
+				SetIndex(uint8(idx)).
+				Save(ctx); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+func migrateLabels(ctx context.Context, tx *ent.Tx) error {
+	labels, err := tx.AppGoodLabel.Query().Where(entappgoodlabel.DeletedAt(0)).All(ctx)
+	if err != nil {
+		return err
+	}
+	if len(labels) > 0 {
+		logger.Sugar().Warnw("appgoodlabels is not empty")
+		return nil
+	}
+
+	rows, err := tx.QueryContext(ctx, "select app_good_id,labels from extra_infos where deleted_at = 0")
+	if err != nil {
+		return err
+	}
+
+	type Poster struct {
+		AppGoodID uuid.UUID
+		Labels    string
+	}
+	for rows.Next() {
+		label := &Poster{}
+		if err := rows.Scan(&label.AppGoodID, &label.Labels); err != nil {
+			return err
+		}
+		var labels []string
+		if err := json.Unmarshal([]byte(label.Labels), &labels); err != nil {
+			return err
+		}
+		for idx, _label := range labels {
+			if _, err := tx.
+				AppGoodLabel.
+				Create().
+				SetAppGoodID(label.AppGoodID).
+				SetLabel(_label).
+				SetIndex(uint8(idx)).
+				Save(ctx); err != nil {
+				return err
+			}
 		}
 	}
 	return nil
@@ -252,5 +322,22 @@ func Migrate(ctx context.Context) error {
 		}
 	}()
 
-	return migrateGoodOrder(ctx, conn)
+	return db.WithTx(ctx, func(_ctx context.Context, tx *ent.Tx) error {
+		if err := migrateDescriptions(ctx, tx); err != nil {
+			return err
+		}
+		if err := migrateDisplayColors(ctx, tx); err != nil {
+			return err
+		}
+		if err := migrateDisplayNames(ctx, tx); err != nil {
+			return err
+		}
+		if err := migratePosters(ctx, tx); err != nil {
+			return err
+		}
+		if err := migrateLabels(ctx, tx); err != nil {
+			return err
+		}
+		return nil
+	})
 }
