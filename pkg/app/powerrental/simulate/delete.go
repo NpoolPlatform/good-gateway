@@ -25,7 +25,7 @@ func (h *Handler) DeleteSimulate(ctx context.Context) (*npool.Simulate, error) {
 	if err != nil {
 		return nil, err
 	}
-	if err := simulatemwcli.DeleteSimulate(ctx, h.ID, h.EntID); err != nil {
+	if err := simulatemwcli.DeleteSimulate(ctx, h.ID, h.EntID, h.AppGoodID); err != nil {
 		return nil, err
 	}
 	return info, nil

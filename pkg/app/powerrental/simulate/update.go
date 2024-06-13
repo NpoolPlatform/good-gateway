@@ -25,6 +25,7 @@ func (h *Handler) UpdateSimulate(ctx context.Context) (*npool.Simulate, error) {
 	if err := simulatemwcli.UpdateSimulate(ctx, &simulatemwpb.SimulateReq{
 		ID:                   h.ID,
 		EntID:                h.EntID,
+		AppGoodID:            h.AppGoodID,
 		OrderUnits:           h.OrderUnits,
 		OrderDurationSeconds: h.OrderDurationSeconds,
 	}); err != nil {

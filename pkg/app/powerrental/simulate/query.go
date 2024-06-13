@@ -56,7 +56,7 @@ func (h *queryHandler) formalize() {
 }
 
 func (h *Handler) GetSimulate(ctx context.Context) (*npool.Simulate, error) {
-	info, err := simulatemwcli.GetSimulate(ctx, *h.EntID)
+	info, err := simulatemwcli.GetSimulate(ctx, *h.AppGoodID)
 	if err != nil {
 		return nil, err
 	}

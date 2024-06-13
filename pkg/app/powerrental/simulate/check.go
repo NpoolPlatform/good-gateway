@@ -16,9 +16,10 @@ type checkHandler struct {
 
 func (h *checkHandler) checkSimulate(ctx context.Context) error {
 	exist, err := apppowerrentalsimulatemwcli.ExistSimulateConds(ctx, &apppowerrentalsimulatemwpb.Conds{
-		ID:    &basetypes.Uint32Val{Op: cruder.EQ, Value: *h.ID},
-		EntID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.EntID},
-		AppID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID},
+		ID:        &basetypes.Uint32Val{Op: cruder.EQ, Value: *h.ID},
+		EntID:     &basetypes.StringVal{Op: cruder.EQ, Value: *h.EntID},
+		AppID:     &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID},
+		AppGoodID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppGoodID},
 	})
 	if err != nil {
 		return err
