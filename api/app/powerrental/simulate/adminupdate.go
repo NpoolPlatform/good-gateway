@@ -18,6 +18,7 @@ func (s *Server) AdminUpdateSimulate(ctx context.Context, in *npool.AdminUpdateS
 		simulate1.WithID(&in.ID, true),
 		simulate1.WithEntID(&in.EntID, true),
 		simulate1.WithAppID(&in.TargetAppID, true),
+		simulate1.WithAppGoodID(&in.AppGoodID, true),
 		simulate1.WithOrderUnits(in.OrderUnits, false),
 		simulate1.WithOrderDurationSeconds(in.OrderDurationSeconds, false),
 	)

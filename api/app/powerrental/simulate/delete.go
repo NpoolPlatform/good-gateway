@@ -1,3 +1,4 @@
+//nolint:dupl
 package simulate
 
 import (
@@ -18,6 +19,7 @@ func (s *Server) DeleteSimulate(ctx context.Context, in *npool.DeleteSimulateReq
 		simulate1.WithID(&in.ID, true),
 		simulate1.WithEntID(&in.EntID, true),
 		simulate1.WithAppID(&in.AppID, true),
+		simulate1.WithAppGoodID(&in.AppGoodID, true),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(
