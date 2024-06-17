@@ -17,14 +17,22 @@ import (
 	"github.com/NpoolPlatform/good-middleware/pkg/db/ent"
 	"github.com/shopspring/decimal"
 
+	entappgood "github.com/NpoolPlatform/good-middleware/pkg/db/ent/appgood"
+	entappgoodbase "github.com/NpoolPlatform/good-middleware/pkg/db/ent/appgoodbase"
 	entappgooddescription "github.com/NpoolPlatform/good-middleware/pkg/db/ent/appgooddescription"
 	entappgooddisplaycolor "github.com/NpoolPlatform/good-middleware/pkg/db/ent/appgooddisplaycolor"
 	entappgooddisplayname "github.com/NpoolPlatform/good-middleware/pkg/db/ent/appgooddisplayname"
 	entappgoodlabel "github.com/NpoolPlatform/good-middleware/pkg/db/ent/appgoodlabel"
 	entappgoodposter "github.com/NpoolPlatform/good-middleware/pkg/db/ent/appgoodposter"
 	entapplegacypowerrental "github.com/NpoolPlatform/good-middleware/pkg/db/ent/applegacypowerrental"
+	entapppowerrental "github.com/NpoolPlatform/good-middleware/pkg/db/ent/apppowerrental"
+	entappstock "github.com/NpoolPlatform/good-middleware/pkg/db/ent/appstock"
 	entdevicemanufacturer "github.com/NpoolPlatform/good-middleware/pkg/db/ent/devicemanufacturer"
+	entgood "github.com/NpoolPlatform/good-middleware/pkg/db/ent/good"
+	entgoodbase "github.com/NpoolPlatform/good-middleware/pkg/db/ent/goodbase"
+	entpowerrental "github.com/NpoolPlatform/good-middleware/pkg/db/ent/powerrental"
 
+	goodtypes "github.com/NpoolPlatform/message/npool/basetypes/good/v1"
 	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 	"github.com/google/uuid"
 )
@@ -284,14 +292,14 @@ func migrateLabels(ctx context.Context, tx *ent.Tx) error {
 		return err
 	}
 
-	type Poster struct {
+	type Label struct {
 		AppGoodID uuid.UUID
 		Labels    string
 		CreatedAt uint32
 		UpdatedAt uint32
 	}
 	for rows.Next() {
-		label := &Poster{}
+		label := &Label{}
 		if err := rows.Scan(&label.AppGoodID, &label.Labels, &label.CreatedAt, &label.UpdatedAt); err != nil {
 			return err
 		}
@@ -410,6 +418,216 @@ func migrateTechnicalFeeRatio(ctx context.Context, tx *ent.Tx) error {
 	return nil
 }
 
+// after migrate posters & labels
+func createExtraInfoForAppGoods(ctx context.Context, tx *ent.Tx) error {
+	appgoods, err := tx.AppGood.Query().Where(entappgood.DeletedAt(0)).All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, appgood := range appgoods {
+		if _, err := tx.
+			ExtraInfo.
+			Create().
+			SetAppGoodID(appgood.EntID).
+			SetLikes(0).
+			SetDislikes(0).
+			SetScore(decimal.NewFromInt(0)).
+			SetScoreCount(0).
+			SetCommentCount(0).
+			SetRecommendCount(0).
+			Save(ctx); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func fillAppGoodIDForAppStockLocks(ctx context.Context, tx *ent.Tx) error {
+	infos, err := tx.AppStock.Query().Where(entappstock.DeletedAt(0)).All(ctx)
+	if err != nil {
+		return err
+	}
+	appstocks := map[string]uuid.UUID{}
+	for _, info := range infos {
+		appstocks[info.EntID.String()] = info.AppGoodID
+	}
+
+	rows, err := tx.QueryContext(ctx, "select id,app_stock_id from app_stock_locks where app_good_id is null and deleted_at = 0")
+	if err != nil {
+		return err
+	}
+	type AppStockLock struct {
+		ID         uint32
+		AppStockID uuid.UUID
+	}
+	for rows.Next() {
+		lock := &AppStockLock{}
+		if err := rows.Scan(&lock.ID, &lock.AppStockID); err != nil {
+			return err
+		}
+		appGoodID, ok := appstocks[lock.AppStockID.String()]
+		if !ok {
+			appGoodID = uuid.Nil
+		}
+		if _, err := tx.
+			AppStockLock.
+			UpdateOneID(lock.ID).
+			SetAppGoodID(appGoodID).
+			Save(ctx); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func migrateGoods(ctx context.Context, tx *ent.Tx) error {
+	goods, err := tx.Good.Query().Where(entgood.DeletedAt(0)).All(ctx)
+	if err != nil {
+		return err
+	}
+
+	for _, good := range goods {
+		exist, err := tx.
+			GoodBase.
+			Query().
+			Where(
+				entgoodbase.EntID(good.EntID),
+				entgoodbase.DeletedAt(0),
+			).
+			Exist(ctx)
+		if err != nil {
+			return err
+		}
+		if !exist {
+			if _, err := tx.
+				GoodBase.
+				Create().
+				SetEntID(good.EntID).
+				SetName(good.Title).
+				SetGoodType(good.GoodType).
+				SetBenefitType(good.BenefitType).
+				SetServiceStartAt(good.StartAt).
+				SetStartMode(good.StartMode).
+				SetTestOnly(good.TestOnly).
+				SetBenefitIntervalHours(good.BenefitIntervalHours).
+				SetPurchasable(true).
+				SetOnline(true).
+				Save(ctx); err != nil {
+				return err
+			}
+		}
+		exist, err = tx.
+			PowerRental.
+			Query().
+			Where(
+				entpowerrental.GoodID(good.EntID),
+				entpowerrental.DeletedAt(0),
+			).
+			Exist(ctx)
+		if err != nil {
+			return err
+		}
+		if !exist {
+			if _, err := tx.
+				PowerRental.
+				Create().
+				// SetEntID(good.EntID).
+				SetGoodID(good.EntID).
+				SetDeviceTypeID(good.DeviceInfoID).
+				SetVendorLocationID(good.VendorLocationID).
+				SetUnitPrice(good.UnitPrice).
+				SetQuantityUnit(good.QuantityUnit).
+				SetQuantityUnitAmount(good.QuantityUnitAmount).
+				SetDeliveryAt(good.DeliveryAt).
+				SetUnitLockDeposit(good.UnitLockDeposit).
+				SetDurationDisplayType(goodtypes.GoodDurationType_GoodDurationByDay.String()).
+				SetStockMode(goodtypes.GoodStockMode_GoodStockByUnique.String()).
+				Save(ctx); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+func migrateAppGoods(ctx context.Context, tx *ent.Tx) error {
+	appgoods, err := tx.AppGood.Query().Where(entappgood.DeletedAt(0)).All(ctx)
+	if err != nil {
+		return err
+	}
+
+	for _, appgood := range appgoods {
+		exist, err := tx.
+			AppGoodBase.
+			Query().
+			Where(
+				entappgoodbase.EntID(appgood.EntID),
+				entappgoodbase.DeletedAt(0),
+			).
+			Exist(ctx)
+		if err != nil {
+			return err
+		}
+		if !exist {
+			if _, err := tx.
+				AppGoodBase.
+				Create().
+				SetEntID(appgood.EntID).
+				SetAppID(appgood.AppID).
+				SetGoodID(appgood.GoodID).
+				SetPurchasable(appgood.EnablePurchase).
+				SetEnableProductPage(appgood.EnableProductPage).
+				SetProductPage(appgood.ProductPage).
+				SetName(appgood.GoodName).
+				SetDisplayIndex(appgood.DisplayIndex).
+				SetBanner(appgood.GoodBanner).
+				SetOnline(appgood.Online).
+				SetVisible(appgood.Visible).
+				Save(ctx); err != nil {
+				return err
+			}
+		}
+		exist, err = tx.
+			AppPowerRental.
+			Query().
+			Where(
+				entapppowerrental.AppGoodID(appgood.EntID),
+				entapppowerrental.DeletedAt(0),
+			).
+			Exist(ctx)
+		if err != nil {
+			return err
+		}
+		if !exist {
+			if _, err := tx.
+				AppPowerRental.
+				Create().
+				// SetEntID(good.EntID).
+				SetAppGoodID(appgood.EntID).
+				SetServiceStartAt(appgood.ServiceStartAt).
+				SetCancelMode(appgood.CancelMode).
+				SetCancelableBeforeStartSeconds(appgood.CancellableBeforeStart).
+				SetEnableSetCommission(appgood.EnableSetCommission).
+				SetMinOrderAmount(appgood.MinOrderAmount).
+				SetMaxOrderAmount(appgood.MaxOrderAmount).
+				SetMaxUserAmount(appgood.MaxUserAmount).
+				SetUnitPrice(appgood.UnitPrice).
+				SetSaleStartAt(appgood.SaleStartAt).
+				SetSaleEndAt(appgood.SaleEndAt).
+				SetSaleMode(goodtypes.GoodSaleMode_GoodSaleModeMainnetSpot.String()).
+				SetFixedDuration(true).
+				SetPackageWithRequireds(appgood.PackageWithRequireds).
+				SetMinOrderDurationSeconds(appgood.MinOrderDuration * 24 * 60 * 60).
+				SetMaxOrderDurationSeconds(appgood.MaxOrderDuration * 24 * 60 * 60).
+				SetStartMode(goodtypes.GoodStartMode_GoodStartModeNextDay.String()).
+				Save(ctx); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
 func lockKey() string {
 	serviceID := config.GetStringValueWithNameSpace(servicename.ServiceDomain, keyServiceID)
 	return fmt.Sprintf("%v:%v", basetypes.Prefix_PrefixMigrate, serviceID)
@@ -459,6 +677,18 @@ func Migrate(ctx context.Context) error {
 			return err
 		}
 		if err := migrateTechnicalFeeRatio(ctx, tx); err != nil {
+			return err
+		}
+		if err := createExtraInfoForAppGoods(ctx, tx); err != nil {
+			return err
+		}
+		if err := fillAppGoodIDForAppStockLocks(ctx, tx); err != nil {
+			return err
+		}
+		if err := migrateGoods(ctx, tx); err != nil {
+			return err
+		}
+		if err := migrateAppGoods(ctx, tx); err != nil {
 			return err
 		}
 		return nil
