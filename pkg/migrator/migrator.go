@@ -32,6 +32,7 @@ import (
 	entgoodbase "github.com/NpoolPlatform/good-middleware/pkg/db/ent/goodbase"
 	entgoodcoin "github.com/NpoolPlatform/good-middleware/pkg/db/ent/goodcoin"
 	entgoodcoinreward "github.com/NpoolPlatform/good-middleware/pkg/db/ent/goodcoinreward"
+
 	// entgoodreward "github.com/NpoolPlatform/good-middleware/pkg/db/ent/goodreward"
 	// entgoodrewardhistory "github.com/NpoolPlatform/good-middleware/pkg/db/ent/goodrewardhistory"
 	entpowerrental "github.com/NpoolPlatform/good-middleware/pkg/db/ent/powerrental"
@@ -94,46 +95,55 @@ func open(hostname string) (conn *sql.DB, err error) {
 }
 
 func migrateDescriptions(ctx context.Context, tx *ent.Tx) error {
-	descriptions, err := tx.AppGoodDescription.Query().Where(entappgooddescription.DeletedAt(0)).All(ctx)
-	if err != nil {
-		return err
-	}
-	if len(descriptions) > 0 {
-		logger.Sugar().Warnw("appgooddescriptions is not empty")
-		return nil
-	}
-
-	rows, err := tx.QueryContext(ctx, "select ent_id,descriptions,created_at,updated_at from app_goods where deleted_at = 0")
+	rows, err := tx.QueryContext(ctx, "select ent_id,descriptions,created_at,updated_at from app_goods where JSON_LENGTH(descriptions) > 0 and deleted_at = 0")
 	if err != nil {
 		return err
 	}
 
 	type Description struct {
 		AppGoodID    uuid.UUID `json:"ent_id"`
-		Descriptions string
-		CreatedAt    uint32
-		UpdatedAt    uint32
+		Descriptions string    `json:"descriptions"`
+		CreatedAt    uint32    `json:"created_at"`
+		UpdatedAt    uint32    `json:"updated_at"`
 	}
+	descriptions := []*Description{}
 	for rows.Next() {
 		des := &Description{}
 		if err := rows.Scan(&des.AppGoodID, &des.Descriptions, &des.CreatedAt, &des.UpdatedAt); err != nil {
 			return err
 		}
+		descriptions = append(descriptions, des)
+	}
+	for _, des := range descriptions {
 		var descriptions []string
 		if err := json.Unmarshal([]byte(des.Descriptions), &descriptions); err != nil {
 			return err
 		}
 		for idx, description := range descriptions {
-			if _, err := tx.
+			exist, err := tx.
 				AppGoodDescription.
-				Create().
-				SetAppGoodID(des.AppGoodID).
-				SetDescription(description).
-				SetCreatedAt(des.CreatedAt).
-				SetUpdatedAt(des.UpdatedAt).
-				SetIndex(uint8(idx)).
-				Save(ctx); err != nil {
+				Query().
+				Where(
+					entappgooddescription.AppGoodID(des.AppGoodID),
+					entappgooddescription.Description(description),
+					entappgooddescription.DeletedAt(0),
+				).
+				Exist(ctx)
+			if err != nil {
 				return err
+			}
+			if !exist {
+				if _, err := tx.
+					AppGoodDescription.
+					Create().
+					SetAppGoodID(des.AppGoodID).
+					SetDescription(description).
+					SetCreatedAt(des.CreatedAt).
+					SetUpdatedAt(des.UpdatedAt).
+					SetIndex(uint8(idx)).
+					Save(ctx); err != nil {
+					return err
+				}
 			}
 		}
 	}
@@ -141,46 +151,56 @@ func migrateDescriptions(ctx context.Context, tx *ent.Tx) error {
 }
 
 func migrateDisplayColors(ctx context.Context, tx *ent.Tx) error {
-	colors, err := tx.AppGoodDisplayColor.Query().Where(entappgooddisplaycolor.DeletedAt(0)).All(ctx)
-	if err != nil {
-		return err
-	}
-	if len(colors) > 0 {
-		logger.Sugar().Warnw("appgooddisplaycolors is not empty")
-		return nil
-	}
-
-	rows, err := tx.QueryContext(ctx, "select ent_id,display_colors,created_at,updated_at from app_goods where deleted_at = 0")
+	rows, err := tx.QueryContext(ctx, "select ent_id,display_colors,created_at,updated_at from app_goods where JSON_LENGTH(display_colors) > 0 and deleted_at = 0")
 	if err != nil {
 		return err
 	}
 
 	type DisplayColor struct {
 		AppGoodID     uuid.UUID `json:"ent_id"`
-		DisplayColors string
-		CreatedAt     uint32
-		UpdatedAt     uint32
+		DisplayColors string    `json:"display_colors"`
+		CreatedAt     uint32    `json:"created_at"`
+		UpdatedAt     uint32    `json:"updated_at"`
 	}
+	displayColors := []*DisplayColor{}
 	for rows.Next() {
 		displayColor := &DisplayColor{}
 		if err := rows.Scan(&displayColor.AppGoodID, &displayColor.DisplayColors, &displayColor.CreatedAt, &displayColor.UpdatedAt); err != nil {
 			return err
 		}
+		displayColors = append(displayColors, displayColor)
+	}
+
+	for _, displayColor := range displayColors {
 		var colors []string
 		if err := json.Unmarshal([]byte(displayColor.DisplayColors), &colors); err != nil {
 			return err
 		}
 		for idx, color := range colors {
-			if _, err := tx.
+			exist, err := tx.
 				AppGoodDisplayColor.
-				Create().
-				SetAppGoodID(displayColor.AppGoodID).
-				SetColor(color).
-				SetIndex(uint8(idx)).
-				SetCreatedAt(displayColor.CreatedAt).
-				SetUpdatedAt(displayColor.UpdatedAt).
-				Save(ctx); err != nil {
+				Query().
+				Where(
+					entappgooddisplaycolor.AppGoodID(displayColor.AppGoodID),
+					entappgooddisplaycolor.Color(color),
+					entappgooddisplaycolor.DeletedAt(0),
+				).
+				Exist(ctx)
+			if err != nil {
 				return err
+			}
+			if !exist {
+				if _, err := tx.
+					AppGoodDisplayColor.
+					Create().
+					SetAppGoodID(displayColor.AppGoodID).
+					SetColor(color).
+					SetIndex(uint8(idx)).
+					SetCreatedAt(displayColor.CreatedAt).
+					SetUpdatedAt(displayColor.UpdatedAt).
+					Save(ctx); err != nil {
+					return err
+				}
 			}
 		}
 	}
@@ -188,46 +208,57 @@ func migrateDisplayColors(ctx context.Context, tx *ent.Tx) error {
 }
 
 func migrateDisplayNames(ctx context.Context, tx *ent.Tx) error {
-	names, err := tx.AppGoodDisplayName.Query().Where(entappgooddisplayname.DeletedAt(0)).All(ctx)
-	if err != nil {
-		return err
-	}
-	if len(names) > 0 {
-		logger.Sugar().Warnw("appgooddisplaynames is not empty")
-		return nil
-	}
-
-	rows, err := tx.QueryContext(ctx, "select ent_id,display_names,created_at,updated_at from app_goods where deleted_at = 0")
+	rows, err := tx.QueryContext(ctx, "select ent_id,display_names,created_at,updated_at from app_goods where JSON_LENGTH(display_names) > 0 and deleted_at = 0")
 	if err != nil {
 		return err
 	}
 
 	type DisplayName struct {
 		AppGoodID    uuid.UUID `json:"ent_id"`
-		DisplayNames string
-		CreatedAt    uint32
-		UpdatedAt    uint32
+		DisplayNames string    `json:"display_names"`
+		CreatedAt    uint32    `json:"created_at"`
+		UpdatedAt    uint32    `json:"updated_at"`
 	}
+
+	displayNames := []*DisplayName{}
 	for rows.Next() {
 		displayName := &DisplayName{}
 		if err := rows.Scan(&displayName.AppGoodID, &displayName.DisplayNames, &displayName.CreatedAt, &displayName.UpdatedAt); err != nil {
 			return err
 		}
+		displayNames = append(displayNames, displayName)
+	}
+
+	for _, displayName := range displayNames {
 		var names []string
 		if err := json.Unmarshal([]byte(displayName.DisplayNames), &names); err != nil {
 			return err
 		}
 		for idx, name := range names {
-			if _, err := tx.
+			exist, err := tx.
 				AppGoodDisplayName.
-				Create().
-				SetAppGoodID(displayName.AppGoodID).
-				SetName(name).
-				SetIndex(uint8(idx)).
-				SetCreatedAt(displayName.CreatedAt).
-				SetUpdatedAt(displayName.UpdatedAt).
-				Save(ctx); err != nil {
+				Query().
+				Where(
+					entappgooddisplayname.AppGoodID(displayName.AppGoodID),
+					entappgooddisplayname.Name(name),
+					entappgooddisplayname.DeletedAt(0),
+				).
+				Exist(ctx)
+			if err != nil {
 				return err
+			}
+			if !exist {
+				if _, err := tx.
+					AppGoodDisplayName.
+					Create().
+					SetAppGoodID(displayName.AppGoodID).
+					SetName(name).
+					SetIndex(uint8(idx)).
+					SetCreatedAt(displayName.CreatedAt).
+					SetUpdatedAt(displayName.UpdatedAt).
+					Save(ctx); err != nil {
+					return err
+				}
 			}
 		}
 	}
@@ -809,15 +840,15 @@ func Migrate(ctx context.Context) error {
 	}()
 
 	return db.WithTx(ctx, func(_ctx context.Context, tx *ent.Tx) error {
-		// if err := migrateDescriptions(ctx, tx); err != nil {
-		// 	return err
-		// }
-		// if err := migrateDisplayColors(ctx, tx); err != nil {
-		// 	return err
-		// }
-		// if err := migrateDisplayNames(ctx, tx); err != nil {
-		// 	return err
-		// }
+		if err := migrateDescriptions(ctx, tx); err != nil {
+			return err
+		}
+		if err := migrateDisplayColors(ctx, tx); err != nil {
+			return err
+		}
+		if err := migrateDisplayNames(ctx, tx); err != nil {
+			return err
+		}
 		// if err := migratePosters(ctx, tx); err != nil {
 		// 	return err
 		// }
