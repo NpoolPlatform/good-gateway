@@ -49,6 +49,7 @@ func (h *queryHandler) formalize() {
 			Banner:                  fee.Banner,
 			UnitValue:               fee.UnitValue,
 			MinOrderDurationSeconds: fee.MinOrderDurationSeconds,
+			CancelMode:              fee.CancelMode,
 			CreatedAt:               fee.CreatedAt,
 			UpdatedAt:               fee.UpdatedAt,
 		})
