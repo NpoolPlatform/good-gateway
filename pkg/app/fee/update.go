@@ -35,6 +35,7 @@ func (h *Handler) UpdateAppFee(ctx context.Context) (*npool.AppFee, error) {
 		Banner:                  h.Banner,
 		UnitValue:               h.UnitValue,
 		MinOrderDurationSeconds: h.MinOrderDurationSeconds,
+		CancelMode:              h.CancelMode,
 	}); err != nil {
 		return nil, err
 	}

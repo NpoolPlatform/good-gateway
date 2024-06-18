@@ -7,6 +7,7 @@ import (
 	appmwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/app"
 	appgoodcommon "github.com/NpoolPlatform/good-gateway/pkg/app/good/common"
 	constant "github.com/NpoolPlatform/good-gateway/pkg/const"
+	types "github.com/NpoolPlatform/message/npool/basetypes/good/v1"
 
 	"github.com/google/uuid"
 	"github.com/shopspring/decimal"
@@ -21,6 +22,7 @@ type Handler struct {
 	Banner                  *string
 	UnitValue               *string
 	MinOrderDurationSeconds *uint32
+	CancelMode              *types.CancelMode
 	Offset                  int32
 	Limit                   int32
 }
@@ -178,6 +180,25 @@ func WithMinOrderDurationSeconds(u *uint32, must bool) func(context.Context, *Ha
 			return fmt.Errorf("invalid minorderdurationseconds")
 		}
 		h.MinOrderDurationSeconds = u
+		return nil
+	}
+}
+
+func WithCancelMode(e *types.CancelMode, must bool) func(context.Context, *Handler) error {
+	return func(ctx context.Context, h *Handler) error {
+		if e == nil {
+			if must {
+				return fmt.Errorf("invalid cancelmode")
+			}
+			return nil
+		}
+		switch *e {
+		case types.CancelMode_Uncancellable:
+		case types.CancelMode_CancellableBeforeUsed:
+		default:
+			return fmt.Errorf("invalid cancelmode")
+		}
+		h.CancelMode = e
 		return nil
 	}
 }

@@ -23,6 +23,7 @@ func (h *Handler) CreateAppFee(ctx context.Context) (*npool.AppFee, error) {
 		Banner:                  h.Banner,
 		UnitValue:               h.UnitValue,
 		MinOrderDurationSeconds: h.MinOrderDurationSeconds,
+		CancelMode:              h.CancelMode,
 	}); err != nil {
 		return nil, err
 	}

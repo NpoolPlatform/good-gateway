@@ -22,6 +22,7 @@ func (s *Server) AdminCreateAppFee(ctx context.Context, in *npool.AdminCreateApp
 		appfee1.WithBanner(in.Banner, false),
 		appfee1.WithUnitValue(&in.UnitValue, true),
 		appfee1.WithMinOrderDurationSeconds(&in.MinOrderDurationSeconds, true),
+		appfee1.WithCancelMode(in.CancelMode, false),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(
