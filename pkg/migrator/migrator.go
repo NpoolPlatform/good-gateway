@@ -360,47 +360,61 @@ func migrateLabels(ctx context.Context, tx *ent.Tx) error {
 }
 
 func migrateDeviceInfo(ctx context.Context, tx *ent.Tx) error {
-	facturers, err := tx.DeviceManufacturer.Query().Where(entdevicemanufacturer.DeletedAt(0)).All(ctx)
-	if err != nil {
-		return err
-	}
-	if len(facturers) > 0 {
-		logger.Sugar().Warnw("device manufacturers is not empty")
-		return nil
-	}
-
-	rows, err := tx.QueryContext(ctx, "select id,manufacturer,created_at,updated_at from device_infos where deleted_at = 0")
+	rows, err := tx.QueryContext(ctx, "select id,manufacturer,created_at,updated_at from device_infos where manufacturer != '' and deleted_at = 0")
 	if err != nil {
 		return err
 	}
 
 	type Manufacturer struct {
-		ID           uint32
-		Manufacturer string
-		CreatedAt    uint32
-		UpdatedAt    uint32
+		ID           uint32 `json:"id"`
+		Manufacturer string `json:"manufacturer"`
+		CreatedAt    uint32 `json:"created_at"`
+		UpdatedAt    uint32 `json:"updated_at"`
 	}
 
-	manufacturerMap := map[string]uuid.UUID{}
+	manufacturers := []*Manufacturer{}
 	for rows.Next() {
 		manufacturer := &Manufacturer{}
 		if err := rows.Scan(&manufacturer.ID, &manufacturer.Manufacturer, &manufacturer.CreatedAt, &manufacturer.UpdatedAt); err != nil {
 			return err
 		}
+		manufacturers = append(manufacturers, manufacturer)
+	}
+
+	manufacturerMap := map[string]uuid.UUID{}
+	for _, manufacturer := range manufacturers {
 		manufacturerID, ok := manufacturerMap[manufacturer.Manufacturer]
 		if !ok {
 			manufacturerID = uuid.New()
-			if _, err := tx.
+			facturer, err := tx.
 				DeviceManufacturer.
-				Create().
-				SetName(manufacturer.Manufacturer).
-				SetLogo("").
-				SetCreatedAt(manufacturer.CreatedAt).
-				SetUpdatedAt(manufacturer.UpdatedAt).
-				Save(ctx); err != nil {
-				return err
+				Query().
+				Where(
+					entdevicemanufacturer.Name(manufacturer.Manufacturer),
+					entdevicemanufacturer.DeletedAt(0),
+				).
+				Only(ctx)
+			if err != nil {
+				if !ent.IsNotFound(err) {
+					return err
+				}
+				if _, err := tx.
+					DeviceManufacturer.
+					Create().
+					SetEntID(manufacturerID).
+					SetName(manufacturer.Manufacturer).
+					SetLogo("").
+					SetCreatedAt(manufacturer.CreatedAt).
+					SetUpdatedAt(manufacturer.UpdatedAt).
+					Save(ctx); err != nil {
+					return err
+				}
+				manufacturerMap[manufacturer.Manufacturer] = manufacturerID
 			}
-			manufacturerMap[manufacturer.Manufacturer] = manufacturerID
+			if err == nil {
+				manufacturerID = facturer.EntID
+				manufacturerMap[manufacturer.Manufacturer] = facturer.EntID
+			}
 		}
 		if _, err := tx.
 			DeviceInfo.
@@ -414,40 +428,49 @@ func migrateDeviceInfo(ctx context.Context, tx *ent.Tx) error {
 }
 
 func migrateTechnicalFeeRatio(ctx context.Context, tx *ent.Tx) error {
-	names, err := tx.AppLegacyPowerRental.Query().Where(entapplegacypowerrental.DeletedAt(0)).All(ctx)
-	if err != nil {
-		return err
-	}
-	if len(names) > 0 {
-		logger.Sugar().Warnw("applegacypowerrentals is not empty")
-		return nil
-	}
-
 	rows, err := tx.QueryContext(ctx, "select ent_id,technical_fee_ratio,created_at,updated_at from app_goods where deleted_at = 0")
 	if err != nil {
 		return err
 	}
 
 	type TechniqueFee struct {
-		AppGoodID         uuid.UUID `json:"ent_id"`
-		TechniqueFeeRatio decimal.Decimal
-		CreatedAt         uint32
-		UpdatedAt         uint32
+		AppGoodID         uuid.UUID       `json:"ent_id"`
+		TechniqueFeeRatio decimal.Decimal `json:"technical_fee_ratio"`
+		CreatedAt         uint32          `json:"created_at"`
+		UpdatedAt         uint32          `json:"updated_at"`
 	}
+
+	techniques := []*TechniqueFee{}
 	for rows.Next() {
 		technique := &TechniqueFee{}
 		if err := rows.Scan(&technique.AppGoodID, &technique.TechniqueFeeRatio, &technique.CreatedAt, &technique.UpdatedAt); err != nil {
 			return err
 		}
-		if _, err := tx.
+		techniques = append(techniques, technique)
+	}
+	for _, technique := range techniques {
+		exist, err := tx.
 			AppLegacyPowerRental.
-			Create().
-			SetAppGoodID(technique.AppGoodID).
-			SetTechniqueFeeRatio(technique.TechniqueFeeRatio).
-			SetCreatedAt(technique.CreatedAt).
-			SetUpdatedAt(technique.UpdatedAt).
-			Save(ctx); err != nil {
+			Query().
+			Where(
+				entapplegacypowerrental.AppGoodID(technique.AppGoodID),
+				entapplegacypowerrental.DeletedAt(0),
+			).
+			Exist(ctx)
+		if err != nil {
 			return err
+		}
+		if !exist {
+			if _, err := tx.
+				AppLegacyPowerRental.
+				Create().
+				SetAppGoodID(technique.AppGoodID).
+				SetTechniqueFeeRatio(technique.TechniqueFeeRatio).
+				SetCreatedAt(technique.CreatedAt).
+				SetUpdatedAt(technique.UpdatedAt).
+				Save(ctx); err != nil {
+				return err
+			}
 		}
 	}
 	return nil
@@ -855,12 +878,12 @@ func Migrate(ctx context.Context) error {
 		// if err := migrateLabels(ctx, tx); err != nil {
 		// 	return err
 		// }
-		// if err := migrateDeviceInfo(ctx, tx); err != nil {
-		// 	return err
-		// }
-		// if err := migrateTechnicalFeeRatio(ctx, tx); err != nil {
-		// 	return err
-		// }
+		if err := migrateDeviceInfo(ctx, tx); err != nil {
+			return err
+		}
+		if err := migrateTechnicalFeeRatio(ctx, tx); err != nil {
+			return err
+		}
 		// if err := createExtraInfoForAppGoods(ctx, tx); err != nil {
 		// 	return err
 		// }
