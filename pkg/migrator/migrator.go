@@ -30,6 +30,10 @@ import (
 	entdevicemanufacturer "github.com/NpoolPlatform/good-middleware/pkg/db/ent/devicemanufacturer"
 	entgood "github.com/NpoolPlatform/good-middleware/pkg/db/ent/good"
 	entgoodbase "github.com/NpoolPlatform/good-middleware/pkg/db/ent/goodbase"
+	entgoodcoin "github.com/NpoolPlatform/good-middleware/pkg/db/ent/goodcoin"
+	entgoodcoinreward "github.com/NpoolPlatform/good-middleware/pkg/db/ent/goodcoinreward"
+	// entgoodreward "github.com/NpoolPlatform/good-middleware/pkg/db/ent/goodreward"
+	// entgoodrewardhistory "github.com/NpoolPlatform/good-middleware/pkg/db/ent/goodrewardhistory"
 	entpowerrental "github.com/NpoolPlatform/good-middleware/pkg/db/ent/powerrental"
 
 	goodtypes "github.com/NpoolPlatform/message/npool/basetypes/good/v1"
@@ -628,6 +632,153 @@ func migrateAppGoods(ctx context.Context, tx *ent.Tx) error {
 	return nil
 }
 
+func migrateGoodCoins(ctx context.Context, tx *ent.Tx) error {
+	goods, err := tx.Good.Query().Where(entgood.DeletedAt(0)).All(ctx)
+	if err != nil {
+		return err
+	}
+
+	for _, good := range goods {
+		exist, err := tx.
+			GoodCoin.
+			Query().
+			Where(
+				entgoodcoin.GoodID(good.EntID),
+				entgoodcoin.CoinTypeID(good.CoinTypeID),
+				entgoodcoin.DeletedAt(0),
+			).
+			Exist(ctx)
+		if err != nil {
+			return err
+		}
+		if !exist {
+			if _, err := tx.
+				GoodCoin.
+				Create().
+				SetGoodID(good.EntID).
+				SetCoinTypeID(good.CoinTypeID).
+				SetMain(true).
+				SetIndex(0).
+				Save(ctx); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+func migrateGoodRewards(ctx context.Context, tx *ent.Tx) error {
+	infos, err := tx.Good.Query().Where(entgood.DeletedAt(0)).All(ctx)
+	if err != nil {
+		return err
+	}
+	goods := map[string]uuid.UUID{}
+	for _, info := range infos {
+		goods[info.EntID.String()] = info.CoinTypeID
+	}
+	rows, err := tx.QueryContext(ctx, "select id,ent_id,good_id,reward_state,last_reward_at,reward_tid,next_reward_start_amount,last_reward_amount,last_unit_reward_amount,total_reward_amount,created_at,updated_at from good_rewards where deleted_at = 0")
+	if err != nil {
+		return err
+	}
+
+	type Reward struct {
+		ID                    uuid.UUID
+		EntID                 uuid.UUID
+		GoodID                uuid.UUID
+		RewardState           string
+		LastRewardAt          uint32
+		RewardTid             uuid.UUID
+		NextRewardStartAmount decimal.Decimal
+		LastRewardAmount      decimal.Decimal
+		LastUnitRewardAmount  decimal.Decimal
+		TotalRewardAmount     decimal.Decimal
+		CreatedAt             uint32
+		UpdatedAt             uint32
+	}
+	for rows.Next() {
+		reward := &Reward{}
+		if err := rows.Scan(&reward.ID, &reward.EntID, &reward.GoodID, &reward.RewardState, &reward.LastRewardAt, &reward.RewardTid, &reward.LastRewardAmount, &reward.LastUnitRewardAmount, &reward.TotalRewardAmount, &reward.CreatedAt, &reward.UpdatedAt); err != nil {
+			return err
+		}
+		coinTypeID, ok := goods[reward.GoodID.String()]
+		if !ok {
+			coinTypeID = uuid.Nil
+		}
+
+		exist, err := tx.
+			GoodCoinReward.
+			Query().
+			Where(
+				entgoodcoinreward.GoodID(reward.GoodID),
+				entgoodcoinreward.CoinTypeID(coinTypeID),
+				entgoodcoinreward.DeletedAt(0),
+			).
+			Exist(ctx)
+		if err != nil {
+			return err
+		}
+
+		if !exist {
+			if _, err := tx.
+				GoodCoinReward.
+				Create().
+				SetEntID(reward.EntID).
+				SetGoodID(reward.GoodID).
+				SetCoinTypeID(coinTypeID).
+				SetRewardTid(reward.RewardTid).
+				SetNextRewardStartAmount(reward.NextRewardStartAmount).
+				SetLastRewardAmount(reward.LastRewardAmount).
+				SetLastUnitRewardAmount(reward.LastUnitRewardAmount).
+				SetTotalRewardAmount(reward.TotalRewardAmount).
+				SetCreatedAt(reward.CreatedAt).
+				SetUpdatedAt(reward.UpdatedAt).
+				Save(ctx); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+func fillCoinTypeIDInGoodRewardHistories(ctx context.Context, tx *ent.Tx) error {
+	infos, err := tx.Good.Query().Where(entgood.DeletedAt(0)).All(ctx)
+	if err != nil {
+		return err
+	}
+	goods := map[string]uuid.UUID{}
+	for _, info := range infos {
+		goods[info.EntID.String()] = info.CoinTypeID
+	}
+
+	rows, err := tx.QueryContext(ctx, "select id,good_id from good_reward_histories where coin_type_id is null and deleted_at = 0")
+	if err != nil {
+		return err
+	}
+
+	type RewardHistory struct {
+		ID     uint32
+		GoodID uuid.UUID
+	}
+	for rows.Next() {
+		reward := &RewardHistory{}
+		if err := rows.Scan(&reward.ID, &reward.GoodID); err != nil {
+			return err
+		}
+		coinTypeID, ok := goods[reward.GoodID.String()]
+		if !ok {
+			coinTypeID = uuid.Nil
+		}
+		if _, err := tx.
+			GoodRewardHistory.
+			UpdateOneID(reward.ID).
+			SetCoinTypeID(coinTypeID).
+			Save(ctx); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func lockKey() string {
 	serviceID := config.GetStringValueWithNameSpace(servicename.ServiceDomain, keyServiceID)
 	return fmt.Sprintf("%v:%v", basetypes.Prefix_PrefixMigrate, serviceID)
@@ -658,39 +809,39 @@ func Migrate(ctx context.Context) error {
 	}()
 
 	return db.WithTx(ctx, func(_ctx context.Context, tx *ent.Tx) error {
-		if err := migrateDescriptions(ctx, tx); err != nil {
-			return err
-		}
-		if err := migrateDisplayColors(ctx, tx); err != nil {
-			return err
-		}
-		if err := migrateDisplayNames(ctx, tx); err != nil {
-			return err
-		}
-		if err := migratePosters(ctx, tx); err != nil {
-			return err
-		}
-		if err := migrateLabels(ctx, tx); err != nil {
-			return err
-		}
-		if err := migrateDeviceInfo(ctx, tx); err != nil {
-			return err
-		}
-		if err := migrateTechnicalFeeRatio(ctx, tx); err != nil {
-			return err
-		}
-		if err := createExtraInfoForAppGoods(ctx, tx); err != nil {
-			return err
-		}
-		if err := fillAppGoodIDForAppStockLocks(ctx, tx); err != nil {
-			return err
-		}
-		if err := migrateGoods(ctx, tx); err != nil {
-			return err
-		}
-		if err := migrateAppGoods(ctx, tx); err != nil {
-			return err
-		}
+		// if err := migrateDescriptions(ctx, tx); err != nil {
+		// 	return err
+		// }
+		// if err := migrateDisplayColors(ctx, tx); err != nil {
+		// 	return err
+		// }
+		// if err := migrateDisplayNames(ctx, tx); err != nil {
+		// 	return err
+		// }
+		// if err := migratePosters(ctx, tx); err != nil {
+		// 	return err
+		// }
+		// if err := migrateLabels(ctx, tx); err != nil {
+		// 	return err
+		// }
+		// if err := migrateDeviceInfo(ctx, tx); err != nil {
+		// 	return err
+		// }
+		// if err := migrateTechnicalFeeRatio(ctx, tx); err != nil {
+		// 	return err
+		// }
+		// if err := createExtraInfoForAppGoods(ctx, tx); err != nil {
+		// 	return err
+		// }
+		// if err := fillAppGoodIDForAppStockLocks(ctx, tx); err != nil {
+		// 	return err
+		// }
+		// if err := migrateGoods(ctx, tx); err != nil {
+		// 	return err
+		// }
+		// if err := migrateAppGoods(ctx, tx); err != nil {
+		// 	return err
+		// }
 		return nil
 	})
 }
