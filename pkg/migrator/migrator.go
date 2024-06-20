@@ -111,6 +111,10 @@ func setDefaultValueForTableColumns(ctx context.Context, tx *ent.Tx) error {
 	if _, err := tx.ExecContext(ctx, "update good_rewards set total_reward_amount = '0.000000000000000000' where total_reward_amount is null"); err != nil {
 		return err
 	}
+	// extra_infos
+	if _, err := tx.ExecContext(ctx, `update extra_infos set app_good_id = ? where app_good_id is null`, uuid.Nil.String()); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -398,13 +402,6 @@ func migrateTechnicalFeeRatio(ctx context.Context, tx *ent.Tx) error {
 				return err
 			}
 		}
-	}
-	return nil
-}
-
-func setDefaultValueForAppGoodIDInExtraInfo(ctx context.Context, tx *ent.Tx) error {
-	if _, err := tx.ExecContext(ctx, `update extra_infos set app_good_id = ? where app_good_id is null`, uuid.Nil.String()); err != nil {
-		return err
 	}
 	return nil
 }
@@ -836,9 +833,6 @@ func Migrate(ctx context.Context) error {
 			return err
 		}
 		if err := migrateTechnicalFeeRatio(ctx, tx); err != nil {
-			return err
-		}
-		if err := setDefaultValueForAppGoodIDInExtraInfo(ctx, tx); err != nil {
 			return err
 		}
 		if err := fillAppGoodIDForAppStockLocks(ctx, tx); err != nil {
