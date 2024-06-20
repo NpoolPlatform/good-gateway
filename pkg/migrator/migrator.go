@@ -90,6 +90,30 @@ func open(hostname string) (conn *sql.DB, err error) {
 	return conn, nil
 }
 
+func setDefaultValueForTableColumns(ctx context.Context, tx *ent.Tx) error {
+	// appdefaultgood
+	if _, err := tx.ExecContext(ctx, `update app_default_goods set app_id = ? where app_id is null`, uuid.Nil.String()); err != nil {
+		return err
+	}
+	if _, err := tx.ExecContext(ctx, `update app_default_goods set good_id = ? where good_id is null`, uuid.Nil.String()); err != nil {
+		return err
+	}
+	// goodreward
+	if _, err := tx.ExecContext(ctx, "update good_rewards set next_reward_start_amount = '0.000000000000000000' where next_reward_start_amount is null"); err != nil {
+		return err
+	}
+	if _, err := tx.ExecContext(ctx, "update good_rewards set last_reward_amount = '0.000000000000000000' where last_reward_amount is null"); err != nil {
+		return err
+	}
+	if _, err := tx.ExecContext(ctx, "update good_rewards set last_unit_reward_amount = '0.000000000000000000' where last_unit_reward_amount is null"); err != nil {
+		return err
+	}
+	if _, err := tx.ExecContext(ctx, "update good_rewards set total_reward_amount = '0.000000000000000000' where total_reward_amount is null"); err != nil {
+		return err
+	}
+	return nil
+}
+
 func migrateDescriptions(ctx context.Context, tx *ent.Tx) error {
 	rows, err := tx.QueryContext(ctx, "select ent_id,descriptions,created_at,updated_at from app_goods where JSON_LENGTH(descriptions) > 0 and deleted_at = 0")
 	if err != nil {
@@ -788,6 +812,15 @@ func Migrate(ctx context.Context) error {
 			logger.Sugar().Errorw("Close", "Error", err)
 		}
 	}()
+
+	if err = db.WithTx(ctx, func(_ctx context.Context, tx *ent.Tx) error {
+		if err := setDefaultValueForTableColumns(ctx, tx); err != nil {
+			return err
+		}
+		return nil
+	}); err != nil {
+		return err
+	}
 
 	return db.WithTx(ctx, func(_ctx context.Context, tx *ent.Tx) error {
 		if err := migrateDescriptions(ctx, tx); err != nil {
