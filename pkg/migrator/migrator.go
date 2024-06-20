@@ -657,7 +657,20 @@ func migrateGoodRewards(ctx context.Context, tx *ent.Tx) error {
 	rewards := []*Reward{}
 	for rows.Next() {
 		reward := &Reward{}
-		if err := rows.Scan(&reward.ID, &reward.EntID, &reward.GoodID, &reward.RewardState, &reward.LastRewardAt, &reward.RewardTid, &reward.NextRewardStartAmount, &reward.LastRewardAmount, &reward.LastUnitRewardAmount, &reward.TotalRewardAmount, &reward.CreatedAt, &reward.UpdatedAt); err != nil {
+		if err := rows.Scan(
+			&reward.ID,
+			&reward.EntID,
+			&reward.GoodID,
+			&reward.RewardState,
+			&reward.LastRewardAt,
+			&reward.RewardTid,
+			&reward.NextRewardStartAmount,
+			&reward.LastRewardAmount,
+			&reward.LastUnitRewardAmount,
+			&reward.TotalRewardAmount,
+			&reward.CreatedAt,
+			&reward.UpdatedAt,
+		); err != nil {
 			return err
 		}
 		rewards = append(rewards, reward)
