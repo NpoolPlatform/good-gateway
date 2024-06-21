@@ -31,10 +31,6 @@ spec:
             backend:
               serviceName: good-gateway
               servicePort: 50550
-          - path: /api/good/v1/get/appgood
-            backend:
-              serviceName: good-gateway
-              servicePort: 50550
           - path: /api/good/v1/get/promotions
             backend:
               serviceName: good-gateway
@@ -55,11 +51,11 @@ spec:
             backend:
               serviceName: good-gateway
               servicePort: 50550
-          - path: /api/good/v1/get/goodcomments
+          - path: /api/good/v1/get/goodrecommends
             backend:
               serviceName: good-gateway
               servicePort: 50550
-          - path: /api/good/v1/get/goodrecommends
+          - path: /api/good/v1/get/defaultgoods
             backend:
               serviceName: good-gateway
               servicePort: 50550
@@ -275,6 +271,317 @@ spec:
               serviceName: good-gateway
               servicePort: 50550
 
+          - path: /api/good/v1/admin/get/appgoods
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+
+          - path: /api/good/v1/create/goodcomment
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/update/goodcomment
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/delete/goodcomment
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/get/goodcomments
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/get/my/goodcomments
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/update/user/goodcomment
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/delete/user/goodcomment
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/admin/update/user/goodcomment
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/admin/delete/user/goodcomment
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/admin/get/goodcomments
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+
+          - path: /api/good/v1/create/defaultgood
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/update/defaultgood
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/delete/defaultgood
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/admin/create/defaultgood
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/admin/update/defaultgood
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/admin/delete/defaultgood
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/admin/get/defaultgoods
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+
+          - path: /api/good/v1/create/gooddescription
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/update/gooddescription
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/delete/gooddescription
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/get/gooddescriptions
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/admin/create/gooddescription
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/admin/update/gooddescription
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/admin/delete/gooddescription
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/admin/get/gooddescriptions
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+
+          - path: /api/good/v1/create/gooddisplaycolor
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/update/gooddisplaycolor
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/delete/gooddisplaycolor
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/get/gooddisplaycolors
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/admin/create/gooddisplaycolor
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/admin/update/gooddisplaycolor
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/admin/delete/gooddisplaycolor
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/admin/get/gooddisplaycolors
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+
+          - path: /api/good/v1/create/gooddisplayname
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/update/gooddisplayname
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/delete/gooddisplayname
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/get/gooddisplaynames
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/admin/create/gooddisplayname
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/admin/update/gooddisplayname
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/admin/delete/gooddisplayname
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/admin/get/gooddisplaynames
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+
+          - path: /api/good/v1/create/goodlabel
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/update/goodlabel
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/delete/goodlabel
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/get/goodlabels
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/admin/create/goodlabel
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/admin/update/goodlabel
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/admin/delete/goodlabels
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/admin/get/goodlabels
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+
+          - path: /api/good/v1/create/goodposter
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/update/goodposter
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/delete/goodposter
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/get/goodposters
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/admin/create/goodposter
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/admin/update/goodposter
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/admin/delete/goodposters
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/admin/get/goodposters
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+
+          - path: /api/good/v1/create/goodrecommend
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/update/goodrecommend
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/delete/goodrecommend
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/get/my/goodrecommends
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/get/goodrecommends
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/update/user/goodrecommend
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/admin/update/goodrecommend
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/admin/get/goodrecommends
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+
+          - path: /api/good/v1/create/appgoodscore
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/delete/appgoodscore
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/get/appgoodscores
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/get/my/appgoodscores
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/admin/get/appgoodscores
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+
+          - path: /api/good/v1/create/goodlike
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/update/goodlike
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/delete/goodlike
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+          - path: /api/good/v1/get/goodlikes
+            backend:
+              serviceName: good-gateway
+              servicePort: 50550
+
           - path: /api/good/v1/create/subgood
             backend:
               serviceName: good-gateway
@@ -296,36 +603,6 @@ spec:
               serviceName: good-gateway
               servicePort: 50550
           - path: /api/good/v1/get/app/subgoods
-            backend:
-              serviceName: good-gateway
-              servicePort: 50550
-
-
-          - path: /api/good/v1/create/defaultgood
-            backend:
-              serviceName: good-gateway
-              servicePort: 50550
-          - path: /api/good/v1/create/n/defaultgood
-            backend:
-              serviceName: good-gateway
-              servicePort: 50550
-          - path: /api/good/v1/get/defaultgoods
-            backend:
-              serviceName: good-gateway
-              servicePort: 50550
-          - path: /api/good/v1/get/n/defaultgoods
-            backend:
-              serviceName: good-gateway
-              servicePort: 50550
-          - path: /api/good/v1/delete/defaultgood
-            backend:
-              serviceName: good-gateway
-              servicePort: 50550
-          - path: /api/good/v1/update/defaultgood
-            backend:
-              serviceName: good-gateway
-              servicePort: 50550
-          - path: /api/good/v1/update/n/defaultgood
             backend:
               serviceName: good-gateway
               servicePort: 50550
@@ -413,54 +690,6 @@ spec:
               serviceName: good-gateway
               servicePort: 50550
 
-          - path: /api/good/v1/get/mygoodcomments
-            backend:
-              serviceName: good-gateway
-              servicePort: 50550
-          - path: /api/good/v1/create/goodcomment
-            backend:
-              serviceName: good-gateway
-              servicePort: 50550
-          - path: /api/good/v1/delete/goodcomment
-            backend:
-              serviceName: good-gateway
-              servicePort: 50550
-          - path: /api/good/v1/update/goodcomment
-            backend:
-              serviceName: good-gateway
-              servicePort: 50550
-          - path: /api/good/v1/delete/app/goodcomment
-            backend:
-              serviceName: good-gateway
-              servicePort: 50550
-
-
-          - path: /api/good/v1/get/mygoodlikes
-            backend:
-              serviceName: good-gateway
-              servicePort: 50550
-          - path: /api/good/v1/delete/goodlike
-            backend:
-              serviceName: good-gateway
-              servicePort: 50550
-
-          - path: /api/good/v1/get/mygoodrecommends
-            backend:
-              serviceName: good-gateway
-              servicePort: 50550
-          - path: /api/good/v1/delete/goodrecommend
-            backend:
-              serviceName: good-gateway
-              servicePort: 50550
-
-          - path: /api/good/v1/get/mygoodscores
-            backend:
-              serviceName: good-gateway
-              servicePort: 50550
-          - path: /api/good/v1/delete/goodscore
-            backend:
-              serviceName: good-gateway
-              servicePort: 50550            
     - host: api.procyon.vip
       http: *http_rules
     - host: api.xpool.top
