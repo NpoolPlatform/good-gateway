@@ -143,15 +143,15 @@ spec:
               serviceName: good-gateway
               servicePort: 50550
 
-          - path: /api/good/v1/admin/create/deviceposters
+          - path: /api/good/v1/admin/create/deviceposter
             backend:
               serviceName: good-gateway
               servicePort: 50550
-          - path: /api/good/v1/admin/update/deviceposters
+          - path: /api/good/v1/admin/update/deviceposter
             backend:
               serviceName: good-gateway
               servicePort: 50550
-          - path: /api/good/v1/admin/delete/deviceposters
+          - path: /api/good/v1/admin/delete/deviceposter
             backend:
               serviceName: good-gateway
               servicePort: 50550
