@@ -22,8 +22,6 @@ import (
 	entappgooddescription "github.com/NpoolPlatform/good-middleware/pkg/db/ent/appgooddescription"
 	entappgooddisplaycolor "github.com/NpoolPlatform/good-middleware/pkg/db/ent/appgooddisplaycolor"
 	entappgooddisplayname "github.com/NpoolPlatform/good-middleware/pkg/db/ent/appgooddisplayname"
-	entappgoodlabel "github.com/NpoolPlatform/good-middleware/pkg/db/ent/appgoodlabel"
-	entappgoodposter "github.com/NpoolPlatform/good-middleware/pkg/db/ent/appgoodposter"
 	entapplegacypowerrental "github.com/NpoolPlatform/good-middleware/pkg/db/ent/applegacypowerrental"
 	entapppowerrental "github.com/NpoolPlatform/good-middleware/pkg/db/ent/apppowerrental"
 	entappstock "github.com/NpoolPlatform/good-middleware/pkg/db/ent/appstock"
@@ -32,8 +30,7 @@ import (
 	entgoodbase "github.com/NpoolPlatform/good-middleware/pkg/db/ent/goodbase"
 	entgoodcoin "github.com/NpoolPlatform/good-middleware/pkg/db/ent/goodcoin"
 	entgoodcoinreward "github.com/NpoolPlatform/good-middleware/pkg/db/ent/goodcoinreward"
-	// entgoodreward "github.com/NpoolPlatform/good-middleware/pkg/db/ent/goodreward"
-	// entgoodrewardhistory "github.com/NpoolPlatform/good-middleware/pkg/db/ent/goodrewardhistory"
+
 	entpowerrental "github.com/NpoolPlatform/good-middleware/pkg/db/ent/powerrental"
 
 	goodtypes "github.com/NpoolPlatform/message/npool/basetypes/good/v1"
@@ -93,47 +90,84 @@ func open(hostname string) (conn *sql.DB, err error) {
 	return conn, nil
 }
 
-func migrateDescriptions(ctx context.Context, tx *ent.Tx) error {
-	descriptions, err := tx.AppGoodDescription.Query().Where(entappgooddescription.DeletedAt(0)).All(ctx)
-	if err != nil {
+func setDefaultValueForTableColumns(ctx context.Context, tx *ent.Tx) error {
+	// appdefaultgood
+	if _, err := tx.ExecContext(ctx, `update app_default_goods set app_id = ? where app_id is null`, uuid.Nil.String()); err != nil {
 		return err
 	}
-	if len(descriptions) > 0 {
-		logger.Sugar().Warnw("appgooddescriptions is not empty")
-		return nil
+	if _, err := tx.ExecContext(ctx, `update app_default_goods set good_id = ? where good_id is null`, uuid.Nil.String()); err != nil {
+		return err
 	}
+	// goodreward
+	if _, err := tx.ExecContext(ctx, "update good_rewards set next_reward_start_amount = '0.000000000000000000' where next_reward_start_amount is null"); err != nil {
+		return err
+	}
+	if _, err := tx.ExecContext(ctx, "update good_rewards set last_reward_amount = '0.000000000000000000' where last_reward_amount is null"); err != nil {
+		return err
+	}
+	if _, err := tx.ExecContext(ctx, "update good_rewards set last_unit_reward_amount = '0.000000000000000000' where last_unit_reward_amount is null"); err != nil {
+		return err
+	}
+	if _, err := tx.ExecContext(ctx, "update good_rewards set total_reward_amount = '0.000000000000000000' where total_reward_amount is null"); err != nil {
+		return err
+	}
+	// extra_infos
+	if _, err := tx.ExecContext(ctx, `update extra_infos set app_good_id = ? where app_good_id is null`, uuid.Nil.String()); err != nil {
+		return err
+	}
+	return nil
+}
 
-	rows, err := tx.QueryContext(ctx, "select ent_id,descriptions,created_at,updated_at from app_goods where deleted_at = 0")
+func migrateDescriptions(ctx context.Context, tx *ent.Tx) error {
+	rows, err := tx.QueryContext(ctx, "select ent_id,descriptions,created_at,updated_at from app_goods where JSON_LENGTH(descriptions) > 0 and deleted_at = 0")
 	if err != nil {
 		return err
 	}
 
 	type Description struct {
 		AppGoodID    uuid.UUID `json:"ent_id"`
-		Descriptions string
-		CreatedAt    uint32
-		UpdatedAt    uint32
+		Descriptions string    `json:"descriptions"`
+		CreatedAt    uint32    `json:"created_at"`
+		UpdatedAt    uint32    `json:"updated_at"`
 	}
+	descriptions := []*Description{}
 	for rows.Next() {
 		des := &Description{}
 		if err := rows.Scan(&des.AppGoodID, &des.Descriptions, &des.CreatedAt, &des.UpdatedAt); err != nil {
 			return err
 		}
+		descriptions = append(descriptions, des)
+	}
+	for _, des := range descriptions {
 		var descriptions []string
 		if err := json.Unmarshal([]byte(des.Descriptions), &descriptions); err != nil {
 			return err
 		}
 		for idx, description := range descriptions {
-			if _, err := tx.
+			exist, err := tx.
 				AppGoodDescription.
-				Create().
-				SetAppGoodID(des.AppGoodID).
-				SetDescription(description).
-				SetCreatedAt(des.CreatedAt).
-				SetUpdatedAt(des.UpdatedAt).
-				SetIndex(uint8(idx)).
-				Save(ctx); err != nil {
+				Query().
+				Where(
+					entappgooddescription.AppGoodID(des.AppGoodID),
+					entappgooddescription.Description(description),
+					entappgooddescription.DeletedAt(0),
+				).
+				Exist(ctx)
+			if err != nil {
 				return err
+			}
+			if !exist {
+				if _, err := tx.
+					AppGoodDescription.
+					Create().
+					SetAppGoodID(des.AppGoodID).
+					SetDescription(description).
+					SetCreatedAt(des.CreatedAt).
+					SetUpdatedAt(des.UpdatedAt).
+					SetIndex(uint8(idx)).
+					Save(ctx); err != nil {
+					return err
+				}
 			}
 		}
 	}
@@ -141,46 +175,56 @@ func migrateDescriptions(ctx context.Context, tx *ent.Tx) error {
 }
 
 func migrateDisplayColors(ctx context.Context, tx *ent.Tx) error {
-	colors, err := tx.AppGoodDisplayColor.Query().Where(entappgooddisplaycolor.DeletedAt(0)).All(ctx)
-	if err != nil {
-		return err
-	}
-	if len(colors) > 0 {
-		logger.Sugar().Warnw("appgooddisplaycolors is not empty")
-		return nil
-	}
-
-	rows, err := tx.QueryContext(ctx, "select ent_id,display_colors,created_at,updated_at from app_goods where deleted_at = 0")
+	rows, err := tx.QueryContext(ctx, "select ent_id,display_colors,created_at,updated_at from app_goods where JSON_LENGTH(display_colors) > 0 and deleted_at = 0")
 	if err != nil {
 		return err
 	}
 
 	type DisplayColor struct {
 		AppGoodID     uuid.UUID `json:"ent_id"`
-		DisplayColors string
-		CreatedAt     uint32
-		UpdatedAt     uint32
+		DisplayColors string    `json:"display_colors"`
+		CreatedAt     uint32    `json:"created_at"`
+		UpdatedAt     uint32    `json:"updated_at"`
 	}
+	displayColors := []*DisplayColor{}
 	for rows.Next() {
 		displayColor := &DisplayColor{}
 		if err := rows.Scan(&displayColor.AppGoodID, &displayColor.DisplayColors, &displayColor.CreatedAt, &displayColor.UpdatedAt); err != nil {
 			return err
 		}
+		displayColors = append(displayColors, displayColor)
+	}
+
+	for _, displayColor := range displayColors {
 		var colors []string
 		if err := json.Unmarshal([]byte(displayColor.DisplayColors), &colors); err != nil {
 			return err
 		}
 		for idx, color := range colors {
-			if _, err := tx.
+			exist, err := tx.
 				AppGoodDisplayColor.
-				Create().
-				SetAppGoodID(displayColor.AppGoodID).
-				SetColor(color).
-				SetIndex(uint8(idx)).
-				SetCreatedAt(displayColor.CreatedAt).
-				SetUpdatedAt(displayColor.UpdatedAt).
-				Save(ctx); err != nil {
+				Query().
+				Where(
+					entappgooddisplaycolor.AppGoodID(displayColor.AppGoodID),
+					entappgooddisplaycolor.Color(color),
+					entappgooddisplaycolor.DeletedAt(0),
+				).
+				Exist(ctx)
+			if err != nil {
 				return err
+			}
+			if !exist {
+				if _, err := tx.
+					AppGoodDisplayColor.
+					Create().
+					SetAppGoodID(displayColor.AppGoodID).
+					SetColor(color).
+					SetIndex(uint8(idx)).
+					SetCreatedAt(displayColor.CreatedAt).
+					SetUpdatedAt(displayColor.UpdatedAt).
+					Save(ctx); err != nil {
+					return err
+				}
 			}
 		}
 	}
@@ -188,140 +232,57 @@ func migrateDisplayColors(ctx context.Context, tx *ent.Tx) error {
 }
 
 func migrateDisplayNames(ctx context.Context, tx *ent.Tx) error {
-	names, err := tx.AppGoodDisplayName.Query().Where(entappgooddisplayname.DeletedAt(0)).All(ctx)
-	if err != nil {
-		return err
-	}
-	if len(names) > 0 {
-		logger.Sugar().Warnw("appgooddisplaynames is not empty")
-		return nil
-	}
-
-	rows, err := tx.QueryContext(ctx, "select ent_id,display_names,created_at,updated_at from app_goods where deleted_at = 0")
+	rows, err := tx.QueryContext(ctx, "select ent_id,display_names,created_at,updated_at from app_goods where JSON_LENGTH(display_names) > 0 and deleted_at = 0")
 	if err != nil {
 		return err
 	}
 
 	type DisplayName struct {
 		AppGoodID    uuid.UUID `json:"ent_id"`
-		DisplayNames string
-		CreatedAt    uint32
-		UpdatedAt    uint32
+		DisplayNames string    `json:"display_names"`
+		CreatedAt    uint32    `json:"created_at"`
+		UpdatedAt    uint32    `json:"updated_at"`
 	}
+
+	displayNames := []*DisplayName{}
 	for rows.Next() {
 		displayName := &DisplayName{}
 		if err := rows.Scan(&displayName.AppGoodID, &displayName.DisplayNames, &displayName.CreatedAt, &displayName.UpdatedAt); err != nil {
 			return err
 		}
+		displayNames = append(displayNames, displayName)
+	}
+
+	for _, displayName := range displayNames {
 		var names []string
 		if err := json.Unmarshal([]byte(displayName.DisplayNames), &names); err != nil {
 			return err
 		}
 		for idx, name := range names {
-			if _, err := tx.
+			exist, err := tx.
 				AppGoodDisplayName.
-				Create().
-				SetAppGoodID(displayName.AppGoodID).
-				SetName(name).
-				SetIndex(uint8(idx)).
-				SetCreatedAt(displayName.CreatedAt).
-				SetUpdatedAt(displayName.UpdatedAt).
-				Save(ctx); err != nil {
+				Query().
+				Where(
+					entappgooddisplayname.AppGoodID(displayName.AppGoodID),
+					entappgooddisplayname.Name(name),
+					entappgooddisplayname.DeletedAt(0),
+				).
+				Exist(ctx)
+			if err != nil {
 				return err
 			}
-		}
-	}
-	return nil
-}
-
-func migratePosters(ctx context.Context, tx *ent.Tx) error {
-	posters, err := tx.AppGoodPoster.Query().Where(entappgoodposter.DeletedAt(0)).All(ctx)
-	if err != nil {
-		return err
-	}
-	if len(posters) > 0 {
-		logger.Sugar().Warnw("appgoodposters is not empty")
-		return nil
-	}
-
-	rows, err := tx.QueryContext(ctx, "select app_good_id,posters,created_at,updated_at from extra_infos where deleted_at = 0")
-	if err != nil {
-		return err
-	}
-
-	type Poster struct {
-		AppGoodID uuid.UUID
-		Posters   string
-		CreatedAt uint32
-		UpdatedAt uint32
-	}
-	for rows.Next() {
-		poster := &Poster{}
-		if err := rows.Scan(&poster.AppGoodID, &poster.Posters, &poster.CreatedAt, &poster.UpdatedAt); err != nil {
-			return err
-		}
-		var posters []string
-		if err := json.Unmarshal([]byte(poster.Posters), &posters); err != nil {
-			return err
-		}
-		for idx, pos := range posters {
-			if _, err := tx.
-				AppGoodPoster.
-				Create().
-				SetAppGoodID(poster.AppGoodID).
-				SetPoster(pos).
-				SetCreatedAt(poster.CreatedAt).
-				SetUpdatedAt(poster.UpdatedAt).
-				SetIndex(uint8(idx)).
-				Save(ctx); err != nil {
-				return err
-			}
-		}
-	}
-	return nil
-}
-
-func migrateLabels(ctx context.Context, tx *ent.Tx) error {
-	labels, err := tx.AppGoodLabel.Query().Where(entappgoodlabel.DeletedAt(0)).All(ctx)
-	if err != nil {
-		return err
-	}
-	if len(labels) > 0 {
-		logger.Sugar().Warnw("appgoodlabels is not empty")
-		return nil
-	}
-
-	rows, err := tx.QueryContext(ctx, "select app_good_id,labels,created_at,updated_at from extra_infos where deleted_at = 0")
-	if err != nil {
-		return err
-	}
-
-	type Label struct {
-		AppGoodID uuid.UUID
-		Labels    string
-		CreatedAt uint32
-		UpdatedAt uint32
-	}
-	for rows.Next() {
-		label := &Label{}
-		if err := rows.Scan(&label.AppGoodID, &label.Labels, &label.CreatedAt, &label.UpdatedAt); err != nil {
-			return err
-		}
-		var labels []string
-		if err := json.Unmarshal([]byte(label.Labels), &labels); err != nil {
-			return err
-		}
-		for idx, _label := range labels {
-			if _, err := tx.
-				AppGoodLabel.
-				Create().
-				SetAppGoodID(label.AppGoodID).
-				SetLabel(_label).
-				SetIndex(uint8(idx)).
-				SetCreatedAt(label.CreatedAt).
-				SetUpdatedAt(label.UpdatedAt).
-				Save(ctx); err != nil {
-				return err
+			if !exist {
+				if _, err := tx.
+					AppGoodDisplayName.
+					Create().
+					SetAppGoodID(displayName.AppGoodID).
+					SetName(name).
+					SetIndex(uint8(idx)).
+					SetCreatedAt(displayName.CreatedAt).
+					SetUpdatedAt(displayName.UpdatedAt).
+					Save(ctx); err != nil {
+					return err
+				}
 			}
 		}
 	}
@@ -329,47 +290,61 @@ func migrateLabels(ctx context.Context, tx *ent.Tx) error {
 }
 
 func migrateDeviceInfo(ctx context.Context, tx *ent.Tx) error {
-	facturers, err := tx.DeviceManufacturer.Query().Where(entdevicemanufacturer.DeletedAt(0)).All(ctx)
-	if err != nil {
-		return err
-	}
-	if len(facturers) > 0 {
-		logger.Sugar().Warnw("device manufacturers is not empty")
-		return nil
-	}
-
-	rows, err := tx.QueryContext(ctx, "select id,manufacturer,created_at,updated_at from device_infos where deleted_at = 0")
+	rows, err := tx.QueryContext(ctx, "select id,manufacturer,created_at,updated_at from device_infos where manufacturer != '' and deleted_at = 0")
 	if err != nil {
 		return err
 	}
 
 	type Manufacturer struct {
-		ID           uint32
-		Manufacturer string
-		CreatedAt    uint32
-		UpdatedAt    uint32
+		ID           uint32 `json:"id"`
+		Manufacturer string `json:"manufacturer"`
+		CreatedAt    uint32 `json:"created_at"`
+		UpdatedAt    uint32 `json:"updated_at"`
 	}
 
-	manufacturerMap := map[string]uuid.UUID{}
+	manufacturers := []*Manufacturer{}
 	for rows.Next() {
 		manufacturer := &Manufacturer{}
 		if err := rows.Scan(&manufacturer.ID, &manufacturer.Manufacturer, &manufacturer.CreatedAt, &manufacturer.UpdatedAt); err != nil {
 			return err
 		}
+		manufacturers = append(manufacturers, manufacturer)
+	}
+
+	manufacturerMap := map[string]uuid.UUID{}
+	for _, manufacturer := range manufacturers {
 		manufacturerID, ok := manufacturerMap[manufacturer.Manufacturer]
 		if !ok {
 			manufacturerID = uuid.New()
-			if _, err := tx.
+			facturer, err := tx.
 				DeviceManufacturer.
-				Create().
-				SetName(manufacturer.Manufacturer).
-				SetLogo("").
-				SetCreatedAt(manufacturer.CreatedAt).
-				SetUpdatedAt(manufacturer.UpdatedAt).
-				Save(ctx); err != nil {
-				return err
+				Query().
+				Where(
+					entdevicemanufacturer.Name(manufacturer.Manufacturer),
+					entdevicemanufacturer.DeletedAt(0),
+				).
+				Only(ctx)
+			if err != nil {
+				if !ent.IsNotFound(err) {
+					return err
+				}
+				if _, err := tx.
+					DeviceManufacturer.
+					Create().
+					SetEntID(manufacturerID).
+					SetName(manufacturer.Manufacturer).
+					SetLogo("").
+					SetCreatedAt(manufacturer.CreatedAt).
+					SetUpdatedAt(manufacturer.UpdatedAt).
+					Save(ctx); err != nil {
+					return err
+				}
+				manufacturerMap[manufacturer.Manufacturer] = manufacturerID
 			}
-			manufacturerMap[manufacturer.Manufacturer] = manufacturerID
+			if err == nil {
+				manufacturerID = facturer.EntID
+				manufacturerMap[manufacturer.Manufacturer] = facturer.EntID
+			}
 		}
 		if _, err := tx.
 			DeviceInfo.
@@ -383,64 +358,49 @@ func migrateDeviceInfo(ctx context.Context, tx *ent.Tx) error {
 }
 
 func migrateTechnicalFeeRatio(ctx context.Context, tx *ent.Tx) error {
-	names, err := tx.AppLegacyPowerRental.Query().Where(entapplegacypowerrental.DeletedAt(0)).All(ctx)
-	if err != nil {
-		return err
-	}
-	if len(names) > 0 {
-		logger.Sugar().Warnw("applegacypowerrentals is not empty")
-		return nil
-	}
-
 	rows, err := tx.QueryContext(ctx, "select ent_id,technical_fee_ratio,created_at,updated_at from app_goods where deleted_at = 0")
 	if err != nil {
 		return err
 	}
 
 	type TechniqueFee struct {
-		AppGoodID         uuid.UUID `json:"ent_id"`
-		TechniqueFeeRatio decimal.Decimal
-		CreatedAt         uint32
-		UpdatedAt         uint32
+		AppGoodID         uuid.UUID       `json:"ent_id"`
+		TechniqueFeeRatio decimal.Decimal `json:"technical_fee_ratio"`
+		CreatedAt         uint32          `json:"created_at"`
+		UpdatedAt         uint32          `json:"updated_at"`
 	}
+
+	techniques := []*TechniqueFee{}
 	for rows.Next() {
 		technique := &TechniqueFee{}
 		if err := rows.Scan(&technique.AppGoodID, &technique.TechniqueFeeRatio, &technique.CreatedAt, &technique.UpdatedAt); err != nil {
 			return err
 		}
-		if _, err := tx.
+		techniques = append(techniques, technique)
+	}
+	for _, technique := range techniques {
+		exist, err := tx.
 			AppLegacyPowerRental.
-			Create().
-			SetAppGoodID(technique.AppGoodID).
-			SetTechniqueFeeRatio(technique.TechniqueFeeRatio).
-			SetCreatedAt(technique.CreatedAt).
-			SetUpdatedAt(technique.UpdatedAt).
-			Save(ctx); err != nil {
+			Query().
+			Where(
+				entapplegacypowerrental.AppGoodID(technique.AppGoodID),
+				entapplegacypowerrental.DeletedAt(0),
+			).
+			Exist(ctx)
+		if err != nil {
 			return err
 		}
-	}
-	return nil
-}
-
-// after migrate posters & labels
-func createExtraInfoForAppGoods(ctx context.Context, tx *ent.Tx) error {
-	appgoods, err := tx.AppGood.Query().Where(entappgood.DeletedAt(0)).All(ctx)
-	if err != nil {
-		return err
-	}
-	for _, appgood := range appgoods {
-		if _, err := tx.
-			ExtraInfo.
-			Create().
-			SetAppGoodID(appgood.EntID).
-			SetLikes(0).
-			SetDislikes(0).
-			SetScore(decimal.NewFromInt(0)).
-			SetScoreCount(0).
-			SetCommentCount(0).
-			SetRecommendCount(0).
-			Save(ctx); err != nil {
-			return err
+		if !exist {
+			if _, err := tx.
+				AppLegacyPowerRental.
+				Create().
+				SetAppGoodID(technique.AppGoodID).
+				SetTechniqueFeeRatio(technique.TechniqueFeeRatio).
+				SetCreatedAt(technique.CreatedAt).
+				SetUpdatedAt(technique.UpdatedAt).
+				Save(ctx); err != nil {
+				return err
+			}
 		}
 	}
 	return nil
@@ -460,15 +420,22 @@ func fillAppGoodIDForAppStockLocks(ctx context.Context, tx *ent.Tx) error {
 	if err != nil {
 		return err
 	}
+
 	type AppStockLock struct {
-		ID         uint32
-		AppStockID uuid.UUID
+		ID         uint32    `json:"id"`
+		AppStockID uuid.UUID `json:"app_stock_id"`
 	}
+
+	appStockLocks := []*AppStockLock{}
 	for rows.Next() {
 		lock := &AppStockLock{}
 		if err := rows.Scan(&lock.ID, &lock.AppStockID); err != nil {
 			return err
 		}
+		appStockLocks = append(appStockLocks, lock)
+	}
+
+	for _, lock := range appStockLocks {
 		appGoodID, ok := appstocks[lock.AppStockID.String()]
 		if !ok {
 			appGoodID = uuid.Nil
@@ -485,7 +452,15 @@ func fillAppGoodIDForAppStockLocks(ctx context.Context, tx *ent.Tx) error {
 }
 
 func migrateGoods(ctx context.Context, tx *ent.Tx) error {
-	goods, err := tx.Good.Query().Where(entgood.DeletedAt(0)).All(ctx)
+	goodType := "PowerRenting"
+	goods, err := tx.
+		Good.
+		Query().
+		Where(
+			entgood.GoodType(goodType),
+			entgood.DeletedAt(0),
+		).
+		All(ctx)
 	if err != nil {
 		return err
 	}
@@ -508,7 +483,7 @@ func migrateGoods(ctx context.Context, tx *ent.Tx) error {
 				Create().
 				SetEntID(good.EntID).
 				SetName(good.Title).
-				SetGoodType(good.GoodType).
+				SetGoodType(goodtypes.GoodType_PowerRental.String()). // change PowerRenting to PowerRental
 				SetBenefitType(good.BenefitType).
 				SetServiceStartAt(good.StartAt).
 				SetStartMode(good.StartMode).
@@ -532,6 +507,10 @@ func migrateGoods(ctx context.Context, tx *ent.Tx) error {
 			return err
 		}
 		if !exist {
+			lockDeposit, err := decimal.NewFromString(good.UnitLockDeposit.String())
+			if err != nil {
+				lockDeposit = decimal.NewFromInt(0)
+			}
 			if _, err := tx.
 				PowerRental.
 				Create().
@@ -543,7 +522,7 @@ func migrateGoods(ctx context.Context, tx *ent.Tx) error {
 				SetQuantityUnit(good.QuantityUnit).
 				SetQuantityUnitAmount(good.QuantityUnitAmount).
 				SetDeliveryAt(good.DeliveryAt).
-				SetUnitLockDeposit(good.UnitLockDeposit).
+				SetUnitLockDeposit(lockDeposit).
 				SetDurationDisplayType(goodtypes.GoodDurationType_GoodDurationByDay.String()).
 				SetStockMode(goodtypes.GoodStockMode_GoodStockByUnique.String()).
 				Save(ctx); err != nil {
@@ -682,24 +661,43 @@ func migrateGoodRewards(ctx context.Context, tx *ent.Tx) error {
 	}
 
 	type Reward struct {
-		ID                    uuid.UUID
-		EntID                 uuid.UUID
-		GoodID                uuid.UUID
-		RewardState           string
-		LastRewardAt          uint32
-		RewardTid             uuid.UUID
-		NextRewardStartAmount decimal.Decimal
-		LastRewardAmount      decimal.Decimal
-		LastUnitRewardAmount  decimal.Decimal
-		TotalRewardAmount     decimal.Decimal
-		CreatedAt             uint32
-		UpdatedAt             uint32
+		ID                    uint32          `json:"ID"`
+		EntID                 uuid.UUID       `json:"EntID"`
+		GoodID                uuid.UUID       `json:"GoodID"`
+		RewardState           string          `json:"reward_state"`
+		LastRewardAt          uint32          `json:"last_reward_at"`
+		RewardTid             uuid.UUID       `json:"reward_tid"`
+		NextRewardStartAmount decimal.Decimal `json:"next_reward_start_amount"`
+		LastRewardAmount      decimal.Decimal `json:"last_reward_amount"`
+		LastUnitRewardAmount  decimal.Decimal `json:"last_unit_reward_amount"`
+		TotalRewardAmount     decimal.Decimal `josn:"total_reward_amount"`
+		CreatedAt             uint32          `json:"created_at"`
+		UpdatedAt             uint32          `json:"updated_at"`
 	}
+
+	rewards := []*Reward{}
 	for rows.Next() {
 		reward := &Reward{}
-		if err := rows.Scan(&reward.ID, &reward.EntID, &reward.GoodID, &reward.RewardState, &reward.LastRewardAt, &reward.RewardTid, &reward.LastRewardAmount, &reward.LastUnitRewardAmount, &reward.TotalRewardAmount, &reward.CreatedAt, &reward.UpdatedAt); err != nil {
+		if err := rows.Scan(
+			&reward.ID,
+			&reward.EntID,
+			&reward.GoodID,
+			&reward.RewardState,
+			&reward.LastRewardAt,
+			&reward.RewardTid,
+			&reward.NextRewardStartAmount,
+			&reward.LastRewardAmount,
+			&reward.LastUnitRewardAmount,
+			&reward.TotalRewardAmount,
+			&reward.CreatedAt,
+			&reward.UpdatedAt,
+		); err != nil {
 			return err
 		}
+		rewards = append(rewards, reward)
+	}
+
+	for _, reward := range rewards {
 		coinTypeID, ok := goods[reward.GoodID.String()]
 		if !ok {
 			coinTypeID = uuid.Nil
@@ -717,7 +715,6 @@ func migrateGoodRewards(ctx context.Context, tx *ent.Tx) error {
 		if err != nil {
 			return err
 		}
-
 		if !exist {
 			if _, err := tx.
 				GoodCoinReward.
@@ -750,27 +747,32 @@ func fillCoinTypeIDInGoodRewardHistories(ctx context.Context, tx *ent.Tx) error 
 		goods[info.EntID.String()] = info.CoinTypeID
 	}
 
-	rows, err := tx.QueryContext(ctx, "select id,good_id from good_reward_histories where coin_type_id is null and deleted_at = 0")
+	rows, err := tx.QueryContext(ctx, "select id,good_id from good_reward_histories where coin_type_id is null")
 	if err != nil {
 		return err
 	}
 
 	type RewardHistory struct {
-		ID     uint32
-		GoodID uuid.UUID
+		ID     uint32    `json:"id"`
+		GoodID uuid.UUID `json:"good_id"`
 	}
+	histories := []*RewardHistory{}
 	for rows.Next() {
-		reward := &RewardHistory{}
-		if err := rows.Scan(&reward.ID, &reward.GoodID); err != nil {
+		rewardHistory := &RewardHistory{}
+		if err := rows.Scan(&rewardHistory.ID, &rewardHistory.GoodID); err != nil {
 			return err
 		}
-		coinTypeID, ok := goods[reward.GoodID.String()]
+		histories = append(histories, rewardHistory)
+	}
+
+	for _, rewardHistory := range histories {
+		coinTypeID, ok := goods[rewardHistory.GoodID.String()]
 		if !ok {
 			coinTypeID = uuid.Nil
 		}
 		if _, err := tx.
 			GoodRewardHistory.
-			UpdateOneID(reward.ID).
+			UpdateOneID(rewardHistory.ID).
 			SetCoinTypeID(coinTypeID).
 			Save(ctx); err != nil {
 			return err
@@ -808,40 +810,49 @@ func Migrate(ctx context.Context) error {
 		}
 	}()
 
+	if err = db.WithTx(ctx, func(_ctx context.Context, tx *ent.Tx) error {
+		if err := setDefaultValueForTableColumns(ctx, tx); err != nil {
+			return err
+		}
+		return nil
+	}); err != nil {
+		return err
+	}
+
 	return db.WithTx(ctx, func(_ctx context.Context, tx *ent.Tx) error {
-		// if err := migrateDescriptions(ctx, tx); err != nil {
-		// 	return err
-		// }
-		// if err := migrateDisplayColors(ctx, tx); err != nil {
-		// 	return err
-		// }
-		// if err := migrateDisplayNames(ctx, tx); err != nil {
-		// 	return err
-		// }
-		// if err := migratePosters(ctx, tx); err != nil {
-		// 	return err
-		// }
-		// if err := migrateLabels(ctx, tx); err != nil {
-		// 	return err
-		// }
-		// if err := migrateDeviceInfo(ctx, tx); err != nil {
-		// 	return err
-		// }
-		// if err := migrateTechnicalFeeRatio(ctx, tx); err != nil {
-		// 	return err
-		// }
-		// if err := createExtraInfoForAppGoods(ctx, tx); err != nil {
-		// 	return err
-		// }
-		// if err := fillAppGoodIDForAppStockLocks(ctx, tx); err != nil {
-		// 	return err
-		// }
-		// if err := migrateGoods(ctx, tx); err != nil {
-		// 	return err
-		// }
+		if err := migrateDescriptions(ctx, tx); err != nil {
+			return err
+		}
+		if err := migrateDisplayColors(ctx, tx); err != nil {
+			return err
+		}
+		if err := migrateDisplayNames(ctx, tx); err != nil {
+			return err
+		}
+		if err := migrateDeviceInfo(ctx, tx); err != nil {
+			return err
+		}
+		if err := migrateTechnicalFeeRatio(ctx, tx); err != nil {
+			return err
+		}
+		if err := fillAppGoodIDForAppStockLocks(ctx, tx); err != nil {
+			return err
+		}
+		if err := migrateGoods(ctx, tx); err != nil {
+			return err
+		}
 		// if err := migrateAppGoods(ctx, tx); err != nil {
 		// 	return err
 		// }
+		if err := migrateGoodCoins(ctx, tx); err != nil {
+			return err
+		}
+		if err := migrateGoodRewards(ctx, tx); err != nil {
+			return err
+		}
+		if err := fillCoinTypeIDInGoodRewardHistories(ctx, tx); err != nil {
+			return err
+		}
 		return nil
 	})
 }
