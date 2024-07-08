@@ -6,6 +6,8 @@ import (
 	wlog "github.com/NpoolPlatform/go-service-framework/pkg/wlog"
 	goodgwcommon "github.com/NpoolPlatform/good-gateway/pkg/common"
 	goodcoinmwcli "github.com/NpoolPlatform/good-middleware/pkg/client/good/coin"
+	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
+	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 	coinmwpb "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin"
 	npool "github.com/NpoolPlatform/message/npool/good/gw/v1/good/coin"
 	goodcoinmwpb "github.com/NpoolPlatform/message/npool/good/mw/v1/good/coin"
@@ -76,7 +78,12 @@ func (h *Handler) GetGoodCoin(ctx context.Context) (*npool.GoodCoin, error) {
 }
 
 func (h *Handler) GetGoodCoins(ctx context.Context) ([]*npool.GoodCoin, uint32, error) {
-	infos, total, err := goodcoinmwcli.GetGoodCoins(ctx, &goodcoinmwpb.Conds{}, h.Offset, h.Limit)
+	conds := &goodcoinmwpb.Conds{}
+	if h.GoodID != nil {
+		conds.GoodID = &basetypes.StringVal{Op: cruder.EQ, Value: *h.GoodID}
+	}
+
+	infos, total, err := goodcoinmwcli.GetGoodCoins(ctx, conds, h.Offset, h.Limit)
 	if err != nil {
 		return nil, 0, wlog.WrapError(err)
 	}
