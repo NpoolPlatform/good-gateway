@@ -53,6 +53,8 @@ func (h *queryHandler) formalize() {
 			GoodName:       recommend.GoodName,
 			RecommendIndex: recommend.RecommendIndex,
 			Message:        recommend.Message,
+			Hide:           recommend.Hide,
+			HideReason:     recommend.HideReason,
 			CreatedAt:      recommend.CreatedAt,
 			UpdatedAt:      recommend.UpdatedAt,
 		}

@@ -10,7 +10,6 @@ import (
 	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 	coinmwpb "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin"
-	goodcoingwpb "github.com/NpoolPlatform/message/npool/good/gw/v1/good/coin"
 	npool "github.com/NpoolPlatform/message/npool/good/gw/v1/good/coin"
 	goodcoinmwpb "github.com/NpoolPlatform/message/npool/good/mw/v1/good/coin"
 
@@ -19,7 +18,7 @@ import (
 
 type createHandler struct {
 	*Handler
-	goodCoins []*goodcoingwpb.GoodCoin
+	goodCoins []*npool.GoodCoin
 }
 
 func (h *createHandler) getGoodCoins(ctx context.Context) error {
