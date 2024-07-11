@@ -1,4 +1,3 @@
-//nolint:dupl
 package topmostgood
 
 import (
@@ -19,9 +18,8 @@ func (s *Server) CreateTopMostGood(ctx context.Context, in *npool.CreateTopMostG
 		topmostgood1.WithAppID(&in.AppID, true),
 		topmostgood1.WithTopMostID(&in.TopMostID, true),
 		topmostgood1.WithAppGoodID(&in.AppGoodID, true),
-		topmostgood1.WithPosters(in.Posters, true),
-		topmostgood1.WithUnitPrice(in.UnitPrice, false),
-		topmostgood1.WithPackagePrice(in.PackagePrice, false),
+		topmostgood1.WithUnitPrice(&in.UnitPrice, true),
+		topmostgood1.WithDisplayIndex(in.DisplayIndex, false),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(
@@ -43,40 +41,6 @@ func (s *Server) CreateTopMostGood(ctx context.Context, in *npool.CreateTopMostG
 	}
 
 	return &npool.CreateTopMostGoodResponse{
-		Info: info,
-	}, nil
-}
-
-func (s *Server) CreateNTopMostGood(ctx context.Context, in *npool.CreateNTopMostGoodRequest) (*npool.CreateNTopMostGoodResponse, error) {
-	handler, err := topmostgood1.NewHandler(
-		ctx,
-		topmostgood1.WithAppID(&in.TargetAppID, true),
-		topmostgood1.WithTopMostID(&in.TopMostID, true),
-		topmostgood1.WithAppGoodID(&in.AppGoodID, true),
-		topmostgood1.WithPosters(in.Posters, true),
-		topmostgood1.WithUnitPrice(in.UnitPrice, false),
-		topmostgood1.WithPackagePrice(in.PackagePrice, false),
-	)
-	if err != nil {
-		logger.Sugar().Errorw(
-			"CreateNTopMostGood",
-			"In", in,
-			"Error", err,
-		)
-		return &npool.CreateNTopMostGoodResponse{}, status.Error(codes.Aborted, err.Error())
-	}
-
-	info, err := handler.CreateTopMostGood(ctx)
-	if err != nil {
-		logger.Sugar().Errorw(
-			"CreateNTopMostGood",
-			"In", in,
-			"Error", err,
-		)
-		return &npool.CreateNTopMostGoodResponse{}, status.Error(codes.Aborted, err.Error())
-	}
-
-	return &npool.CreateNTopMostGoodResponse{
 		Info: info,
 	}, nil
 }

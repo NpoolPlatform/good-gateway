@@ -11,17 +11,18 @@ import (
 )
 
 func (h *Handler) CreateDefault(ctx context.Context) (*npool.Default, error) {
-	id := uuid.NewString()
-	if h.EntID == nil {
-		h.EntID = &id
+	if err := h.CheckAppGood(ctx); err != nil {
+		return nil, err
 	}
-
-	if _, err := defaultmwcli.CreateDefault(ctx, &defaultmwpb.DefaultReq{
-		EntID:     h.EntID,
-		AppGoodID: h.AppGoodID,
+	if h.EntID == nil {
+		h.EntID = func() *string { s := uuid.NewString(); return &s }()
+	}
+	if err := defaultmwcli.CreateDefault(ctx, &defaultmwpb.DefaultReq{
+		EntID:      h.EntID,
+		CoinTypeID: h.CoinTypeID,
+		AppGoodID:  h.AppGoodID,
 	}); err != nil {
 		return nil, err
 	}
-
 	return h.GetDefault(ctx)
 }

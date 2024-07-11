@@ -4,8 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	appmwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/app"
-	coinmwcli "github.com/NpoolPlatform/chain-middleware/pkg/client/coin"
+	goodgwcommon "github.com/NpoolPlatform/good-gateway/pkg/common"
 	defaultmwcli "github.com/NpoolPlatform/good-middleware/pkg/client/app/good/default"
 	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 	appmwpb "github.com/NpoolPlatform/message/npool/appuser/mw/v1/app"
@@ -23,38 +22,24 @@ type queryHandler struct {
 	coins    map[string]*coinmwpb.Coin
 }
 
-func (h *queryHandler) getApps(ctx context.Context) error {
-	appIDs := []string{}
-	for _, def := range h.defaults {
-		appIDs = append(appIDs, def.AppID)
-	}
-	apps, _, err := appmwcli.GetApps(ctx, &appmwpb.Conds{
-		EntIDs: &basetypes.StringSliceVal{Op: cruder.IN, Value: appIDs},
-	}, int32(0), int32(len(appIDs)))
-	if err != nil {
-		return err
-	}
-	for _, app := range apps {
-		h.apps[app.EntID] = app
-	}
-	return nil
+func (h *queryHandler) getApps(ctx context.Context) (err error) {
+	h.apps, err = goodgwcommon.GetApps(ctx, func() (appIDs []string) {
+		for _, defalut := range h.defaults {
+			appIDs = append(appIDs, defalut.AppID)
+		}
+		return
+	}())
+	return err
 }
 
-func (h *queryHandler) getCoins(ctx context.Context) error {
-	coinTypeIDs := []string{}
-	for _, def := range h.defaults {
-		coinTypeIDs = append(coinTypeIDs, def.CoinTypeID)
-	}
-	coins, _, err := coinmwcli.GetCoins(ctx, &coinmwpb.Conds{
-		EntIDs: &basetypes.StringSliceVal{Op: cruder.IN, Value: coinTypeIDs},
-	}, int32(0), int32(len(coinTypeIDs)))
-	if err != nil {
-		return err
-	}
-	for _, coin := range coins {
-		h.coins[coin.EntID] = coin
-	}
-	return nil
+func (h *queryHandler) getCoins(ctx context.Context) (err error) {
+	h.coins, err = goodgwcommon.GetCoins(ctx, func() (coinTypeIDs []string) {
+		for _, def := range h.defaults {
+			coinTypeIDs = append(coinTypeIDs, def.CoinTypeID)
+		}
+		return
+	}())
+	return err
 }
 
 func (h *queryHandler) formalize() {
@@ -118,41 +103,10 @@ func (h *Handler) GetDefault(ctx context.Context) (*npool.Default, error) {
 	return handler.infos[0], nil
 }
 
-func (h *Handler) GetDefaultExt(ctx context.Context, info *defaultmwpb.Default) (*npool.Default, error) {
-	if info == nil {
-		return nil, nil
-	}
-
-	handler := &queryHandler{
-		Handler:  h,
-		defaults: []*defaultmwpb.Default{info},
-		apps:     map[string]*appmwpb.App{},
-		coins:    map[string]*coinmwpb.Coin{},
-	}
-	if err := handler.getApps(ctx); err != nil {
-		return nil, err
-	}
-	if err := handler.getCoins(ctx); err != nil {
-		return nil, err
-	}
-
-	handler.formalize()
-	if len(handler.infos) == 0 {
-		return nil, nil
-	}
-
-	return handler.infos[0], nil
-}
-
 func (h *Handler) GetDefaults(ctx context.Context) ([]*npool.Default, uint32, error) {
-	infos, total, err := defaultmwcli.GetDefaults(
-		ctx,
-		&defaultmwpb.Conds{
-			AppID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID},
-		},
-		h.Offset,
-		h.Limit,
-	)
+	infos, total, err := defaultmwcli.GetDefaults(ctx, &defaultmwpb.Conds{
+		AppID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.AppID},
+	}, h.Offset, h.Limit)
 	if err != nil {
 		return nil, 0, err
 	}

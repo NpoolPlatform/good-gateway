@@ -2,25 +2,31 @@ package required
 
 import (
 	"context"
-	"fmt"
 
 	requiredmwcli "github.com/NpoolPlatform/good-middleware/pkg/client/good/required"
-	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
-	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 	requiredmwpb "github.com/NpoolPlatform/message/npool/good/mw/v1/good/required"
 )
 
+type deleteHandler struct {
+	*checkHandler
+}
+
 func (h *Handler) DeleteRequired(ctx context.Context) (*requiredmwpb.Required, error) {
-	info, err := requiredmwcli.GetRequiredOnly(ctx, &requiredmwpb.Conds{
-		ID:    &basetypes.Uint32Val{Op: cruder.EQ, Value: *h.ID},
-		EntID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.EntID},
-	})
+	handler := &deleteHandler{
+		checkHandler: &checkHandler{
+			Handler: h,
+		},
+	}
+	if err := handler.checkRequired(ctx); err != nil {
+		return nil, err
+	}
+
+	info, err := h.GetRequired(ctx)
 	if err != nil {
 		return nil, err
 	}
-	if info == nil {
-		return nil, fmt.Errorf("invalid required")
+	if err := requiredmwcli.DeleteRequired(ctx, h.ID, h.EntID); err != nil {
+		return nil, err
 	}
-
-	return requiredmwcli.DeleteRequired(ctx, *h.ID)
+	return info, nil
 }

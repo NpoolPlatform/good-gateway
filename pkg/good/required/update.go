@@ -2,28 +2,30 @@ package required
 
 import (
 	"context"
-	"fmt"
 
 	requiredmwcli "github.com/NpoolPlatform/good-middleware/pkg/client/good/required"
-	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
-	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 	requiredmwpb "github.com/NpoolPlatform/message/npool/good/mw/v1/good/required"
 )
 
+type updateHandler struct {
+	*checkHandler
+}
+
 func (h *Handler) UpdateRequired(ctx context.Context) (*requiredmwpb.Required, error) {
-	info, err := requiredmwcli.GetRequiredOnly(ctx, &requiredmwpb.Conds{
-		ID:    &basetypes.Uint32Val{Op: cruder.EQ, Value: *h.ID},
-		EntID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.EntID},
-	})
-	if err != nil {
+	handler := &updateHandler{
+		checkHandler: &checkHandler{
+			Handler: h,
+		},
+	}
+	if err := handler.checkRequired(ctx); err != nil {
 		return nil, err
 	}
-	if info == nil {
-		return nil, fmt.Errorf("invalid required")
-	}
 
-	return requiredmwcli.UpdateRequired(ctx, &requiredmwpb.RequiredReq{
+	if err := requiredmwcli.UpdateRequired(ctx, &requiredmwpb.RequiredReq{
 		ID:   h.ID,
 		Must: h.Must,
-	})
+	}); err != nil {
+		return nil, err
+	}
+	return h.GetRequired(ctx)
 }

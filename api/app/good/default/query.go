@@ -1,4 +1,3 @@
-//nolint:dupl
 package default1
 
 import (
@@ -40,38 +39,6 @@ func (s *Server) GetDefaults(ctx context.Context, in *npool.GetDefaultsRequest) 
 	}
 
 	return &npool.GetDefaultsResponse{
-		Infos: infos,
-		Total: total,
-	}, nil
-}
-
-func (s *Server) GetNDefaults(ctx context.Context, in *npool.GetNDefaultsRequest) (*npool.GetNDefaultsResponse, error) {
-	handler, err := default1.NewHandler(
-		ctx,
-		default1.WithAppID(&in.TargetAppID, true),
-		default1.WithOffset(in.Offset),
-		default1.WithLimit(in.Limit),
-	)
-	if err != nil {
-		logger.Sugar().Errorw(
-			"GetNDefaults",
-			"In", in,
-			"Error", err,
-		)
-		return &npool.GetNDefaultsResponse{}, status.Error(codes.Aborted, err.Error())
-	}
-
-	infos, total, err := handler.GetDefaults(ctx)
-	if err != nil {
-		logger.Sugar().Errorw(
-			"GetNDefaults",
-			"In", in,
-			"Error", err,
-		)
-		return &npool.GetNDefaultsResponse{}, status.Error(codes.Aborted, err.Error())
-	}
-
-	return &npool.GetNDefaultsResponse{
 		Infos: infos,
 		Total: total,
 	}, nil

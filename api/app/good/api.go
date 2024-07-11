@@ -1,4 +1,4 @@
-package good
+package appgood
 
 import (
 	"context"

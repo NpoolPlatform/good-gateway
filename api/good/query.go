@@ -12,35 +12,6 @@ import (
 	npool "github.com/NpoolPlatform/message/npool/good/gw/v1/good"
 )
 
-func (s *Server) GetGood(ctx context.Context, in *npool.GetGoodRequest) (*npool.GetGoodResponse, error) {
-	handler, err := good1.NewHandler(
-		ctx,
-		good1.WithEntID(&in.EntID, true),
-	)
-	if err != nil {
-		logger.Sugar().Errorw(
-			"GetGood",
-			"In", in,
-			"Error", err,
-		)
-		return &npool.GetGoodResponse{}, status.Error(codes.Aborted, err.Error())
-	}
-
-	info, err := handler.GetGood(ctx)
-	if err != nil {
-		logger.Sugar().Errorw(
-			"GetGood",
-			"In", in,
-			"Error", err,
-		)
-		return &npool.GetGoodResponse{}, status.Error(codes.Aborted, err.Error())
-	}
-
-	return &npool.GetGoodResponse{
-		Info: info,
-	}, nil
-}
-
 func (s *Server) GetGoods(ctx context.Context, in *npool.GetGoodsRequest) (*npool.GetGoodsResponse, error) {
 	handler, err := good1.NewHandler(
 		ctx,

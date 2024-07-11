@@ -4,13 +4,11 @@ import (
 	"context"
 	"fmt"
 
-	appmwcli "github.com/NpoolPlatform/appuser-middleware/pkg/client/app"
-	coinmwcli "github.com/NpoolPlatform/chain-middleware/pkg/client/coin"
+	goodgwcommon "github.com/NpoolPlatform/good-gateway/pkg/common"
 	topmostgoodmwcli "github.com/NpoolPlatform/good-middleware/pkg/client/app/good/topmost/good"
 	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 	appmwpb "github.com/NpoolPlatform/message/npool/appuser/mw/v1/app"
 	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
-	coinmwpb "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin"
 	npool "github.com/NpoolPlatform/message/npool/good/gw/v1/app/good/topmost/good"
 	topmostgoodmwpb "github.com/NpoolPlatform/message/npool/good/mw/v1/app/good/topmost/good"
 )
@@ -20,41 +18,16 @@ type queryHandler struct {
 	goods []*topmostgoodmwpb.TopMostGood
 	infos []*npool.TopMostGood
 	apps  map[string]*appmwpb.App
-	coins map[string]*coinmwpb.Coin
 }
 
-func (h *queryHandler) getApps(ctx context.Context) error {
-	appIDs := []string{}
-	for _, good := range h.goods {
-		appIDs = append(appIDs, good.AppID)
-	}
-	apps, _, err := appmwcli.GetApps(ctx, &appmwpb.Conds{
-		EntIDs: &basetypes.StringSliceVal{Op: cruder.IN, Value: appIDs},
-	}, int32(0), int32(len(appIDs)))
-	if err != nil {
-		return err
-	}
-	for _, app := range apps {
-		h.apps[app.EntID] = app
-	}
-	return nil
-}
-
-func (h *queryHandler) getCoins(ctx context.Context) error {
-	coinTypeIDs := []string{}
-	for _, good := range h.goods {
-		coinTypeIDs = append(coinTypeIDs, good.CoinTypeID)
-	}
-	coins, _, err := coinmwcli.GetCoins(ctx, &coinmwpb.Conds{
-		EntIDs: &basetypes.StringSliceVal{Op: cruder.IN, Value: coinTypeIDs},
-	}, int32(0), int32(len(coinTypeIDs)))
-	if err != nil {
-		return err
-	}
-	for _, coin := range coins {
-		h.coins[coin.EntID] = coin
-	}
-	return nil
+func (h *queryHandler) getApps(ctx context.Context) (err error) {
+	h.apps, err = goodgwcommon.GetApps(ctx, func() (appIDs []string) {
+		for _, good := range h.goods {
+			appIDs = append(appIDs, good.AppID)
+		}
+		return
+	}())
+	return err
 }
 
 func (h *queryHandler) formalize() {
@@ -67,14 +40,12 @@ func (h *queryHandler) formalize() {
 			GoodName:       good.GoodName,
 			AppGoodID:      good.AppGoodID,
 			AppGoodName:    good.AppGoodName,
-			CoinTypeID:     good.CoinTypeID,
 			TopMostID:      good.TopMostID,
 			TopMostType:    good.TopMostType,
 			TopMostTitle:   good.TopMostTitle,
 			TopMostMessage: good.TopMostMessage,
+			DisplayIndex:   good.DisplayIndex,
 			UnitPrice:      good.UnitPrice,
-			PackagePrice:   good.PackagePrice,
-			Posters:        good.Posters,
 			CreatedAt:      good.CreatedAt,
 			UpdatedAt:      good.UpdatedAt,
 		}
@@ -83,14 +54,6 @@ func (h *queryHandler) formalize() {
 		if ok {
 			info.AppName = app.Name
 		}
-		coin, ok := h.coins[good.CoinTypeID]
-		if ok {
-			info.CoinName = coin.Name
-			info.CoinLogo = coin.Logo
-			info.CoinEnv = coin.ENV
-			info.CoinUnit = coin.Unit
-		}
-
 		h.infos = append(h.infos, info)
 	}
 }
@@ -108,38 +71,8 @@ func (h *Handler) GetTopMostGood(ctx context.Context) (*npool.TopMostGood, error
 		Handler: h,
 		goods:   []*topmostgoodmwpb.TopMostGood{info},
 		apps:    map[string]*appmwpb.App{},
-		coins:   map[string]*coinmwpb.Coin{},
 	}
 	if err := handler.getApps(ctx); err != nil {
-		return nil, err
-	}
-	if err := handler.getCoins(ctx); err != nil {
-		return nil, err
-	}
-
-	handler.formalize()
-	if len(handler.infos) == 0 {
-		return nil, nil
-	}
-
-	return handler.infos[0], nil
-}
-
-func (h *Handler) GetTopMostGoodExt(ctx context.Context, info *topmostgoodmwpb.TopMostGood) (*npool.TopMostGood, error) {
-	if info == nil {
-		return nil, nil
-	}
-
-	handler := &queryHandler{
-		Handler: h,
-		goods:   []*topmostgoodmwpb.TopMostGood{info},
-		apps:    map[string]*appmwpb.App{},
-		coins:   map[string]*coinmwpb.Coin{},
-	}
-	if err := handler.getApps(ctx); err != nil {
-		return nil, err
-	}
-	if err := handler.getCoins(ctx); err != nil {
 		return nil, err
 	}
 
@@ -171,12 +104,8 @@ func (h *Handler) GetTopMostGoods(ctx context.Context) ([]*npool.TopMostGood, ui
 		Handler: h,
 		goods:   infos,
 		apps:    map[string]*appmwpb.App{},
-		coins:   map[string]*coinmwpb.Coin{},
 	}
 	if err := handler.getApps(ctx); err != nil {
-		return nil, 0, err
-	}
-	if err := handler.getCoins(ctx); err != nil {
 		return nil, 0, err
 	}
 

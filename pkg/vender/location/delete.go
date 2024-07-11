@@ -2,25 +2,31 @@ package location
 
 import (
 	"context"
-	"fmt"
 
 	locationmwcli "github.com/NpoolPlatform/good-middleware/pkg/client/vender/location"
-	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
-	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 	locationmwpb "github.com/NpoolPlatform/message/npool/good/mw/v1/vender/location"
 )
 
+type deleteHandler struct {
+	*checkHandler
+}
+
 func (h *Handler) DeleteLocation(ctx context.Context) (*locationmwpb.Location, error) {
-	info, err := locationmwcli.GetLocationOnly(ctx, &locationmwpb.Conds{
-		ID:    &basetypes.Uint32Val{Op: cruder.EQ, Value: *h.ID},
-		EntID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.EntID},
-	})
+	handler := &deleteHandler{
+		checkHandler: &checkHandler{
+			Handler: h,
+		},
+	}
+	if err := handler.checkLocation(ctx); err != nil {
+		return nil, err
+	}
+
+	info, err := h.GetLocation(ctx)
 	if err != nil {
 		return nil, err
 	}
-	if info == nil {
-		return nil, fmt.Errorf("invalid venderlocation")
+	if err := locationmwcli.DeleteLocation(ctx, h.ID, h.EntID); err != nil {
+		return nil, err
 	}
-
-	return locationmwcli.DeleteLocation(ctx, *h.ID)
+	return info, nil
 }

@@ -17,6 +17,7 @@ func (s *Server) CreateDefault(ctx context.Context, in *npool.CreateDefaultReque
 	handler, err := default1.NewHandler(
 		ctx,
 		default1.WithAppID(&in.AppID, true),
+		default1.WithCoinTypeID(&in.CoinTypeID, true),
 		default1.WithAppGoodID(&in.AppGoodID, true),
 	)
 	if err != nil {
@@ -39,36 +40,6 @@ func (s *Server) CreateDefault(ctx context.Context, in *npool.CreateDefaultReque
 	}
 
 	return &npool.CreateDefaultResponse{
-		Info: info,
-	}, nil
-}
-
-func (s *Server) CreateNDefault(ctx context.Context, in *npool.CreateNDefaultRequest) (*npool.CreateNDefaultResponse, error) {
-	handler, err := default1.NewHandler(
-		ctx,
-		default1.WithAppID(&in.TargetAppID, true),
-		default1.WithAppGoodID(&in.AppGoodID, true),
-	)
-	if err != nil {
-		logger.Sugar().Errorw(
-			"CreateNDefault",
-			"In", in,
-			"Error", err,
-		)
-		return &npool.CreateNDefaultResponse{}, status.Error(codes.Aborted, err.Error())
-	}
-
-	info, err := handler.CreateDefault(ctx)
-	if err != nil {
-		logger.Sugar().Errorw(
-			"CreateNDefault",
-			"In", in,
-			"Error", err,
-		)
-		return &npool.CreateNDefaultResponse{}, status.Error(codes.Aborted, err.Error())
-	}
-
-	return &npool.CreateNDefaultResponse{
 		Info: info,
 	}, nil
 }

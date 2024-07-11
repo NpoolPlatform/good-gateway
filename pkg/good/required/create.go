@@ -10,15 +10,16 @@ import (
 )
 
 func (h *Handler) CreateRequired(ctx context.Context) (*requiredmwpb.Required, error) {
-	id := uuid.NewString()
 	if h.EntID == nil {
-		h.EntID = &id
+		h.EntID = func() *string { s := uuid.NewString(); return &s }()
 	}
-
-	return requiredmwcli.CreateRequired(ctx, &requiredmwpb.RequiredReq{
+	if err := requiredmwcli.CreateRequired(ctx, &requiredmwpb.RequiredReq{
 		EntID:          h.EntID,
 		MainGoodID:     h.MainGoodID,
 		RequiredGoodID: h.RequiredGoodID,
 		Must:           h.Must,
-	})
+	}); err != nil {
+		return nil, err
+	}
+	return h.GetRequired(ctx)
 }

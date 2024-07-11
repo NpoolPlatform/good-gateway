@@ -1,4 +1,3 @@
-//nolint:dupl
 package topmostgood
 
 import (
@@ -40,38 +39,6 @@ func (s *Server) GetTopMostGoods(ctx context.Context, in *npool.GetTopMostGoodsR
 	}
 
 	return &npool.GetTopMostGoodsResponse{
-		Infos: infos,
-		Total: total,
-	}, nil
-}
-
-func (s *Server) GetNTopMostGoods(ctx context.Context, in *npool.GetNTopMostGoodsRequest) (*npool.GetNTopMostGoodsResponse, error) {
-	handler, err := topmostgood1.NewHandler(
-		ctx,
-		topmostgood1.WithAppID(&in.TargetAppID, true),
-		topmostgood1.WithOffset(in.Offset),
-		topmostgood1.WithLimit(in.Limit),
-	)
-	if err != nil {
-		logger.Sugar().Errorw(
-			"GetNTopMostGoods",
-			"In", in,
-			"Error", err,
-		)
-		return &npool.GetNTopMostGoodsResponse{}, status.Error(codes.Aborted, err.Error())
-	}
-
-	infos, total, err := handler.GetTopMostGoods(ctx)
-	if err != nil {
-		logger.Sugar().Errorw(
-			"GetNTopMostGoods",
-			"In", in,
-			"Error", err,
-		)
-		return &npool.GetNTopMostGoodsResponse{}, status.Error(codes.Aborted, err.Error())
-	}
-
-	return &npool.GetNTopMostGoodsResponse{
 		Infos: infos,
 		Total: total,
 	}, nil

@@ -2,32 +2,35 @@ package location
 
 import (
 	"context"
-	"fmt"
 
 	locationmwcli "github.com/NpoolPlatform/good-middleware/pkg/client/vender/location"
-	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
-	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 	locationmwpb "github.com/NpoolPlatform/message/npool/good/mw/v1/vender/location"
 )
 
+type updateHandler struct {
+	*checkHandler
+}
+
 func (h *Handler) UpdateLocation(ctx context.Context) (*locationmwpb.Location, error) {
-	info, err := locationmwcli.GetLocationOnly(ctx, &locationmwpb.Conds{
-		ID:    &basetypes.Uint32Val{Op: cruder.EQ, Value: *h.ID},
-		EntID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.EntID},
-	})
-	if err != nil {
+	handler := &updateHandler{
+		checkHandler: &checkHandler{
+			Handler: h,
+		},
+	}
+	if err := handler.checkLocation(ctx); err != nil {
 		return nil, err
 	}
-	if info == nil {
-		return nil, fmt.Errorf("invalid venderlocation")
-	}
 
-	return locationmwcli.UpdateLocation(ctx, &locationmwpb.LocationReq{
+	if err := locationmwcli.UpdateLocation(ctx, &locationmwpb.LocationReq{
 		ID:       h.ID,
+		EntID:    h.EntID,
 		Country:  h.Country,
 		Province: h.Province,
 		City:     h.City,
 		Address:  h.Address,
 		BrandID:  h.BrandID,
-	})
+	}); err != nil {
+		return nil, err
+	}
+	return h.GetLocation(ctx)
 }

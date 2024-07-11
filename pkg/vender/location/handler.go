@@ -21,8 +21,6 @@ type Handler struct {
 	Limit    int32
 }
 
-const leastStrLen = 3
-
 func NewHandler(ctx context.Context, options ...func(context.Context, *Handler) error) (*Handler, error) {
 	handler := &Handler{}
 	for _, opt := range options {
@@ -70,7 +68,7 @@ func WithCountry(s *string, must bool) func(context.Context, *Handler) error {
 			}
 			return nil
 		}
-		if len(*s) < leastStrLen {
+		if len(*s) < 3 {
 			return fmt.Errorf("invalid country")
 		}
 		h.Country = s
@@ -86,8 +84,7 @@ func WithProvince(s *string, must bool) func(context.Context, *Handler) error {
 			}
 			return nil
 		}
-		const leastStrLen = 3
-		if len(*s) < leastStrLen {
+		if len(*s) < 3 {
 			return fmt.Errorf("invalid province")
 		}
 		h.Province = s
@@ -103,8 +100,7 @@ func WithCity(s *string, must bool) func(context.Context, *Handler) error {
 			}
 			return nil
 		}
-		const leastStrLen = 3
-		if len(*s) < leastStrLen {
+		if len(*s) < 3 {
 			return fmt.Errorf("invalid city")
 		}
 		h.City = s
@@ -120,8 +116,7 @@ func WithAddress(s *string, must bool) func(context.Context, *Handler) error {
 			}
 			return nil
 		}
-		const leastStrLen = 3
-		if len(*s) < leastStrLen {
+		if len(*s) < 3 {
 			return fmt.Errorf("invalid address")
 		}
 		h.Address = s

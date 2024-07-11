@@ -1,4 +1,3 @@
-//nolint:dupl
 package default1
 
 import (
@@ -41,38 +40,6 @@ func (s *Server) UpdateDefault(ctx context.Context, in *npool.UpdateDefaultReque
 	}
 
 	return &npool.UpdateDefaultResponse{
-		Info: info,
-	}, nil
-}
-
-func (s *Server) UpdateNDefault(ctx context.Context, in *npool.UpdateNDefaultRequest) (*npool.UpdateNDefaultResponse, error) {
-	handler, err := default1.NewHandler(
-		ctx,
-		default1.WithID(&in.ID, true),
-		default1.WithEntID(&in.EntID, true),
-		default1.WithAppID(&in.TargetAppID, true),
-		default1.WithAppGoodID(in.AppGoodID, false),
-	)
-	if err != nil {
-		logger.Sugar().Errorw(
-			"UpdateNDefault",
-			"In", in,
-			"Error", err,
-		)
-		return &npool.UpdateNDefaultResponse{}, status.Error(codes.Aborted, err.Error())
-	}
-
-	info, err := handler.UpdateDefault(ctx)
-	if err != nil {
-		logger.Sugar().Errorw(
-			"UpdateNDefault",
-			"In", in,
-			"Error", err,
-		)
-		return &npool.UpdateNDefaultResponse{}, status.Error(codes.Aborted, err.Error())
-	}
-
-	return &npool.UpdateNDefaultResponse{
 		Info: info,
 	}, nil
 }

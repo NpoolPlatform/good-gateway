@@ -2,25 +2,31 @@ package brand
 
 import (
 	"context"
-	"fmt"
 
 	brandmwcli "github.com/NpoolPlatform/good-middleware/pkg/client/vender/brand"
-	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
-	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 	brandmwpb "github.com/NpoolPlatform/message/npool/good/mw/v1/vender/brand"
 )
 
+type deleteHandler struct {
+	*checkHandler
+}
+
 func (h *Handler) DeleteBrand(ctx context.Context) (*brandmwpb.Brand, error) {
-	info, err := brandmwcli.GetBrandOnly(ctx, &brandmwpb.Conds{
-		ID:    &basetypes.Uint32Val{Op: cruder.EQ, Value: *h.ID},
-		EntID: &basetypes.StringVal{Op: cruder.EQ, Value: *h.EntID},
-	})
+	handler := &deleteHandler{
+		checkHandler: &checkHandler{
+			Handler: h,
+		},
+	}
+	if err := handler.checkBrand(ctx); err != nil {
+		return nil, err
+	}
+
+	info, err := h.GetBrand(ctx)
 	if err != nil {
 		return nil, err
 	}
-	if info == nil {
-		return nil, fmt.Errorf("invalid venderbrand")
+	if err := brandmwcli.DeleteBrand(ctx, h.ID, h.EntID); err != nil {
+		return nil, err
 	}
-
-	return brandmwcli.DeleteBrand(ctx, *h.ID)
+	return info, nil
 }

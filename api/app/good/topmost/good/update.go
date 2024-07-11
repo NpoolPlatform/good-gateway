@@ -19,9 +19,8 @@ func (s *Server) UpdateTopMostGood(ctx context.Context, in *npool.UpdateTopMostG
 		topmostgood1.WithID(&in.ID, true),
 		topmostgood1.WithEntID(&in.EntID, true),
 		topmostgood1.WithAppID(&in.AppID, true),
-		topmostgood1.WithPosters(in.Posters, false),
 		topmostgood1.WithUnitPrice(in.UnitPrice, false),
-		topmostgood1.WithPackagePrice(in.PackagePrice, false),
+		topmostgood1.WithDisplayIndex(in.DisplayIndex, false),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(
@@ -43,40 +42,6 @@ func (s *Server) UpdateTopMostGood(ctx context.Context, in *npool.UpdateTopMostG
 	}
 
 	return &npool.UpdateTopMostGoodResponse{
-		Info: info,
-	}, nil
-}
-
-func (s *Server) UpdateNTopMostGood(ctx context.Context, in *npool.UpdateNTopMostGoodRequest) (*npool.UpdateNTopMostGoodResponse, error) {
-	handler, err := topmostgood1.NewHandler(
-		ctx,
-		topmostgood1.WithID(&in.ID, true),
-		topmostgood1.WithEntID(&in.EntID, true),
-		topmostgood1.WithAppID(&in.TargetAppID, true),
-		topmostgood1.WithPosters(in.Posters, false),
-		topmostgood1.WithUnitPrice(in.UnitPrice, false),
-		topmostgood1.WithPackagePrice(in.PackagePrice, false),
-	)
-	if err != nil {
-		logger.Sugar().Errorw(
-			"UpdateNTopMostGood",
-			"In", in,
-			"Error", err,
-		)
-		return &npool.UpdateNTopMostGoodResponse{}, status.Error(codes.Aborted, err.Error())
-	}
-
-	info, err := handler.UpdateTopMostGood(ctx)
-	if err != nil {
-		logger.Sugar().Errorw(
-			"UpdateNTopMostGood",
-			"In", in,
-			"Error", err,
-		)
-		return &npool.UpdateNTopMostGoodResponse{}, status.Error(codes.Aborted, err.Error())
-	}
-
-	return &npool.UpdateNTopMostGoodResponse{
 		Info: info,
 	}, nil
 }
