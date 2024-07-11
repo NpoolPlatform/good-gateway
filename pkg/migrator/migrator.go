@@ -115,6 +115,9 @@ func setDefaultValueForTableColumns(ctx context.Context, tx *ent.Tx) error {
 	if _, err := tx.ExecContext(ctx, `update extra_infos set app_good_id = ? where app_good_id is null`, uuid.Nil.String()); err != nil {
 		return err
 	}
+	if _, err := tx.ExecContext(ctx, `update extra_infos set good_id = ? where good_id is null`, uuid.Nil.String()); err != nil {
+		return err
+	}
 	return nil
 }
 
