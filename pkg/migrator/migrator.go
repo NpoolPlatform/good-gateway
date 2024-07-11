@@ -491,6 +491,8 @@ func migrateGoods(ctx context.Context, tx *ent.Tx) error {
 				SetBenefitIntervalHours(good.BenefitIntervalHours).
 				SetPurchasable(true).
 				SetOnline(true).
+				SetCreatedAt(good.CreatedAt).
+				SetUpdatedAt(good.UpdatedAt).
 				Save(ctx); err != nil {
 				return err
 			}
@@ -514,7 +516,6 @@ func migrateGoods(ctx context.Context, tx *ent.Tx) error {
 			if _, err := tx.
 				PowerRental.
 				Create().
-				// SetEntID(good.EntID).
 				SetGoodID(good.EntID).
 				SetDeviceTypeID(good.DeviceInfoID).
 				SetVendorLocationID(good.VendorLocationID).
@@ -525,6 +526,8 @@ func migrateGoods(ctx context.Context, tx *ent.Tx) error {
 				SetUnitLockDeposit(lockDeposit).
 				SetDurationDisplayType(goodtypes.GoodDurationType_GoodDurationByDay.String()).
 				SetStockMode(goodtypes.GoodStockMode_GoodStockByUnique.String()).
+				SetCreatedAt(good.CreatedAt).
+				SetUpdatedAt(good.UpdatedAt).
 				Save(ctx); err != nil {
 				return err
 			}
@@ -566,6 +569,8 @@ func migrateAppGoods(ctx context.Context, tx *ent.Tx) error {
 				SetBanner(appgood.GoodBanner).
 				SetOnline(appgood.Online).
 				SetVisible(appgood.Visible).
+				SetCreatedAt(appgood.CreatedAt).
+				SetUpdatedAt(appgood.UpdatedAt).
 				Save(ctx); err != nil {
 				return err
 			}
@@ -585,7 +590,6 @@ func migrateAppGoods(ctx context.Context, tx *ent.Tx) error {
 			if _, err := tx.
 				AppPowerRental.
 				Create().
-				// SetEntID(good.EntID).
 				SetAppGoodID(appgood.EntID).
 				SetServiceStartAt(appgood.ServiceStartAt).
 				SetCancelMode(appgood.CancelMode).
@@ -603,6 +607,8 @@ func migrateAppGoods(ctx context.Context, tx *ent.Tx) error {
 				SetMinOrderDurationSeconds(appgood.MinOrderDuration * 24 * 60 * 60).
 				SetMaxOrderDurationSeconds(appgood.MaxOrderDuration * 24 * 60 * 60).
 				SetStartMode(goodtypes.GoodStartMode_GoodStartModeNextDay.String()).
+				SetCreatedAt(appgood.CreatedAt).
+				SetUpdatedAt(appgood.UpdatedAt).
 				Save(ctx); err != nil {
 				return err
 			}
@@ -638,6 +644,8 @@ func migrateGoodCoins(ctx context.Context, tx *ent.Tx) error {
 				SetCoinTypeID(good.CoinTypeID).
 				SetMain(true).
 				SetIndex(0).
+				SetCreatedAt(good.CreatedAt).
+				SetUpdatedAt(good.UpdatedAt).
 				Save(ctx); err != nil {
 				return err
 			}
