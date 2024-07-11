@@ -662,9 +662,9 @@ func migrateGoodRewards(ctx context.Context, tx *ent.Tx) error {
 	if err != nil {
 		return err
 	}
-	goods := map[string]uuid.UUID{}
+	goods := map[uuid.UUID]uuid.UUID{}
 	for _, info := range infos {
-		goods[info.EntID.String()] = info.CoinTypeID
+		goods[info.EntID] = info.CoinTypeID
 	}
 	rows, err := tx.QueryContext(ctx, "select id,ent_id,good_id,reward_state,last_reward_at,reward_tid,next_reward_start_amount,last_reward_amount,last_unit_reward_amount,total_reward_amount,created_at,updated_at from good_rewards where deleted_at = 0")
 	if err != nil {
@@ -672,9 +672,9 @@ func migrateGoodRewards(ctx context.Context, tx *ent.Tx) error {
 	}
 
 	type Reward struct {
-		ID                    uint32          `json:"ID"`
-		EntID                 uuid.UUID       `json:"EntID"`
-		GoodID                uuid.UUID       `json:"GoodID"`
+		ID                    uint32          `json:"id"`
+		EntID                 uuid.UUID       `json:"ent_id"`
+		GoodID                uuid.UUID       `json:"good_id"`
 		RewardState           string          `json:"reward_state"`
 		LastRewardAt          uint32          `json:"last_reward_at"`
 		RewardTid             uuid.UUID       `json:"reward_tid"`
@@ -709,17 +709,16 @@ func migrateGoodRewards(ctx context.Context, tx *ent.Tx) error {
 	}
 
 	for _, reward := range rewards {
-		coinTypeID, ok := goods[reward.GoodID.String()]
+		coinTypeID, ok := goods[reward.GoodID]
 		if !ok {
-			coinTypeID = uuid.Nil
+			continue
 		}
 
 		exist, err := tx.
 			GoodCoinReward.
 			Query().
 			Where(
-				entgoodcoinreward.GoodID(reward.GoodID),
-				entgoodcoinreward.CoinTypeID(coinTypeID),
+				entgoodcoinreward.EntID(reward.EntID),
 				entgoodcoinreward.DeletedAt(0),
 			).
 			Exist(ctx)
