@@ -176,6 +176,7 @@ func (h *queryHandler) formalize() {
 			Posters:       appPowerRental.Posters,
 			DisplayNames:  appPowerRental.DisplayNames,
 			DisplayColors: appPowerRental.DisplayColors,
+			Requireds:     appPowerRental.Requireds,
 			// TODO: expand mining pool information
 			AppMiningGoodStocks: appPowerRental.AppMiningGoodStocks,
 			MiningGoodStocks:    appPowerRental.MiningGoodStocks,
