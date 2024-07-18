@@ -851,9 +851,9 @@ func Migrate(ctx context.Context) error {
 		if err := migrateGoods(ctx, tx); err != nil {
 			return err
 		}
-		// if err := migrateAppGoods(ctx, tx); err != nil {
-		// 	return err
-		// }
+		if err := migrateAppGoods(ctx, tx); err != nil {
+			return err
+		}
 		if err := migrateGoodCoins(ctx, tx); err != nil {
 			return err
 		}
