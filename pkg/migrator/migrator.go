@@ -26,6 +26,7 @@ import (
 	entapppowerrental "github.com/NpoolPlatform/good-middleware/pkg/db/ent/apppowerrental"
 	entappstock "github.com/NpoolPlatform/good-middleware/pkg/db/ent/appstock"
 	entdevicemanufacturer "github.com/NpoolPlatform/good-middleware/pkg/db/ent/devicemanufacturer"
+	entextrainfo "github.com/NpoolPlatform/good-middleware/pkg/db/ent/extrainfo"
 	entgood "github.com/NpoolPlatform/good-middleware/pkg/db/ent/good"
 	entgoodbase "github.com/NpoolPlatform/good-middleware/pkg/db/ent/goodbase"
 	entgoodcoin "github.com/NpoolPlatform/good-middleware/pkg/db/ent/goodcoin"
@@ -791,6 +792,84 @@ func fillCoinTypeIDInGoodRewardHistories(ctx context.Context, tx *ent.Tx) error 
 	return nil
 }
 
+func migrateExtraInfos(ctx context.Context, tx *ent.Tx) error {
+	appgoods, err := tx.AppGood.Query().Where(entappgood.DeletedAt(0)).All(ctx)
+	if err != nil {
+		return err
+	}
+	goodToAppGoods := map[uuid.UUID][]*ent.AppGood{}
+	for _, appgood := range appgoods {
+		_appgoods, ok := goodToAppGoods[appgood.GoodID]
+		if !ok {
+			_appgoods = []*ent.AppGood{}
+		}
+		_appgoods = append(_appgoods, appgood)
+		goodToAppGoods[appgood.GoodID] = _appgoods
+	}
+
+	sql := fmt.Sprintf("select good_id,likes,dislikes,recommend_count,comment_count,score_count,score,created_at,updated_at from extra_infos where deleted_at = 0 and good_id != %v", uuid.Nil.String())
+	rows, err := tx.QueryContext(ctx, sql)
+	if err != nil {
+		return err
+	}
+
+	type Extra struct {
+		GoodID         uuid.UUID       `json:"good_id"`
+		Likes          uint32          `json:"likes"`
+		Dislikes       uint32          `json:"dislikes"`
+		RecommendCount uint32          `json:"recommend_count"`
+		CommentCount   uint32          `json:"comment_count"`
+		ScoreCount     uint32          `json:"score_count"`
+		Score          decimal.Decimal `json:"score"`
+		CreatedAt      uint32          `json:"created_at"`
+		UpdatedAt      uint32          `json:"updated_at"`
+	}
+	extras := []*Extra{}
+	for rows.Next() {
+		extra := &Extra{}
+		if err := rows.Scan(&extra.GoodID, &extra.Likes, &extra.Dislikes, &extra.RecommendCount, &extra.CommentCount, &extra.ScoreCount, &extra.Score, &extra.CreatedAt, &extra.UpdatedAt); err != nil {
+			return err
+		}
+		extras = append(extras, extra)
+	}
+	for _, extra := range extras {
+		_appgoods, ok := goodToAppGoods[extra.GoodID]
+		if ok {
+			for _, appgood := range _appgoods {
+				exist, err := tx.
+					ExtraInfo.
+					Query().
+					Where(
+						entextrainfo.AppGoodID(appgood.EntID),
+						entextrainfo.DeletedAt(0),
+					).
+					Exist(ctx)
+				if err != nil {
+					return err
+				}
+				if !exist {
+					if _, err := tx.
+						ExtraInfo.
+						Create().
+						SetAppGoodID(appgood.EntID).
+						SetLikes(extra.Likes).
+						SetDislikes(extra.Dislikes).
+						SetRecommendCount(extra.RecommendCount).
+						SetCommentCount(extra.CommentCount).
+						SetScoreCount(extra.ScoreCount).
+						SetScore(extra.Score).
+						SetCreatedAt(extra.CreatedAt).
+						SetUpdatedAt(extra.UpdatedAt).
+						Save(ctx); err != nil {
+						return err
+					}
+				}
+			}
+		}
+	}
+	return nil
+}
+
 func lockKey() string {
 	serviceID := config.GetStringValueWithNameSpace(servicename.ServiceDomain, keyServiceID)
 	return fmt.Sprintf("%v:%v", basetypes.Prefix_PrefixMigrate, serviceID)
@@ -861,6 +940,9 @@ func Migrate(ctx context.Context) error {
 			return err
 		}
 		if err := fillCoinTypeIDInGoodRewardHistories(ctx, tx); err != nil {
+			return err
+		}
+		if err := migrateExtraInfos(ctx, tx); err != nil {
 			return err
 		}
 		return nil
