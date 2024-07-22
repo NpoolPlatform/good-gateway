@@ -1,4 +1,4 @@
-//nolint
+//nolint:gocyclo,dupl,lll,gomnd
 package migrator
 
 import (
@@ -93,33 +93,26 @@ func setDefaultValueForTableColumns(ctx context.Context, tx *ent.Tx) error {
 	// appdefaultgood
 	if _, err := tx.ExecContext(ctx, `update app_default_goods set app_id = ? where app_id is null`, uuid.Nil.String()); err != nil {
 		return wlog.WrapError(err)
-		return err
 	}
 	if _, err := tx.ExecContext(ctx, `update app_default_goods set good_id = ? where good_id is null`, uuid.Nil.String()); err != nil {
 		return wlog.WrapError(err)
-		return err
 	}
 	// goodreward
 	if _, err := tx.ExecContext(ctx, "update good_rewards set next_reward_start_amount = '0.000000000000000000' where next_reward_start_amount is null"); err != nil {
 		return wlog.WrapError(err)
-		return err
 	}
 	if _, err := tx.ExecContext(ctx, "update good_rewards set last_reward_amount = '0.000000000000000000' where last_reward_amount is null"); err != nil {
 		return wlog.WrapError(err)
-		return err
 	}
 	if _, err := tx.ExecContext(ctx, "update good_rewards set last_unit_reward_amount = '0.000000000000000000' where last_unit_reward_amount is null"); err != nil {
 		return wlog.WrapError(err)
-		return err
 	}
 	if _, err := tx.ExecContext(ctx, "update good_rewards set total_reward_amount = '0.000000000000000000' where total_reward_amount is null"); err != nil {
 		return wlog.WrapError(err)
-		return err
 	}
 	// extra_infos
 	if _, err := tx.ExecContext(ctx, `update extra_infos set app_good_id = ? where app_good_id is null`, uuid.Nil.String()); err != nil {
 		return wlog.WrapError(err)
-		return err
 	}
 	if _, err := tx.ExecContext(ctx, `update extra_infos set good_id = ? where good_id is null`, uuid.Nil.String()); err != nil {
 		return wlog.WrapError(err)
@@ -243,7 +236,7 @@ func migrateDisplayColors(ctx context.Context, tx *ent.Tx) error {
 func migrateDisplayNames(ctx context.Context, tx *ent.Tx) error {
 	rows, err := tx.QueryContext(ctx, "select ent_id,display_names,created_at,updated_at from app_goods where JSON_LENGTH(display_names) > 0 and deleted_at = 0")
 	if err != nil {
-		return err
+		return wlog.WrapError(err)
 	}
 
 	type DisplayName struct {
@@ -477,7 +470,7 @@ func migrateGoods(ctx context.Context, tx *ent.Tx) error {
 	type GoodBase struct {
 		EntID uuid.UUID `json:"ent_id"`
 	}
-	rows, err := tx.QueryContext(ctx, fmt.Sprintf("select ent_id from good_bases"))
+	rows, err := tx.QueryContext(ctx, "select ent_id from good_bases")
 	if err != nil {
 		return wlog.WrapError(err)
 	}
@@ -559,7 +552,7 @@ func migrateAppGoods(ctx context.Context, tx *ent.Tx) error {
 	type AppGoodBase struct {
 		EntID uuid.UUID `json:"ent_id"`
 	}
-	rows, err := tx.QueryContext(ctx, fmt.Sprintf("select ent_id from app_good_bases"))
+	rows, err := tx.QueryContext(ctx, "select ent_id from app_good_bases")
 	if err != nil {
 		return wlog.WrapError(err)
 	}
@@ -728,7 +721,7 @@ func migrateGoodRewards(ctx context.Context, tx *ent.Tx) error {
 	type GoodCoinReward struct {
 		EntID uuid.UUID `json:"ent_id"`
 	}
-	_rows, err := tx.QueryContext(ctx, fmt.Sprintf("select ent_id from good_coin_rewards"))
+	_rows, err := tx.QueryContext(ctx, "select ent_id from good_coin_rewards")
 	if err != nil {
 		return wlog.WrapError(err)
 	}
@@ -829,7 +822,7 @@ func migrateExtraInfos(ctx context.Context, tx *ent.Tx) error {
 		goodToAppGoods[appgood.GoodID] = _appgoods
 	}
 
-	sql := fmt.Sprintf("select good_id,likes,dislikes,recommend_count,comment_count,score_count,score,created_at,updated_at from extra_infos where deleted_at = 0 and good_id != %v", uuid.Nil.String())
+	sql := fmt.Sprintf("select good_id,likes,dislikes,recommend_count,comment_count,score_count,score,created_at,updated_at from extra_infos where deleted_at = 0 and good_id != %v", uuid.Nil.String()) //nolint
 	rows, err := tx.QueryContext(ctx, sql)
 	if err != nil {
 		return wlog.WrapError(err)
