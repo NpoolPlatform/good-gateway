@@ -18,6 +18,7 @@ func (s *Server) GetHistories(ctx context.Context, in *npool.GetHistoriesRequest
 		history1.WithGoodID(in.GoodID, false),
 		history1.WithStartAt(in.StartAt, false),
 		history1.WithEndAt(in.EndAt, false),
+		history1.WithCoinTypeID(in.CoinTypeID, false),
 		history1.WithOffset(in.Offset),
 		history1.WithLimit(in.Limit),
 	)

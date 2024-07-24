@@ -12,10 +12,11 @@ import (
 
 type Handler struct {
 	goodcommon.GoodCheckHandler
-	StartAt *uint32
-	EndAt   *uint32
-	Offset  int32
-	Limit   int32
+	StartAt    *uint32
+	EndAt      *uint32
+	CoinTypeID *string
+	Offset     int32
+	Limit      int32
 }
 
 func NewHandler(ctx context.Context, options ...func(context.Context, *Handler) error) (*Handler, error) {
@@ -66,6 +67,22 @@ func WithEndAt(n *uint32, must bool) func(context.Context, *Handler) error {
 			return nil
 		}
 		h.EndAt = n
+		return nil
+	}
+}
+
+func WithCoinTypeID(id *string, must bool) func(context.Context, *Handler) error {
+	return func(ctx context.Context, h *Handler) error {
+		if id == nil {
+			if must {
+				return fmt.Errorf("invalid cointypeid")
+			}
+			return nil
+		}
+		if _, err := uuid.Parse(*id); err != nil {
+			return err
+		}
+		h.CoinTypeID = id
 		return nil
 	}
 }
