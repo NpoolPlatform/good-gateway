@@ -490,7 +490,7 @@ func migrateGoods(ctx context.Context, tx *ent.Tx) error {
 				Create().
 				SetEntID(good.EntID).
 				SetName(good.Title).
-				SetGoodType(goodtypes.GoodType_PowerRental.String()). // change PowerRenting to PowerRental
+				SetGoodType(goodtypes.GoodType_LegacyPowerRental.String()). // change PowerRenting to LegacyPowerRental
 				SetBenefitType(good.BenefitType).
 				SetServiceStartAt(good.StartAt).
 				SetStartMode(good.StartMode).
