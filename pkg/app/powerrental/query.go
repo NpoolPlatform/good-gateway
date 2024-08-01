@@ -14,6 +14,7 @@ import (
 	npool "github.com/NpoolPlatform/message/npool/good/gw/v1/app/powerrental"
 	goodcoingwpb "github.com/NpoolPlatform/message/npool/good/gw/v1/good/coin"
 	goodcoinrewardgwpb "github.com/NpoolPlatform/message/npool/good/gw/v1/good/coin/reward"
+	goodstockgwpb "github.com/NpoolPlatform/message/npool/good/gw/v1/good/stock"
 	apppowerrentalmwpb "github.com/NpoolPlatform/message/npool/good/mw/v1/app/powerrental"
 )
 
@@ -179,8 +180,20 @@ func (h *queryHandler) formalize() {
 			Requireds:     appPowerRental.Requireds,
 			// TODO: expand mining pool information
 			AppMiningGoodStocks: appPowerRental.AppMiningGoodStocks,
-			MiningGoodStocks:    appPowerRental.MiningGoodStocks,
-			Labels:              appPowerRental.Labels,
+
+			MiningGoodStocks: func() (mininGoodStocks []*goodstockgwpb.MiningGoodStockInfo) {
+				for _, stock := range appPowerRental.MiningGoodStocks {
+					mininGoodStocks = append(mininGoodStocks, &goodstockgwpb.MiningGoodStockInfo{
+						EntID:          stock.EntID,
+						GoodStockID:    stock.GoodStockID,
+						PoolGoodUserID: stock.PoolGoodUserID,
+						Total:          stock.Total,
+						SpotQuantity:   stock.SpotQuantity,
+					})
+				}
+				return mininGoodStocks
+			}(),
+			Labels: appPowerRental.Labels,
 
 			CreatedAt: appPowerRental.CreatedAt,
 			UpdatedAt: appPowerRental.UpdatedAt,
