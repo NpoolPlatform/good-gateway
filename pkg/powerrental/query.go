@@ -69,6 +69,7 @@ func (h *queryHandler) formalize() {
 			BenefitIntervalHours: powerRental.BenefitIntervalHours,
 			Purchasable:          powerRental.Purchasable,
 			Online:               powerRental.Online,
+			State:                powerRental.State,
 
 			StockMode:    powerRental.StockMode,
 			StockID:      powerRental.GoodStockID,
