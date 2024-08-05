@@ -87,6 +87,7 @@ func (h *queryHandler) formalize() {
 			BenefitIntervalHours: appPowerRental.BenefitIntervalHours,
 			GoodPurchasable:      appPowerRental.GoodPurchasable,
 			GoodOnline:           appPowerRental.GoodOnline,
+			State:                appPowerRental.State,
 
 			StockMode:                    appPowerRental.StockMode,
 			AppGoodPurchasable:           appPowerRental.AppGoodPurchasable,
