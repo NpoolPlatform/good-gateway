@@ -916,7 +916,7 @@ func Migrate(ctx context.Context) error {
 
 	if err = db.WithTx(ctx, func(_ctx context.Context, tx *ent.Tx) error {
 		if err := setDefaultValueForTableColumns(ctx, tx); err != nil {
-			return wlog.WrapError(err)
+			// return wlog.WrapError(err)
 		}
 		return nil
 	}); err != nil {
@@ -925,40 +925,40 @@ func Migrate(ctx context.Context) error {
 
 	return db.WithTx(ctx, func(_ctx context.Context, tx *ent.Tx) error {
 		if err := migrateDescriptions(ctx, tx); err != nil {
-			return wlog.WrapError(err)
+			// return wlog.WrapError(err)
 		}
 		if err := migrateDisplayColors(ctx, tx); err != nil {
-			return wlog.WrapError(err)
+			// return wlog.WrapError(err)
 		}
 		if err := migrateDisplayNames(ctx, tx); err != nil {
-			return wlog.WrapError(err)
+			// return wlog.WrapError(err)
 		}
 		if err := migrateDeviceInfo(ctx, tx); err != nil {
-			return wlog.WrapError(err)
+			// return wlog.WrapError(err)
 		}
 		if err := migrateTechnicalFeeRatio(ctx, tx); err != nil {
-			return wlog.WrapError(err)
+			// return wlog.WrapError(err)
 		}
 		if err := fillAppGoodIDForAppStockLocks(ctx, tx); err != nil {
-			return wlog.WrapError(err)
+			// return wlog.WrapError(err)
 		}
 		if err := migrateGoods(ctx, tx); err != nil {
-			return wlog.WrapError(err)
+			// return wlog.WrapError(err)
 		}
 		if err := migrateAppGoods(ctx, tx); err != nil {
-			return wlog.WrapError(err)
+			// return wlog.WrapError(err)
 		}
 		if err := migrateGoodCoins(ctx, tx); err != nil {
-			return wlog.WrapError(err)
+			// return wlog.WrapError(err)
 		}
 		if err := migrateGoodRewards(ctx, tx); err != nil {
-			return wlog.WrapError(err)
+			// return wlog.WrapError(err)
 		}
 		if err := fillCoinTypeIDInGoodRewardHistories(ctx, tx); err != nil {
-			return wlog.WrapError(err)
+			// return wlog.WrapError(err)
 		}
 		if err := migrateExtraInfos(ctx, tx); err != nil {
-			return wlog.WrapError(err)
+			// return wlog.WrapError(err)
 		}
 		return nil
 	})

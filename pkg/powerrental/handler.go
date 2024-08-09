@@ -401,12 +401,21 @@ func WithTotal(s *string, must bool) func(context.Context, *Handler) error {
 func WithMiningGoodStocks(stocks []*goodstockgwpb.MiningGoodStockReq, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		miningGoodStocks := []*goodstockmwpb.MiningGoodStockReq{}
+
+		ids := []string{}
 		for _, req := range stocks {
+			ids = append(ids, req.PoolRootUserID)
 			miningGoodStocks = append(miningGoodStocks, &goodstockmwpb.MiningGoodStockReq{
 				PoolRootUserID: &req.PoolRootUserID,
 				Total:          &req.Total,
 			})
 		}
+
+		handle := &checkHandler{h}
+		if err := handle.checkPoolRootUserIDs(ctx, ids); err != nil {
+			return wlog.WrapError(err)
+		}
+
 		h.MiningGoodStocks = miningGoodStocks
 		return nil
 	}
