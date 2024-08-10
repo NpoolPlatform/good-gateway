@@ -89,8 +89,8 @@ func open(hostname string) (conn *sql.DB, err error) {
 	return conn, nil
 }
 
-func validFieldExist(ctx context.Context, tx *ent.Tx, databaseName, tableName, fieldName string) (bool, error) {
-	checkFieldSQL := fmt.Sprintf("show columns from %v.%v like '%v'", databaseName, tableName, fieldName)
+func validFieldExist(ctx context.Context, tx *ent.Tx, tableName, fieldName string) (bool, error) {
+	checkFieldSQL := fmt.Sprintf("show columns from good_manager.%v like '%v'", tableName, fieldName)
 	logger.Sugar().Warnw(
 		"validFieldExist",
 		"checkFieldSQL",
@@ -111,7 +111,7 @@ func validFieldExist(ctx context.Context, tx *ent.Tx, databaseName, tableName, f
 }
 
 func setDefaultValueForTableColumns(ctx context.Context, tx *ent.Tx) error {
-	exist, err := validFieldExist(ctx, tx, "good_manager", "app_default_goods", "app_id")
+	exist, err := validFieldExist(ctx, tx, "app_default_goods", "app_id")
 	if err != nil {
 		return wlog.WrapError(err)
 	}
@@ -122,7 +122,7 @@ func setDefaultValueForTableColumns(ctx context.Context, tx *ent.Tx) error {
 		}
 	}
 
-	exist, err = validFieldExist(ctx, tx, "good_manager", "app_default_goods", "good_id")
+	exist, err = validFieldExist(ctx, tx, "app_default_goods", "good_id")
 	if err != nil {
 		return wlog.WrapError(err)
 	}
@@ -132,7 +132,7 @@ func setDefaultValueForTableColumns(ctx context.Context, tx *ent.Tx) error {
 		}
 	}
 
-	exist, err = validFieldExist(ctx, tx, "good_manager", "good_rewards", "next_reward_start_amount")
+	exist, err = validFieldExist(ctx, tx, "good_rewards", "next_reward_start_amount")
 	if err != nil {
 		return wlog.WrapError(err)
 	}
@@ -143,7 +143,7 @@ func setDefaultValueForTableColumns(ctx context.Context, tx *ent.Tx) error {
 		}
 	}
 
-	exist, err = validFieldExist(ctx, tx, "good_manager", "good_rewards", "last_reward_amount")
+	exist, err = validFieldExist(ctx, tx, "good_rewards", "last_reward_amount")
 	if err != nil {
 		return wlog.WrapError(err)
 	}
@@ -153,7 +153,7 @@ func setDefaultValueForTableColumns(ctx context.Context, tx *ent.Tx) error {
 		}
 	}
 
-	exist, err = validFieldExist(ctx, tx, "good_manager", "good_rewards", "last_unit_reward_amount")
+	exist, err = validFieldExist(ctx, tx, "good_rewards", "last_unit_reward_amount")
 	if err != nil {
 		return wlog.WrapError(err)
 	}
@@ -163,7 +163,7 @@ func setDefaultValueForTableColumns(ctx context.Context, tx *ent.Tx) error {
 		}
 	}
 
-	exist, err = validFieldExist(ctx, tx, "good_manager", "good_rewards", "total_reward_amount")
+	exist, err = validFieldExist(ctx, tx, "good_rewards", "total_reward_amount")
 	if err != nil {
 		return wlog.WrapError(err)
 	}
@@ -173,7 +173,7 @@ func setDefaultValueForTableColumns(ctx context.Context, tx *ent.Tx) error {
 		}
 	}
 
-	exist, err = validFieldExist(ctx, tx, "good_manager", "extra_infos", "app_good_id")
+	exist, err = validFieldExist(ctx, tx, "extra_infos", "app_good_id")
 	if err != nil {
 		return wlog.WrapError(err)
 	}
@@ -184,7 +184,7 @@ func setDefaultValueForTableColumns(ctx context.Context, tx *ent.Tx) error {
 		}
 	}
 
-	exist, err = validFieldExist(ctx, tx, "good_manager", "extra_infos", "good_id")
+	exist, err = validFieldExist(ctx, tx, "extra_infos", "good_id")
 	if err != nil {
 		return wlog.WrapError(err)
 	}
