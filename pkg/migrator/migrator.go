@@ -369,6 +369,14 @@ func migrateDisplayNames(ctx context.Context, tx *ent.Tx) error {
 }
 
 func migrateDeviceInfo(ctx context.Context, tx *ent.Tx) error {
+	exist, err := validFieldExist(ctx, tx, "device_infos", "manufacturer")
+	if err != nil {
+		return wlog.WrapError(err)
+	}
+	if !exist {
+		logger.Sugar().Warnw("unnecessary to exec migrateDeviceInfo")
+		return nil
+	}
 	rows, err := tx.QueryContext(ctx, "select id,manufacturer,created_at,updated_at from device_infos where manufacturer != '' and deleted_at = 0")
 	if err != nil {
 		return wlog.WrapError(err)
@@ -745,6 +753,14 @@ func migrateGoodCoins(ctx context.Context, tx *ent.Tx) error {
 }
 
 func migrateGoodRewards(ctx context.Context, tx *ent.Tx) error {
+	exist, err := validFieldExist(ctx, tx, "good_rewards", "reward_tid")
+	if err != nil {
+		return wlog.WrapError(err)
+	}
+	if !exist {
+		logger.Sugar().Warnw("unnecessary to exec migrateGoodRewards")
+		return nil
+	}
 	infos, err := tx.Good.Query().Where(entgood.DeletedAt(0)).All(ctx)
 	if err != nil {
 		return wlog.WrapError(err)
@@ -885,6 +901,14 @@ func fillCoinTypeIDInGoodRewardHistories(ctx context.Context, tx *ent.Tx) error 
 }
 
 func migrateExtraInfos(ctx context.Context, tx *ent.Tx) error {
+	exist, err := validFieldExist(ctx, tx, "extra_infos", "good_id")
+	if err != nil {
+		return wlog.WrapError(err)
+	}
+	if !exist {
+		logger.Sugar().Warnw("unnecessary to exec migrateExtraInfos")
+		return nil
+	}
 	appgoods, err := tx.AppGood.Query().Where(entappgood.DeletedAt(0)).All(ctx)
 	if err != nil {
 		return wlog.WrapError(err)
