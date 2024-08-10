@@ -110,6 +110,24 @@ func validFieldExist(ctx context.Context, tx *ent.Tx, tableName, fieldName strin
 	return true, nil
 }
 
+func migrateFieldType(ctx context.Context, tx *ent.Tx, tableName, fieldName, fieldType string) error {
+	updateFieldSQL := fmt.Sprintf("alter table %v modify %v %v", tableName, fieldName, fieldType)
+	logger.Sugar().Warnw(
+		"exec updateFieldSQL",
+		"sql", updateFieldSQL,
+	)
+	rc, err := tx.ExecContext(ctx, updateFieldSQL)
+	if err != nil {
+		return err
+	}
+	_, err = rc.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("fail modify updateFieldSQL: %v", err)
+	}
+	return nil
+}
+
+//nolint:funlen
 func setDefaultValueForTableColumns(ctx context.Context, tx *ent.Tx) error {
 	exist, err := validFieldExist(ctx, tx, "app_default_goods", "app_id")
 	if err != nil {
@@ -189,6 +207,11 @@ func setDefaultValueForTableColumns(ctx context.Context, tx *ent.Tx) error {
 		return wlog.WrapError(err)
 	}
 	if exist {
+		// updatefieldtype
+		if err := migrateFieldType(ctx, tx, "extra_infos", "good_id", "char(36)"); err != nil {
+			return wlog.WrapError(err)
+		}
+		println("exec update extra_infos set good_id ")
 		if _, err := tx.ExecContext(ctx, `update extra_infos set good_id = ? where good_id is null`, uuid.Nil.String()); err != nil {
 			return wlog.WrapError(err)
 		}
@@ -752,7 +775,8 @@ func migrateGoodCoins(ctx context.Context, tx *ent.Tx) error {
 	return nil
 }
 
-func migrateGoodRewards(ctx context.Context, tx *ent.Tx) error { //nolint:funlen
+//nolint:funlen
+func migrateGoodRewards(ctx context.Context, tx *ent.Tx) error {
 	exist, err := validFieldExist(ctx, tx, "good_rewards", "reward_tid")
 	if err != nil {
 		return wlog.WrapError(err)
