@@ -89,34 +89,111 @@ func open(hostname string) (conn *sql.DB, err error) {
 	return conn, nil
 }
 
+func validFieldExist(ctx context.Context, tx *ent.Tx, databaseName, tableName, fieldName string) (bool, error) {
+	checkFieldSQL := fmt.Sprintf("show columns from %v.%v like '%v'", databaseName, tableName, fieldName)
+	logger.Sugar().Warnw(
+		"validFieldExist",
+		"checkFieldSQL",
+		checkFieldSQL,
+	)
+	checkRows, err := tx.QueryContext(ctx, checkFieldSQL)
+	if err != nil {
+		return false, err
+	}
+	count := 0
+	for checkRows.Next() {
+		count++
+	}
+	if count == 0 {
+		return false, nil
+	}
+	return true, nil
+}
+
 func setDefaultValueForTableColumns(ctx context.Context, tx *ent.Tx) error {
-	// appdefaultgood
-	if _, err := tx.ExecContext(ctx, `update app_default_goods set app_id = ? where app_id is null`, uuid.Nil.String()); err != nil {
-		return wlog.WrapError(err)
+	exist, err := validFieldExist(ctx, tx, "good_manager", "app_default_goods", "app_id")
+	if err != nil {
+		wlog.WrapError(err)
 	}
-	if _, err := tx.ExecContext(ctx, `update app_default_goods set good_id = ? where good_id is null`, uuid.Nil.String()); err != nil {
-		return wlog.WrapError(err)
+	if exist {
+		// appdefaultgood
+		if _, err := tx.ExecContext(ctx, `update app_default_goods set app_id = ? where app_id is null`, uuid.Nil.String()); err != nil {
+			return wlog.WrapError(err)
+		}
 	}
-	// goodreward
-	if _, err := tx.ExecContext(ctx, "update good_rewards set next_reward_start_amount = '0.000000000000000000' where next_reward_start_amount is null"); err != nil {
-		return wlog.WrapError(err)
+
+	exist, err = validFieldExist(ctx, tx, "good_manager", "app_default_goods", "good_id")
+	if err != nil {
+		wlog.WrapError(err)
 	}
-	if _, err := tx.ExecContext(ctx, "update good_rewards set last_reward_amount = '0.000000000000000000' where last_reward_amount is null"); err != nil {
-		return wlog.WrapError(err)
+	if exist {
+		if _, err := tx.ExecContext(ctx, `update app_default_goods set good_id = ? where good_id is null`, uuid.Nil.String()); err != nil {
+			return wlog.WrapError(err)
+		}
 	}
-	if _, err := tx.ExecContext(ctx, "update good_rewards set last_unit_reward_amount = '0.000000000000000000' where last_unit_reward_amount is null"); err != nil {
-		return wlog.WrapError(err)
+
+	exist, err = validFieldExist(ctx, tx, "good_manager", "good_rewards", "next_reward_start_amount")
+	if err != nil {
+		wlog.WrapError(err)
 	}
-	if _, err := tx.ExecContext(ctx, "update good_rewards set total_reward_amount = '0.000000000000000000' where total_reward_amount is null"); err != nil {
-		return wlog.WrapError(err)
+	if exist {
+		// goodreward
+		if _, err := tx.ExecContext(ctx, "update good_rewards set next_reward_start_amount = '0.000000000000000000' where next_reward_start_amount is null"); err != nil {
+			return wlog.WrapError(err)
+		}
 	}
-	// extra_infos
-	if _, err := tx.ExecContext(ctx, `update extra_infos set app_good_id = ? where app_good_id is null`, uuid.Nil.String()); err != nil {
-		return wlog.WrapError(err)
+
+	exist, err = validFieldExist(ctx, tx, "good_manager", "good_rewards", "last_reward_amount")
+	if err != nil {
+		wlog.WrapError(err)
 	}
-	if _, err := tx.ExecContext(ctx, `update extra_infos set good_id = ? where good_id is null`, uuid.Nil.String()); err != nil {
-		return wlog.WrapError(err)
+	if exist {
+		if _, err := tx.ExecContext(ctx, "update good_rewards set last_reward_amount = '0.000000000000000000' where last_reward_amount is null"); err != nil {
+			return wlog.WrapError(err)
+		}
 	}
+
+	exist, err = validFieldExist(ctx, tx, "good_manager", "good_rewards", "last_unit_reward_amount")
+	if err != nil {
+		wlog.WrapError(err)
+	}
+	if exist {
+		if _, err := tx.ExecContext(ctx, "update good_rewards set last_unit_reward_amount = '0.000000000000000000' where last_unit_reward_amount is null"); err != nil {
+			return wlog.WrapError(err)
+		}
+	}
+
+	exist, err = validFieldExist(ctx, tx, "good_manager", "good_rewards", "total_reward_amount")
+	if err != nil {
+		wlog.WrapError(err)
+	}
+	if exist {
+		if _, err := tx.ExecContext(ctx, "update good_rewards set total_reward_amount = '0.000000000000000000' where total_reward_amount is null"); err != nil {
+			return wlog.WrapError(err)
+		}
+	}
+
+	exist, err = validFieldExist(ctx, tx, "good_manager", "extra_infos", "app_good_id")
+	if err != nil {
+		wlog.WrapError(err)
+	}
+	if exist {
+		// extra_infos
+		if _, err := tx.ExecContext(ctx, `update extra_infos set app_good_id = ? where app_good_id is null`, uuid.Nil.String()); err != nil {
+			return wlog.WrapError(err)
+		}
+	}
+
+	exist, err = validFieldExist(ctx, tx, "good_manager", "extra_infos", "good_id")
+	if err != nil {
+		wlog.WrapError(err)
+	}
+	if exist {
+		if _, err := tx.ExecContext(ctx, `update extra_infos set good_id = ? where good_id is null`, uuid.Nil.String()); err != nil {
+			return wlog.WrapError(err)
+		}
+	}
+
 	return nil
 }
 
