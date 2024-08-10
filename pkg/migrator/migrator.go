@@ -111,7 +111,6 @@ func validFieldExist(ctx context.Context, tx *ent.Tx, tableName, fieldName strin
 }
 
 func migrateFieldType(ctx context.Context, tx *ent.Tx, tableName, fieldName, fieldType string) error {
-	// orderLocksSQL := "alter table order_locks modify app_id varchar(36)"
 	updateFieldSQL := fmt.Sprintf("alter table %v modify %v %v", tableName, fieldName, fieldType)
 	logger.Sugar().Warnw(
 		"exec updateFieldSQL",
@@ -128,6 +127,7 @@ func migrateFieldType(ctx context.Context, tx *ent.Tx, tableName, fieldName, fie
 	return nil
 }
 
+//nolint:funlen
 func setDefaultValueForTableColumns(ctx context.Context, tx *ent.Tx) error {
 	exist, err := validFieldExist(ctx, tx, "app_default_goods", "app_id")
 	if err != nil {
@@ -775,6 +775,7 @@ func migrateGoodCoins(ctx context.Context, tx *ent.Tx) error {
 	return nil
 }
 
+//nolint:funlen
 func migrateGoodRewards(ctx context.Context, tx *ent.Tx) error {
 	exist, err := validFieldExist(ctx, tx, "good_rewards", "reward_tid")
 	if err != nil {
