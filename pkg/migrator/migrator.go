@@ -752,7 +752,7 @@ func migrateGoodCoins(ctx context.Context, tx *ent.Tx) error {
 	return nil
 }
 
-func migrateGoodRewards(ctx context.Context, tx *ent.Tx) error {
+func migrateGoodRewards(ctx context.Context, tx *ent.Tx) error { //nolint:funlen
 	exist, err := validFieldExist(ctx, tx, "good_rewards", "reward_tid")
 	if err != nil {
 		return wlog.WrapError(err)
