@@ -89,34 +89,111 @@ func open(hostname string) (conn *sql.DB, err error) {
 	return conn, nil
 }
 
+func validFieldExist(ctx context.Context, tx *ent.Tx, tableName, fieldName string) (bool, error) {
+	checkFieldSQL := fmt.Sprintf("show columns from good_manager.%v like '%v'", tableName, fieldName)
+	logger.Sugar().Warnw(
+		"validFieldExist",
+		"checkFieldSQL",
+		checkFieldSQL,
+	)
+	checkRows, err := tx.QueryContext(ctx, checkFieldSQL)
+	if err != nil {
+		return false, err
+	}
+	count := 0
+	for checkRows.Next() {
+		count++
+	}
+	if count == 0 {
+		return false, nil
+	}
+	return true, nil
+}
+
 func setDefaultValueForTableColumns(ctx context.Context, tx *ent.Tx) error {
-	// appdefaultgood
-	if _, err := tx.ExecContext(ctx, `update app_default_goods set app_id = ? where app_id is null`, uuid.Nil.String()); err != nil {
+	exist, err := validFieldExist(ctx, tx, "app_default_goods", "app_id")
+	if err != nil {
 		return wlog.WrapError(err)
 	}
-	if _, err := tx.ExecContext(ctx, `update app_default_goods set good_id = ? where good_id is null`, uuid.Nil.String()); err != nil {
+	if exist {
+		// appdefaultgood
+		if _, err := tx.ExecContext(ctx, `update app_default_goods set app_id = ? where app_id is null`, uuid.Nil.String()); err != nil {
+			return wlog.WrapError(err)
+		}
+	}
+
+	exist, err = validFieldExist(ctx, tx, "app_default_goods", "good_id")
+	if err != nil {
 		return wlog.WrapError(err)
 	}
-	// goodreward
-	if _, err := tx.ExecContext(ctx, "update good_rewards set next_reward_start_amount = '0.000000000000000000' where next_reward_start_amount is null"); err != nil {
+	if exist {
+		if _, err := tx.ExecContext(ctx, `update app_default_goods set good_id = ? where good_id is null`, uuid.Nil.String()); err != nil {
+			return wlog.WrapError(err)
+		}
+	}
+
+	exist, err = validFieldExist(ctx, tx, "good_rewards", "next_reward_start_amount")
+	if err != nil {
 		return wlog.WrapError(err)
 	}
-	if _, err := tx.ExecContext(ctx, "update good_rewards set last_reward_amount = '0.000000000000000000' where last_reward_amount is null"); err != nil {
+	if exist {
+		// goodreward
+		if _, err := tx.ExecContext(ctx, "update good_rewards set next_reward_start_amount = '0.000000000000000000' where next_reward_start_amount is null"); err != nil {
+			return wlog.WrapError(err)
+		}
+	}
+
+	exist, err = validFieldExist(ctx, tx, "good_rewards", "last_reward_amount")
+	if err != nil {
 		return wlog.WrapError(err)
 	}
-	if _, err := tx.ExecContext(ctx, "update good_rewards set last_unit_reward_amount = '0.000000000000000000' where last_unit_reward_amount is null"); err != nil {
+	if exist {
+		if _, err := tx.ExecContext(ctx, "update good_rewards set last_reward_amount = '0.000000000000000000' where last_reward_amount is null"); err != nil {
+			return wlog.WrapError(err)
+		}
+	}
+
+	exist, err = validFieldExist(ctx, tx, "good_rewards", "last_unit_reward_amount")
+	if err != nil {
 		return wlog.WrapError(err)
 	}
-	if _, err := tx.ExecContext(ctx, "update good_rewards set total_reward_amount = '0.000000000000000000' where total_reward_amount is null"); err != nil {
+	if exist {
+		if _, err := tx.ExecContext(ctx, "update good_rewards set last_unit_reward_amount = '0.000000000000000000' where last_unit_reward_amount is null"); err != nil {
+			return wlog.WrapError(err)
+		}
+	}
+
+	exist, err = validFieldExist(ctx, tx, "good_rewards", "total_reward_amount")
+	if err != nil {
 		return wlog.WrapError(err)
 	}
-	// extra_infos
-	if _, err := tx.ExecContext(ctx, `update extra_infos set app_good_id = ? where app_good_id is null`, uuid.Nil.String()); err != nil {
+	if exist {
+		if _, err := tx.ExecContext(ctx, "update good_rewards set total_reward_amount = '0.000000000000000000' where total_reward_amount is null"); err != nil {
+			return wlog.WrapError(err)
+		}
+	}
+
+	exist, err = validFieldExist(ctx, tx, "extra_infos", "app_good_id")
+	if err != nil {
 		return wlog.WrapError(err)
 	}
-	if _, err := tx.ExecContext(ctx, `update extra_infos set good_id = ? where good_id is null`, uuid.Nil.String()); err != nil {
+	if exist {
+		// extra_infos
+		if _, err := tx.ExecContext(ctx, `update extra_infos set app_good_id = ? where app_good_id is null`, uuid.Nil.String()); err != nil {
+			return wlog.WrapError(err)
+		}
+	}
+
+	exist, err = validFieldExist(ctx, tx, "extra_infos", "good_id")
+	if err != nil {
 		return wlog.WrapError(err)
 	}
+	if exist {
+		if _, err := tx.ExecContext(ctx, `update extra_infos set good_id = ? where good_id is null`, uuid.Nil.String()); err != nil {
+			return wlog.WrapError(err)
+		}
+	}
+
 	return nil
 }
 
@@ -292,6 +369,14 @@ func migrateDisplayNames(ctx context.Context, tx *ent.Tx) error {
 }
 
 func migrateDeviceInfo(ctx context.Context, tx *ent.Tx) error {
+	exist, err := validFieldExist(ctx, tx, "device_infos", "manufacturer")
+	if err != nil {
+		return wlog.WrapError(err)
+	}
+	if !exist {
+		logger.Sugar().Warnw("unnecessary to exec migrateDeviceInfo")
+		return nil
+	}
 	rows, err := tx.QueryContext(ctx, "select id,manufacturer,created_at,updated_at from device_infos where manufacturer != '' and deleted_at = 0")
 	if err != nil {
 		return wlog.WrapError(err)
@@ -668,6 +753,14 @@ func migrateGoodCoins(ctx context.Context, tx *ent.Tx) error {
 }
 
 func migrateGoodRewards(ctx context.Context, tx *ent.Tx) error {
+	exist, err := validFieldExist(ctx, tx, "good_rewards", "reward_tid")
+	if err != nil {
+		return wlog.WrapError(err)
+	}
+	if !exist {
+		logger.Sugar().Warnw("unnecessary to exec migrateGoodRewards")
+		return nil
+	}
 	infos, err := tx.Good.Query().Where(entgood.DeletedAt(0)).All(ctx)
 	if err != nil {
 		return wlog.WrapError(err)
@@ -808,6 +901,14 @@ func fillCoinTypeIDInGoodRewardHistories(ctx context.Context, tx *ent.Tx) error 
 }
 
 func migrateExtraInfos(ctx context.Context, tx *ent.Tx) error {
+	exist, err := validFieldExist(ctx, tx, "extra_infos", "good_id")
+	if err != nil {
+		return wlog.WrapError(err)
+	}
+	if !exist {
+		logger.Sugar().Warnw("unnecessary to exec migrateExtraInfos")
+		return nil
+	}
 	appgoods, err := tx.AppGood.Query().Where(entappgood.DeletedAt(0)).All(ctx)
 	if err != nil {
 		return wlog.WrapError(err)
