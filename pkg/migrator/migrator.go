@@ -947,7 +947,7 @@ func migrateExtraInfos(ctx context.Context, tx *ent.Tx) error {
 		goodToAppGoods[appgood.GoodID] = _appgoods
 	}
 
-	sql := fmt.Sprintf("select good_id,likes,dislikes,recommend_count,comment_count,score_count,score,created_at,updated_at from extra_infos where deleted_at = 0 and good_id != %v", uuid.Nil.String()) //nolint
+	sql := fmt.Sprintf("select good_id,likes,dislikes,recommend_count,comment_count,score_count,score,created_at,updated_at from extra_infos where deleted_at = 0 and good_id != '%v'", uuid.Nil.String()) //nolint
 	rows, err := tx.QueryContext(ctx, sql)
 	if err != nil {
 		return wlog.WrapError(err)
