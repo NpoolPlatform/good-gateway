@@ -1010,6 +1010,45 @@ func migrateExtraInfos(ctx context.Context, tx *ent.Tx) error {
 	return nil
 }
 
+func setFieldToNull(ctx context.Context, tx *ent.Tx, tableName, filedName, fieldType string) error {
+	alterSQL := fmt.Sprintf("alter table %v MODIFY column %v %v NULL", tableName, filedName, fieldType)
+	if _, err := tx.ExecContext(ctx, alterSQL); err != nil {
+		return wlog.WrapError(err)
+	}
+	return nil
+}
+
+func migrateTopMostGood(ctx context.Context, tx *ent.Tx) error {
+	exist, err := validFieldExist(ctx, tx, "top_most_goods", "app_id")
+	if err != nil {
+		return wlog.WrapError(err)
+	}
+	if exist {
+		if err := setFieldToNull(ctx, tx, "top_most_goods", "app_id", "char(36)"); err != nil {
+			return wlog.WrapError(err)
+		}
+	}
+	exist, err = validFieldExist(ctx, tx, "top_most_goods", "good_id")
+	if err != nil {
+		return wlog.WrapError(err)
+	}
+	if exist {
+		if err := setFieldToNull(ctx, tx, "top_most_goods", "good_id", "char(36)"); err != nil {
+			return wlog.WrapError(err)
+		}
+	}
+	exist, err = validFieldExist(ctx, tx, "top_most_goods", "coin_type_id")
+	if err != nil {
+		return wlog.WrapError(err)
+	}
+	if exist {
+		if err := setFieldToNull(ctx, tx, "top_most_goods", "coin_type_id", "char(36)"); err != nil {
+			return wlog.WrapError(err)
+		}
+	}
+	return nil
+}
+
 func lockKey() string {
 	serviceID := config.GetStringValueWithNameSpace(servicename.ServiceDomain, keyServiceID)
 	return fmt.Sprintf("%v:%v", basetypes.Prefix_PrefixMigrate, serviceID)
@@ -1083,6 +1122,9 @@ func Migrate(ctx context.Context) error {
 			return wlog.WrapError(err)
 		}
 		if err := migrateExtraInfos(ctx, tx); err != nil {
+			return wlog.WrapError(err)
+		}
+		if err := migrateTopMostGood(ctx, tx); err != nil {
 			return wlog.WrapError(err)
 		}
 		return nil
