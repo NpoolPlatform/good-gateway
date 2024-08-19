@@ -213,7 +213,7 @@ func WithUnitLockDeposit(s *string, must bool) func(context.Context, *Handler) e
 		if err != nil {
 			return wlog.WrapError(err)
 		}
-		if amount.Cmp(decimal.NewFromInt(0)) <= 0 {
+		if amount.Cmp(decimal.NewFromInt(0)) < 0 {
 			return wlog.Errorf("invalid unitlockdeposit")
 		}
 		h.UnitLockDeposit = s
