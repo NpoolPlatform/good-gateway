@@ -51,7 +51,7 @@ func (h *checkHandler) checkPoolRootUserIDs(ctx context.Context, ids []string) e
 			}
 		}
 		if !exist {
-			wlog.Errorf("invalid pool rootuserid")
+			return wlog.Errorf("invalid pool rootuserid")
 		}
 	}
 	return nil

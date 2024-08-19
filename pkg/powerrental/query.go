@@ -47,6 +47,7 @@ func (h *queryHandler) getPoolGoodUsers(ctx context.Context) (err error) {
 	return err
 }
 
+//nolint:funlen
 func (h *queryHandler) formalize() {
 	for _, powerRental := range h.powerRentals {
 		info := &npool.PowerRental{
