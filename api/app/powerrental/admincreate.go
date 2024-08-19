@@ -26,7 +26,6 @@ func (s *Server) AdminCreateAppPowerRental(ctx context.Context, in *npool.AdminC
 		powerrental1.WithName(&in.Name, true),
 		powerrental1.WithDisplayIndex(in.DisplayIndex, false),
 		powerrental1.WithBanner(in.Banner, false),
-		powerrental1.WithStartMode(in.StartMode, false),
 
 		powerrental1.WithServiceStartAt(&in.ServiceStartAt, true),
 		powerrental1.WithCancelMode(in.CancelMode, false),
@@ -43,6 +42,7 @@ func (s *Server) AdminCreateAppPowerRental(ctx context.Context, in *npool.AdminC
 		powerrental1.WithSaleMode(&in.SaleMode, true),
 		powerrental1.WithFixedDuration(in.FixedDuration, false),
 		powerrental1.WithPackageWithRequireds(in.PackageWithRequireds, false),
+		powerrental1.WithStartMode(in.StartMode, false),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(
