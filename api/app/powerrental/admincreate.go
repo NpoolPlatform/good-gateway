@@ -26,6 +26,7 @@ func (s *Server) AdminCreateAppPowerRental(ctx context.Context, in *npool.AdminC
 		powerrental1.WithName(&in.Name, true),
 		powerrental1.WithDisplayIndex(in.DisplayIndex, false),
 		powerrental1.WithBanner(in.Banner, false),
+		powerrental1.WithStartMode(in.StartMode, false),
 
 		powerrental1.WithServiceStartAt(&in.ServiceStartAt, true),
 		powerrental1.WithCancelMode(in.CancelMode, false),
