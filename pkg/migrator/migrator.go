@@ -708,6 +708,10 @@ func migrateAppGoods(ctx context.Context, tx *ent.Tx) error {
 			return wlog.WrapError(err)
 		}
 		if !exist {
+			price := appgood.UnitPrice
+			if appgood.PackageWithRequireds {
+				price = appgood.PackagePrice
+			}
 			if _, err := tx.
 				AppPowerRental.
 				Create().
@@ -719,7 +723,7 @@ func migrateAppGoods(ctx context.Context, tx *ent.Tx) error {
 				SetMinOrderAmount(appgood.MinOrderAmount).
 				SetMaxOrderAmount(appgood.MaxOrderAmount).
 				SetMaxUserAmount(appgood.MaxUserAmount).
-				SetUnitPrice(appgood.UnitPrice).
+				SetUnitPrice(price).
 				SetSaleStartAt(appgood.SaleStartAt).
 				SetSaleEndAt(appgood.SaleEndAt).
 				SetSaleMode(goodtypes.GoodSaleMode_GoodSaleModeMainnetSpot.String()).
