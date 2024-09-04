@@ -205,11 +205,11 @@ func (h *queryHandler) formalize() {
 						SpotQuantity:   stock.SpotQuantity,
 					}
 					if goodUser, ok := h.poolGoodUsers[stock.PoolGoodUserID]; ok {
-						mininGoodStock.MiningpoolID = goodUser.PoolID
-						mininGoodStock.MiningpoolName = goodUser.MiningpoolName
-						mininGoodStock.MiningpoolLogo = goodUser.MiningpoolLogo
-						mininGoodStock.MiningpoolSite = goodUser.MiningpoolSite
-						mininGoodStock.MiningpoolReadPageLink = goodUser.ReadPageLink
+						mininGoodStock.MiningPoolID = goodUser.PoolID
+						mininGoodStock.MiningPoolName = goodUser.MiningPoolName
+						mininGoodStock.MiningPoolLogo = goodUser.MiningPoolLogo
+						mininGoodStock.MiningPoolSite = goodUser.MiningPoolSite
+						mininGoodStock.MiningPoolReadPageLink = goodUser.ReadPageLink
 					}
 					mininGoodStocks = append(mininGoodStocks, mininGoodStock)
 				}

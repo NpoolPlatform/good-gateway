@@ -346,7 +346,7 @@ func WithStockMode(e *types.GoodStockMode, must bool) func(context.Context, *Han
 			return nil
 		}
 		switch *e {
-		case types.GoodStockMode_GoodStockByMiningpool:
+		case types.GoodStockMode_GoodStockByMiningPool:
 		case types.GoodStockMode_GoodStockByUnique:
 		default:
 			return wlog.Errorf("invalid stockmode")
