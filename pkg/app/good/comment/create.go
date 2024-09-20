@@ -25,7 +25,7 @@ func (h *createHandler) rewardWriteComment() {
 	if err := pubsub.WithPublisher(func(publisher *pubsub.Publisher) error {
 		req := &eventmwpb.CalcluateEventRewardsRequest{
 			AppID:       *h.AppID,
-			UserID:      *h.UserID,
+			UserID:      *h.CommentUserID,
 			EventType:   basetypes.UsedFor_WriteComment,
 			Consecutive: 1,
 		}
