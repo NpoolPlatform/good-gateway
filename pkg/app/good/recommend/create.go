@@ -24,7 +24,7 @@ func (h *createHandler) rewardWriteRecommend() {
 	if err := pubsub.WithPublisher(func(publisher *pubsub.Publisher) error {
 		req := &eventmwpb.CalcluateEventRewardsRequest{
 			AppID:       *h.AppID,
-			UserID:      *h.UserID,
+			UserID:      *h.RecommenderID,
 			EventType:   basetypes.UsedFor_WriteRecommend,
 			Consecutive: 1,
 		}
