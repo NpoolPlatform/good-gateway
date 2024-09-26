@@ -1,4 +1,3 @@
-//nolint:gocyclo,dupl,lll,gomnd
 package migrator
 
 import (

@@ -9,7 +9,7 @@ require (
 	github.com/NpoolPlatform/go-service-framework v0.0.0-20240510075442-89278cb5cf47
 	github.com/NpoolPlatform/good-middleware v0.0.0-20240902070043-64d264a1eee6
 	github.com/NpoolPlatform/libent-cruder v0.0.0-20240323085036-7679b4818ce7
-	github.com/NpoolPlatform/message v0.0.0-20240712091456-13abc12c772d
+	github.com/NpoolPlatform/message v0.0.0-20240926015312-8a21355537dc
 	github.com/NpoolPlatform/order-middleware v0.0.0-20240711091705-d8489ca569a2
 	github.com/go-resty/resty/v2 v2.7.0
 	github.com/google/uuid v1.3.0
