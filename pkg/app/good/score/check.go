@@ -2,12 +2,14 @@ package score
 
 import (
 	"context"
-	"fmt"
 
+	wlog "github.com/NpoolPlatform/go-service-framework/pkg/wlog"
 	scoremwcli "github.com/NpoolPlatform/good-middleware/pkg/client/app/good/score"
 	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 	scoremwpb "github.com/NpoolPlatform/message/npool/good/mw/v1/app/good/score"
+
+	"github.com/shopspring/decimal"
 )
 
 type checkHandler struct {
@@ -25,7 +27,19 @@ func (h *checkHandler) checkScore(ctx context.Context) error {
 		return err
 	}
 	if !exist {
-		return fmt.Errorf("invalid score")
+		return wlog.Errorf("invalid score")
+	}
+	return nil
+}
+
+func (h *checkHandler) validateScore() error {
+	maxScore := decimal.RequireFromString("10.0")
+	score, err := decimal.NewFromString(*h.Score)
+	if err != nil {
+		return wlog.WrapError(err)
+	}
+	if score.GreaterThan(maxScore) || score.LessThan(decimal.NewFromInt(0)) {
+		return wlog.Errorf("invalid score")
 	}
 	return nil
 }

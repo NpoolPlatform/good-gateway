@@ -23,9 +23,10 @@ func (h *Handler) UpdatePoster(ctx context.Context) (*npool.Poster, error) {
 	}
 
 	if err := topmostpostermwcli.UpdatePoster(ctx, &topmostpostermwpb.PosterReq{
-		ID:    h.ID,
-		EntID: h.EntID,
-		Index: h.Index,
+		ID:     h.ID,
+		EntID:  h.EntID,
+		Index:  h.Index,
+		Poster: h.Poster,
 	}); err != nil {
 		return nil, err
 	}

@@ -38,6 +38,7 @@ func (h *queryHandler) formalize() {
 			AppID:       topmost.AppID,
 			TopMostType: topmost.TopMostType,
 			Title:       topmost.Title,
+			TargetUrl:   topmost.TargetUrl,
 			Message:     topmost.Message,
 			StartAt:     topmost.StartAt,
 			EndAt:       topmost.EndAt,

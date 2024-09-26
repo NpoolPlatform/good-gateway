@@ -1,4 +1,4 @@
-//nolint
+//nolint:gocyclo,dupl,lll,gomnd
 package migrator
 
 import (
@@ -11,6 +11,7 @@ import (
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
 	constant "github.com/NpoolPlatform/go-service-framework/pkg/mysql/const"
 	redis2 "github.com/NpoolPlatform/go-service-framework/pkg/redis"
+	"github.com/NpoolPlatform/go-service-framework/pkg/wlog"
 	servicename "github.com/NpoolPlatform/good-gateway/pkg/servicename"
 
 	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
@@ -84,12 +85,12 @@ func Migrate(ctx context.Context) error {
 
 	err = redis2.TryLock(lockKey(), 0)
 	if err != nil {
-		return err
+		return wlog.WrapError(err)
 	}
 
 	conn, err := open(servicename.ServiceDomain)
 	if err != nil {
-		return err
+		return wlog.WrapError(err)
 	}
 	defer func() {
 		if err := conn.Close(); err != nil {

@@ -2,10 +2,10 @@ package score
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
 	"github.com/NpoolPlatform/go-service-framework/pkg/pubsub"
+	wlog "github.com/NpoolPlatform/go-service-framework/pkg/wlog"
 	scoremwcli "github.com/NpoolPlatform/good-middleware/pkg/client/app/good/score"
 	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 	npool "github.com/NpoolPlatform/message/npool/good/gw/v1/app/good/score"
@@ -13,11 +13,10 @@ import (
 	eventmwpb "github.com/NpoolPlatform/message/npool/inspire/mw/v1/event"
 
 	"github.com/google/uuid"
-	"github.com/shopspring/decimal"
 )
 
 type createHandler struct {
-	*Handler
+	*checkHandler
 }
 
 func (h *createHandler) rewardGoodScoring() {
@@ -47,13 +46,16 @@ func (h *createHandler) rewardGoodScoring() {
 
 func (h *Handler) CreateScore(ctx context.Context) (*npool.Score, error) {
 	handler := &createHandler{
-		Handler: h,
+		checkHandler: &checkHandler{
+			Handler: h,
+		},
 	}
+
 	if err := h.CheckUser(ctx); err != nil {
-		return nil, err
+		return nil, wlog.WrapError(err)
 	}
 	if err := h.CheckAppGood(ctx); err != nil {
-		return nil, err
+		return nil, wlog.WrapError(err)
 	}
 
 	if h.EntID == nil {
@@ -61,13 +63,8 @@ func (h *Handler) CreateScore(ctx context.Context) (*npool.Score, error) {
 	}
 
 	if h.Score != nil {
-		maxScore := decimal.RequireFromString("10.0")
-		score, err := decimal.NewFromString(*h.Score)
-		if err != nil {
-			return nil, err
-		}
-		if score.GreaterThan(maxScore) || score.LessThan(decimal.NewFromInt(0)) {
-			return nil, fmt.Errorf("invalid score")
+		if err := handler.validateScore(); err != nil {
+			return nil, wlog.WrapError(err)
 		}
 	}
 
@@ -77,7 +74,7 @@ func (h *Handler) CreateScore(ctx context.Context) (*npool.Score, error) {
 		AppGoodID: h.AppGoodID,
 		Score:     h.Score,
 	}); err != nil {
-		return nil, err
+		return nil, wlog.WrapError(err)
 	}
 
 	handler.rewardGoodScoring()

@@ -2,15 +2,15 @@ package powerrental
 
 import (
 	"context"
-	"fmt"
 
+	wlog "github.com/NpoolPlatform/go-service-framework/pkg/wlog"
 	goodgwcommon "github.com/NpoolPlatform/good-gateway/pkg/common"
 	apppowerrentalmwcli "github.com/NpoolPlatform/good-middleware/pkg/client/app/powerrental"
 	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 	appmwpb "github.com/NpoolPlatform/message/npool/appuser/mw/v1/app"
 	types "github.com/NpoolPlatform/message/npool/basetypes/good/v1"
 	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
-	coinmwpb "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin"
+	appcoinmwpb "github.com/NpoolPlatform/message/npool/chain/mw/v1/app/coin"
 	npool "github.com/NpoolPlatform/message/npool/good/gw/v1/app/powerrental"
 	goodcoingwpb "github.com/NpoolPlatform/message/npool/good/gw/v1/good/coin"
 	goodcoinrewardgwpb "github.com/NpoolPlatform/message/npool/good/gw/v1/good/coin/reward"
@@ -22,7 +22,7 @@ type queryHandler struct {
 	appPowerRentals []*apppowerrentalmwpb.PowerRental
 	infos           []*npool.AppPowerRental
 	apps            map[string]*appmwpb.App
-	coins           map[string]*coinmwpb.Coin
+	appCoins        map[string]map[string]*appcoinmwpb.Coin
 }
 
 func (h *queryHandler) getApps(ctx context.Context) (err error) {
@@ -32,19 +32,30 @@ func (h *queryHandler) getApps(ctx context.Context) (err error) {
 		}
 		return
 	}())
-	return err
+	return wlog.WrapError(err)
 }
 
 func (h *queryHandler) getCoins(ctx context.Context) (err error) {
-	h.coins, err = goodgwcommon.GetCoins(ctx, func() (coinTypeIDs []string) {
-		for _, appPowerRental := range h.appPowerRentals {
-			for _, goodCoin := range appPowerRental.GoodCoins {
-				coinTypeIDs = append(coinTypeIDs, goodCoin.CoinTypeID)
-			}
+	h.appCoins = map[string]map[string]*appcoinmwpb.Coin{}
+	appCoinTypeIDs := map[string][]string{}
+	for _, appPowerRental := range h.appPowerRentals {
+		coinTypeIDs, ok := appCoinTypeIDs[appPowerRental.AppID]
+		if !ok {
+			coinTypeIDs = []string{}
 		}
-		return
-	}())
-	return err
+		for _, goodCoin := range appPowerRental.GoodCoins {
+			coinTypeIDs = append(coinTypeIDs, goodCoin.CoinTypeID)
+		}
+		appCoinTypeIDs[appPowerRental.AppID] = coinTypeIDs
+	}
+	for appID, coinTypeIDs := range appCoinTypeIDs {
+		coins, err := goodgwcommon.GetAppCoins(ctx, appID, coinTypeIDs)
+		if err != nil {
+			return wlog.WrapError(err)
+		}
+		h.appCoins[appID] = coins
+	}
+	return wlog.WrapError(err)
 }
 
 //nolint:funlen
@@ -133,7 +144,11 @@ func (h *queryHandler) formalize() {
 			LastRewardAt: appPowerRental.LastRewardAt,
 			Rewards: func() (rewards []*goodcoinrewardgwpb.RewardInfo) {
 				for _, reward := range appPowerRental.Rewards {
-					coin, ok := h.coins[reward.CoinTypeID]
+					coins, ok := h.appCoins[appPowerRental.AppID]
+					if !ok {
+						continue
+					}
+					coin, ok := coins[reward.CoinTypeID]
 					if !ok {
 						continue
 					}
@@ -156,16 +171,20 @@ func (h *queryHandler) formalize() {
 
 			GoodCoins: func() (coins []*goodcoingwpb.GoodCoinInfo) {
 				for _, goodCoin := range appPowerRental.GoodCoins {
-					coin, ok := h.coins[goodCoin.CoinTypeID]
+					appCoins, ok := h.appCoins[appPowerRental.AppID]
+					if !ok {
+						continue
+					}
+					appCoin, ok := appCoins[goodCoin.CoinTypeID]
 					if !ok {
 						continue
 					}
 					coins = append(coins, &goodcoingwpb.GoodCoinInfo{
 						CoinTypeID: goodCoin.CoinTypeID,
-						CoinName:   coin.Name,
-						CoinUnit:   coin.Unit,
-						CoinENV:    coin.ENV,
-						CoinLogo:   coin.Logo,
+						CoinName:   appCoin.Name,
+						CoinUnit:   appCoin.Unit,
+						CoinENV:    appCoin.ENV,
+						CoinLogo:   appCoin.Logo,
 						Main:       goodCoin.Main,
 						Index:      goodCoin.Index,
 					})
@@ -176,6 +195,7 @@ func (h *queryHandler) formalize() {
 			Posters:       appPowerRental.Posters,
 			DisplayNames:  appPowerRental.DisplayNames,
 			DisplayColors: appPowerRental.DisplayColors,
+			Requireds:     appPowerRental.Requireds,
 			// TODO: expand mining pool information
 			AppMiningGoodStocks: appPowerRental.AppMiningGoodStocks,
 			MiningGoodStocks:    appPowerRental.MiningGoodStocks,
@@ -201,7 +221,7 @@ func (h *Handler) GetPowerRental(ctx context.Context) (*npool.AppPowerRental, er
 		return nil, err
 	}
 	if appPowerRental == nil {
-		return nil, fmt.Errorf("invalid apppowerrental")
+		return nil, wlog.Errorf("invalid apppowerrental")
 	}
 
 	handler := &queryHandler{
