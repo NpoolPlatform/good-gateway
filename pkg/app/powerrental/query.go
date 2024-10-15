@@ -54,7 +54,9 @@ func (h *queryHandler) getPoolGoodUsers(ctx context.Context) (err error) {
 	h.poolGoodUsers, err = goodgwcommon.GetPoolGoodUsers(ctx, func() (poolGoodUserIDs []string) {
 		for _, powerRental := range h.appPowerRentals {
 			for _, miningGoodStock := range powerRental.MiningGoodStocks {
-				poolGoodUserIDs = append(poolGoodUserIDs, miningGoodStock.PoolGoodUserID)
+				if len(miningGoodStock.PoolGoodUserID) > 0 {
+					poolGoodUserIDs = append(poolGoodUserIDs, miningGoodStock.PoolGoodUserID)
+				}
 			}
 		}
 		return
