@@ -47,7 +47,7 @@ func (h *CreateHander) checkAppPoolAuth(ctx context.Context) error {
 	}
 
 	if h.powerRental.State == goodtypes.GoodState_DefaultGoodState ||
-		h.powerRental.State == goodtypes.GoodState_GoodStateWait {
+		h.powerRental.State == goodtypes.GoodState_GoodStatePreWait {
 		return wlog.Errorf("cannot auth to app, wait goodstate allow")
 	}
 

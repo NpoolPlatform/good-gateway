@@ -56,12 +56,12 @@ github.com/NpoolPlatform/chain-middleware v0.0.0-20240711085642-93249f191575 h1:
 github.com/NpoolPlatform/chain-middleware v0.0.0-20240711085642-93249f191575/go.mod h1:33JYBYNHoLcxGzsndIEdjtId9OX1JWyxiGzq8KZGVT4=
 github.com/NpoolPlatform/go-service-framework v0.0.0-20240510075442-89278cb5cf47 h1:17FyjOnXXioSqcM4L7qa0ML/L2a0LEIODPiGTtDYR3o=
 github.com/NpoolPlatform/go-service-framework v0.0.0-20240510075442-89278cb5cf47/go.mod h1:8ZqSAAL4eLX/09HLWwDzQY0fMORy8nqHj3kwiUHEyS4=
-github.com/NpoolPlatform/good-middleware v0.0.0-20240904034522-6e5572699f92 h1:xIHVpSxuBz0uPaYnaFrY2pKYG2MwaIlBnNXpTHNYUHk=
-github.com/NpoolPlatform/good-middleware v0.0.0-20240904034522-6e5572699f92/go.mod h1:njNn0x5Q8TMbPFp5df2mkALkb8YcuX3cfEMaxwJ0Wuk=
+github.com/NpoolPlatform/good-middleware v0.0.0-20241022091710-654d9c6a82d6 h1:qKi5Jz38+QSIHODwsD0+6lAs1vI8fjezQkZVHtu+8pE=
+github.com/NpoolPlatform/good-middleware v0.0.0-20241022091710-654d9c6a82d6/go.mod h1:mQ0nENPmGmp/R9tLzio4LREasrartwwDmxPT3iFNaTE=
 github.com/NpoolPlatform/libent-cruder v0.0.0-20240323085036-7679b4818ce7 h1:MFVwhO6TBiPw8t9u/oe5WzRgoPbH1XjSWF8ZuEnVN5M=
 github.com/NpoolPlatform/libent-cruder v0.0.0-20240323085036-7679b4818ce7/go.mod h1:EXCihQpRNNyWaPu1IphiZFLTyyUK/CJMZdW4My7y48Q=
-github.com/NpoolPlatform/message v0.0.0-20240904024644-493ba54cfbb9 h1:JJvkU9phOcsot17E9Gu16nzIbv0ysDhhrz/XcUbwATI=
-github.com/NpoolPlatform/message v0.0.0-20240904024644-493ba54cfbb9/go.mod h1:PxJpF0vSSOke+NJskbRBRQ2fK2K3SRe8zaEja+GxSHk=
+github.com/NpoolPlatform/message v0.0.0-20241022090939-3f305cf54abc h1:WpKD/ws9NF5KJx0Vc/GUHrBJB1tRelUsFqDxHm5xp+k=
+github.com/NpoolPlatform/message v0.0.0-20241022090939-3f305cf54abc/go.mod h1:PxJpF0vSSOke+NJskbRBRQ2fK2K3SRe8zaEja+GxSHk=
 github.com/NpoolPlatform/miningpool-middleware v0.0.0-20240904034146-29b81226c207 h1:WI69oXxK6pzbfM6e1H+TfWTILxOxR+nF+y7wWP4ihxQ=
 github.com/NpoolPlatform/miningpool-middleware v0.0.0-20240904034146-29b81226c207/go.mod h1:FONhYEcKlT845C1MO8kHzFS8Te0ha6igPt7k2Gsyyfs=
 github.com/NpoolPlatform/order-middleware v0.0.0-20240904031225-e66132d9176c h1:+8rh0jbD6cQwtJ72edO4BtW7P43xUywCwYBDVJzmsic=

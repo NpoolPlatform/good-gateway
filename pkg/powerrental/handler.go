@@ -365,6 +365,7 @@ func WithState(e *types.GoodState, must bool) func(context.Context, *Handler) er
 			return nil
 		}
 		switch *e {
+		case types.GoodState_GoodStatePreWait:
 		case types.GoodState_GoodStateWait:
 		case types.GoodState_GoodStateCreateGoodUser:
 		case types.GoodState_GoodStateCheckHashRate:
