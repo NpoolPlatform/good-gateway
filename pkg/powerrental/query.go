@@ -192,11 +192,11 @@ func (h *Handler) GetPowerRental(ctx context.Context) (*npool.PowerRental, error
 		powerRentals: []*powerrentalmwpb.PowerRental{powerRental},
 	}
 	if err := handler.getCoins(ctx); err != nil {
-		return nil, fmt.Errorf("sssssss1,%v", err)
+		return nil, err
 	}
 
 	if err := handler.getPoolGoodUsers(ctx); err != nil {
-		return nil, fmt.Errorf("sssssss2,%v", err)
+		return nil, err
 	}
 
 	handler.formalize()
