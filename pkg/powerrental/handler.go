@@ -405,10 +405,14 @@ func WithMiningGoodStocks(stocks []*goodstockgwpb.MiningGoodStockReq, must bool)
 
 		ids := []string{}
 		for _, req := range stocks {
-			ids = append(ids, req.PoolRootUserID)
+			if req.PoolRootUserID != nil {
+				ids = append(ids, *req.PoolRootUserID)
+			}
 			miningGoodStocks = append(miningGoodStocks, &goodstockmwpb.MiningGoodStockReq{
-				PoolRootUserID: &req.PoolRootUserID,
-				Total:          &req.Total,
+				EntID:          req.EntID,
+				PoolRootUserID: req.PoolRootUserID,
+				State:          req.State,
+				Total:          req.Total,
 			})
 		}
 
