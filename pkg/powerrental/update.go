@@ -37,6 +37,7 @@ func (h *Handler) UpdatePowerRental(ctx context.Context) (*npool.PowerRental, er
 		Purchasable:          h.Purchasable,
 		Online:               h.Online,
 		StockMode:            h.StockMode,
+		State:                h.State,
 		Total:                h.Total,
 		MiningGoodStocks:     h.MiningGoodStocks,
 	}); err != nil {

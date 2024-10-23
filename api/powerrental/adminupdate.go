@@ -37,6 +37,7 @@ func (s *Server) AdminUpdatePowerRental(ctx context.Context, in *npool.AdminUpda
 		powerrental1.WithPurchasable(in.Purchasable, false),
 		powerrental1.WithOnline(in.Online, false),
 		powerrental1.WithStockMode(in.StockMode, false),
+		powerrental1.WithState(in.State, false),
 
 		powerrental1.WithTotal(in.Total, false),
 		powerrental1.WithMiningGoodStocks(in.MiningGoodStocks, false),
