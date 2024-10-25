@@ -7,11 +7,11 @@ require (
 	github.com/NpoolPlatform/basal-middleware v0.0.0-20240228105108-f00107969a4f
 	github.com/NpoolPlatform/chain-middleware v0.0.0-20240711085642-93249f191575
 	github.com/NpoolPlatform/go-service-framework v0.0.0-20240510075442-89278cb5cf47
-	github.com/NpoolPlatform/good-middleware v0.0.0-20241022091710-654d9c6a82d6
+	github.com/NpoolPlatform/good-middleware v0.0.0-20241025072200-f1ad98cdd06a
 	github.com/NpoolPlatform/libent-cruder v0.0.0-20240323085036-7679b4818ce7
-	github.com/NpoolPlatform/message v0.0.0-20241023112654-5367cb693c74
-	github.com/NpoolPlatform/miningpool-middleware v0.0.0-20240904034146-29b81226c207
-	github.com/NpoolPlatform/order-middleware v0.0.0-20240904031225-e66132d9176c
+	github.com/NpoolPlatform/message v0.0.0-20241025065540-29a6e394c9aa
+	github.com/NpoolPlatform/miningpool-middleware v0.0.0-20241025070432-43b1070ae5cb
+	github.com/NpoolPlatform/order-middleware v0.0.0-20241025073132-80eb88ffdfd1
 	github.com/go-resty/resty/v2 v2.7.0
 	github.com/google/uuid v1.3.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.15.2
