@@ -44,6 +44,7 @@ func (s *Server) AdminUpdateAppPowerRental(ctx context.Context, in *npool.AdminU
 		powerrental1.WithSaleMode(in.SaleMode, false),
 		powerrental1.WithFixedDuration(in.FixedDuration, false),
 		powerrental1.WithPackageWithRequireds(in.PackageWithRequireds, false),
+		powerrental1.WithStartMode(in.StartMode, false),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(
