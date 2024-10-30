@@ -6,7 +6,6 @@ import (
 
 	goodgwcommon "github.com/NpoolPlatform/good-gateway/pkg/common"
 	powerrentalmwcli "github.com/NpoolPlatform/good-middleware/pkg/client/powerrental"
-	v1 "github.com/NpoolPlatform/message/npool/basetypes/good/v1"
 	coinmwpb "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin"
 	goodcoingwpb "github.com/NpoolPlatform/message/npool/good/gw/v1/good/coin"
 	goodcoinrewardgwpb "github.com/NpoolPlatform/message/npool/good/gw/v1/good/coin/reward"
@@ -40,9 +39,7 @@ func (h *queryHandler) getPoolGoodUsers(ctx context.Context) (err error) {
 	h.poolGoodUsers, err = goodgwcommon.GetPoolGoodUsers(ctx, func() (poolGoodUserIDs []string) {
 		for _, powerRental := range h.powerRentals {
 			for _, miningGoodStock := range powerRental.MiningGoodStocks {
-				switch miningGoodStock.State {
-				case v1.MiningGoodStockState_MiningGoodStockStateReady,
-					v1.MiningGoodStockState_MiningGoodStockStateCheckHashRate:
+				if len(miningGoodStock.PoolGoodUserID) > 0 {
 					poolGoodUserIDs = append(poolGoodUserIDs, miningGoodStock.PoolGoodUserID)
 				}
 			}

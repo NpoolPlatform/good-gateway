@@ -12,22 +12,27 @@ import (
 )
 
 //nolint:dupl
-func GetPoolGoodUsers(ctx context.Context, poolGoodUserIDs []string) (map[string]*goodusermwpb.GoodUser, error) {
-	for _, poolGoodUserID := range poolGoodUserIDs {
+func GetPoolGoodUsers(ctx context.Context, _poolGoodUserIDs []string) (map[string]*goodusermwpb.GoodUser, error) {
+	poolGoodUserIDs := []string{}
+	for _, poolGoodUserID := range _poolGoodUserIDs {
+		if len(poolGoodUserID) == 0 {
+			continue
+		}
 		if _, err := uuid.Parse(poolGoodUserID); err != nil {
 			return nil, err
 		}
+		poolGoodUserIDs = append(poolGoodUserIDs, poolGoodUserID)
 	}
 
-	orderUsers, _, err := goodusermwcli.GetGoodUsers(ctx, &goodusermwpb.Conds{
+	goodUsers, _, err := goodusermwcli.GetGoodUsers(ctx, &goodusermwpb.Conds{
 		EntIDs: &basetypes.StringSliceVal{Op: cruder.IN, Value: poolGoodUserIDs},
 	}, int32(0), int32(len(poolGoodUserIDs)))
 	if err != nil {
 		return nil, err
 	}
-	orderUserMap := map[string]*goodusermwpb.GoodUser{}
-	for _, orderUser := range orderUsers {
-		orderUserMap[orderUser.EntID] = orderUser
+	goodUserMap := map[string]*goodusermwpb.GoodUser{}
+	for _, goodUser := range goodUsers {
+		goodUserMap[goodUser.EntID] = goodUser
 	}
-	return orderUserMap, nil
+	return goodUserMap, nil
 }
