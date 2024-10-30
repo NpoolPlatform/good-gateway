@@ -11,11 +11,10 @@ import (
 	"github.com/google/uuid"
 )
 
-//nolint:dupl
 func GetPoolGoodUsers(ctx context.Context, _poolGoodUserIDs []string) (map[string]*goodusermwpb.GoodUser, error) {
 	poolGoodUserIDs := []string{}
 	for _, poolGoodUserID := range _poolGoodUserIDs {
-		if len(poolGoodUserID) == 0 {
+		if poolGoodUserID == "" {
 			continue
 		}
 		if _, err := uuid.Parse(poolGoodUserID); err != nil {
