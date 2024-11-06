@@ -10,6 +10,7 @@ import (
 	goodcommon "github.com/NpoolPlatform/good-gateway/pkg/good/common"
 	locationcommon "github.com/NpoolPlatform/good-gateway/pkg/vender/location/common"
 	types "github.com/NpoolPlatform/message/npool/basetypes/good/v1"
+	goodstockgwpb "github.com/NpoolPlatform/message/npool/good/gw/v1/good/stock"
 	goodstockmwpb "github.com/NpoolPlatform/message/npool/good/mw/v1/good/stock"
 
 	"github.com/google/uuid"
@@ -41,6 +42,7 @@ type Handler struct {
 	StockMode            *types.GoodStockMode
 	Total                *string
 	MiningGoodStocks     []*goodstockmwpb.MiningGoodStockReq
+	State                *types.GoodState
 	Offset               int32
 	Limit                int32
 }
@@ -354,6 +356,29 @@ func WithStockMode(e *types.GoodStockMode, must bool) func(context.Context, *Han
 	}
 }
 
+func WithState(e *types.GoodState, must bool) func(context.Context, *Handler) error {
+	return func(ctx context.Context, h *Handler) error {
+		if e == nil {
+			if must {
+				return wlog.Errorf("invalid state")
+			}
+			return nil
+		}
+		switch *e {
+		case types.GoodState_GoodStatePreWait:
+		case types.GoodState_GoodStateWait:
+		case types.GoodState_GoodStateCreateGoodUser:
+		case types.GoodState_GoodStateCheckHashRate:
+		case types.GoodState_GoodStateReady:
+		case types.GoodState_GoodStateFail:
+		default:
+			return wlog.Errorf("invalid state")
+		}
+		h.State = e
+		return nil
+	}
+}
+
 func WithTotal(s *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if s == nil {
@@ -374,9 +399,29 @@ func WithTotal(s *string, must bool) func(context.Context, *Handler) error {
 	}
 }
 
-func WithMiningGoodStocks(stocks []*goodstockmwpb.MiningGoodStockReq, must bool) func(context.Context, *Handler) error {
+func WithMiningGoodStocks(stocks []*goodstockgwpb.MiningGoodStockReq, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
-		h.MiningGoodStocks = stocks
+		miningGoodStocks := []*goodstockmwpb.MiningGoodStockReq{}
+
+		ids := []string{}
+		for _, req := range stocks {
+			if req.PoolRootUserID != nil {
+				ids = append(ids, *req.PoolRootUserID)
+			}
+			miningGoodStocks = append(miningGoodStocks, &goodstockmwpb.MiningGoodStockReq{
+				EntID:          req.EntID,
+				PoolRootUserID: req.PoolRootUserID,
+				State:          req.State,
+				Total:          req.Total,
+			})
+		}
+
+		handle := &checkHandler{h}
+		if err := handle.checkPoolRootUserIDs(ctx, ids); err != nil {
+			return wlog.WrapError(err)
+		}
+
+		h.MiningGoodStocks = miningGoodStocks
 		return nil
 	}
 }

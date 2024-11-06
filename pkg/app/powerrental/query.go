@@ -14,11 +14,14 @@ import (
 	npool "github.com/NpoolPlatform/message/npool/good/gw/v1/app/powerrental"
 	goodcoingwpb "github.com/NpoolPlatform/message/npool/good/gw/v1/good/coin"
 	goodcoinrewardgwpb "github.com/NpoolPlatform/message/npool/good/gw/v1/good/coin/reward"
+	goodstockgwpb "github.com/NpoolPlatform/message/npool/good/gw/v1/good/stock"
 	apppowerrentalmwpb "github.com/NpoolPlatform/message/npool/good/mw/v1/app/powerrental"
+	goodusermwpb "github.com/NpoolPlatform/message/npool/miningpool/mw/v1/gooduser"
 )
 
 type queryHandler struct {
 	*Handler
+	poolGoodUsers   map[string]*goodusermwpb.GoodUser
 	appPowerRentals []*apppowerrentalmwpb.PowerRental
 	infos           []*npool.AppPowerRental
 	apps            map[string]*appmwpb.App
@@ -56,6 +59,20 @@ func (h *queryHandler) getCoins(ctx context.Context) (err error) {
 		h.appCoins[appID] = coins
 	}
 	return wlog.WrapError(err)
+}
+
+func (h *queryHandler) getPoolGoodUsers(ctx context.Context) (err error) {
+	h.poolGoodUsers, err = goodgwcommon.GetPoolGoodUsers(ctx, func() (poolGoodUserIDs []string) {
+		for _, powerRental := range h.appPowerRentals {
+			for _, miningGoodStock := range powerRental.MiningGoodStocks {
+				if len(miningGoodStock.PoolGoodUserID) > 0 {
+					poolGoodUserIDs = append(poolGoodUserIDs, miningGoodStock.PoolGoodUserID)
+				}
+			}
+		}
+		return
+	}())
+	return err
 }
 
 //nolint:funlen
@@ -97,6 +114,7 @@ func (h *queryHandler) formalize() {
 			BenefitIntervalHours: appPowerRental.BenefitIntervalHours,
 			GoodPurchasable:      appPowerRental.GoodPurchasable,
 			GoodOnline:           appPowerRental.GoodOnline,
+			State:                appPowerRental.State,
 
 			StockMode:                    appPowerRental.StockMode,
 			AppGoodPurchasable:           appPowerRental.AppGoodPurchasable,
@@ -191,15 +209,34 @@ func (h *queryHandler) formalize() {
 				}
 				return
 			}(),
-			Descriptions:  appPowerRental.Descriptions,
-			Posters:       appPowerRental.Posters,
-			DisplayNames:  appPowerRental.DisplayNames,
-			DisplayColors: appPowerRental.DisplayColors,
-			Requireds:     appPowerRental.Requireds,
-			// TODO: expand mining pool information
+			Descriptions:        appPowerRental.Descriptions,
+			Posters:             appPowerRental.Posters,
+			DisplayNames:        appPowerRental.DisplayNames,
+			DisplayColors:       appPowerRental.DisplayColors,
+			Requireds:           appPowerRental.Requireds,
 			AppMiningGoodStocks: appPowerRental.AppMiningGoodStocks,
-			MiningGoodStocks:    appPowerRental.MiningGoodStocks,
-			Labels:              appPowerRental.Labels,
+
+			MiningGoodStocks: func() (mininGoodStocks []*goodstockgwpb.MiningGoodStockInfo) {
+				for _, stock := range appPowerRental.MiningGoodStocks {
+					mininGoodStock := &goodstockgwpb.MiningGoodStockInfo{
+						EntID:          stock.EntID,
+						GoodStockID:    stock.GoodStockID,
+						PoolGoodUserID: stock.PoolGoodUserID,
+						Total:          stock.Total,
+						SpotQuantity:   stock.SpotQuantity,
+					}
+					if goodUser, ok := h.poolGoodUsers[stock.PoolGoodUserID]; ok {
+						mininGoodStock.MiningPoolID = goodUser.PoolID
+						mininGoodStock.MiningPoolName = goodUser.MiningPoolName
+						mininGoodStock.MiningPoolLogo = goodUser.MiningPoolLogo
+						mininGoodStock.MiningPoolSite = goodUser.MiningPoolSite
+						mininGoodStock.MiningPoolReadPageLink = goodUser.ReadPageLink
+					}
+					mininGoodStocks = append(mininGoodStocks, mininGoodStock)
+				}
+				return mininGoodStocks
+			}(),
+			Labels: appPowerRental.Labels,
 
 			CreatedAt: appPowerRental.CreatedAt,
 			UpdatedAt: appPowerRental.UpdatedAt,
@@ -235,7 +272,9 @@ func (h *Handler) GetPowerRental(ctx context.Context) (*npool.AppPowerRental, er
 	if err := handler.getCoins(ctx); err != nil {
 		return nil, err
 	}
-
+	if err := handler.getPoolGoodUsers(ctx); err != nil {
+		return nil, err
+	}
 	handler.formalize()
 	if len(handler.infos) == 0 {
 		return nil, nil

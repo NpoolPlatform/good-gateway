@@ -3,14 +3,15 @@ module github.com/NpoolPlatform/good-gateway
 go 1.17
 
 require (
-	github.com/NpoolPlatform/appuser-middleware v0.0.0-20240926060520-1949246cf711
-	github.com/NpoolPlatform/basal-middleware v0.0.0-20231015112137-254853c60eec
+	github.com/NpoolPlatform/appuser-middleware v0.0.0-20240119021359-948c8504d662
+	github.com/NpoolPlatform/basal-middleware v0.0.0-20240228105108-f00107969a4f
 	github.com/NpoolPlatform/chain-middleware v0.0.0-20240711085642-93249f191575
 	github.com/NpoolPlatform/go-service-framework v0.0.0-20240510075442-89278cb5cf47
-	github.com/NpoolPlatform/good-middleware v0.0.0-20240902070043-64d264a1eee6
+	github.com/NpoolPlatform/good-middleware v0.0.0-20241106020322-e0263589a08c
 	github.com/NpoolPlatform/libent-cruder v0.0.0-20240323085036-7679b4818ce7
-	github.com/NpoolPlatform/message v0.0.0-20240926035258-262baa9486ff
-	github.com/NpoolPlatform/order-middleware v0.0.0-20240711091705-d8489ca569a2
+	github.com/NpoolPlatform/message v0.0.0-20241104010148-4dc1b1efd9d1
+	github.com/NpoolPlatform/miningpool-middleware v0.0.0-20241106020300-03d147aeb913
+	github.com/NpoolPlatform/order-middleware v0.0.0-20241106020324-b91339b3d20e
 	github.com/go-resty/resty/v2 v2.7.0
 	github.com/google/uuid v1.3.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.15.2
@@ -22,7 +23,7 @@ require (
 )
 
 require (
-	ariga.io/atlas v0.10.0 // indirect
+	ariga.io/atlas v0.14.1-0.20230918065911-83ad451a4935 // indirect
 	entgo.io/ent v0.12.0 // indirect
 	github.com/Shonminh/apollo-client v0.4.0 // indirect
 	github.com/ThreeDotsLabs/watermill v1.2.0 // indirect
@@ -103,9 +104,9 @@ require (
 	go.uber.org/multierr v1.8.0 // indirect
 	go.uber.org/ratelimit v0.2.0 // indirect
 	go.uber.org/zap v1.24.0 // indirect
-	golang.org/x/mod v0.9.0 // indirect
+	golang.org/x/mod v0.10.0 // indirect
 	golang.org/x/net v0.8.0 // indirect
-	golang.org/x/sys v0.6.0 // indirect
+	golang.org/x/sys v0.7.0 // indirect
 	golang.org/x/text v0.8.0 // indirect
 	golang.org/x/tools v0.7.0 // indirect
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect

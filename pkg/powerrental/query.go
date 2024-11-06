@@ -9,15 +9,18 @@ import (
 	coinmwpb "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin"
 	goodcoingwpb "github.com/NpoolPlatform/message/npool/good/gw/v1/good/coin"
 	goodcoinrewardgwpb "github.com/NpoolPlatform/message/npool/good/gw/v1/good/coin/reward"
+	goodstockgwpb "github.com/NpoolPlatform/message/npool/good/gw/v1/good/stock"
 	npool "github.com/NpoolPlatform/message/npool/good/gw/v1/powerrental"
 	powerrentalmwpb "github.com/NpoolPlatform/message/npool/good/mw/v1/powerrental"
+	goodusermwpb "github.com/NpoolPlatform/message/npool/miningpool/mw/v1/gooduser"
 )
 
 type queryHandler struct {
 	*Handler
-	powerRentals []*powerrentalmwpb.PowerRental
-	coins        map[string]*coinmwpb.Coin
-	infos        []*npool.PowerRental
+	powerRentals  []*powerrentalmwpb.PowerRental
+	coins         map[string]*coinmwpb.Coin
+	poolGoodUsers map[string]*goodusermwpb.GoodUser
+	infos         []*npool.PowerRental
 }
 
 func (h *queryHandler) getCoins(ctx context.Context) (err error) {
@@ -32,6 +35,21 @@ func (h *queryHandler) getCoins(ctx context.Context) (err error) {
 	return err
 }
 
+func (h *queryHandler) getPoolGoodUsers(ctx context.Context) (err error) {
+	h.poolGoodUsers, err = goodgwcommon.GetPoolGoodUsers(ctx, func() (poolGoodUserIDs []string) {
+		for _, powerRental := range h.powerRentals {
+			for _, miningGoodStock := range powerRental.MiningGoodStocks {
+				if len(miningGoodStock.PoolGoodUserID) > 0 {
+					poolGoodUserIDs = append(poolGoodUserIDs, miningGoodStock.PoolGoodUserID)
+				}
+			}
+		}
+		return
+	}())
+	return err
+}
+
+//nolint:funlen
 func (h *queryHandler) formalize() {
 	for _, powerRental := range h.powerRentals {
 		info := &npool.PowerRental{
@@ -68,6 +86,7 @@ func (h *queryHandler) formalize() {
 			BenefitIntervalHours: powerRental.BenefitIntervalHours,
 			Purchasable:          powerRental.Purchasable,
 			Online:               powerRental.Online,
+			State:                powerRental.State,
 
 			StockMode:    powerRental.StockMode,
 			StockID:      powerRental.GoodStockID,
@@ -122,7 +141,32 @@ func (h *queryHandler) formalize() {
 				}
 				return
 			}(),
-			MiningGoodStocks: powerRental.MiningGoodStocks,
+			MiningGoodStocks: func() (mininGoodStocks []*goodstockgwpb.MiningGoodStock) {
+				for _, stock := range powerRental.MiningGoodStocks {
+					mininGoodStock := &goodstockgwpb.MiningGoodStock{
+						ID:             stock.ID,
+						EntID:          stock.EntID,
+						GoodStockID:    stock.GoodStockID,
+						PoolGoodUserID: stock.PoolGoodUserID,
+						Total:          stock.Total,
+						SpotQuantity:   stock.SpotQuantity,
+						Locked:         stock.Locked,
+						WaitStart:      stock.WaitStart,
+						InService:      stock.InService,
+						Sold:           stock.Sold,
+						State:          stock.State,
+					}
+					if goodUser, ok := h.poolGoodUsers[stock.PoolGoodUserID]; ok {
+						mininGoodStock.MiningPoolID = goodUser.PoolID
+						mininGoodStock.MiningPoolName = goodUser.MiningPoolName
+						mininGoodStock.MiningPoolLogo = goodUser.MiningPoolLogo
+						mininGoodStock.MiningPoolSite = goodUser.MiningPoolSite
+						mininGoodStock.MiningPoolReadPageLink = goodUser.ReadPageLink
+					}
+					mininGoodStocks = append(mininGoodStocks, mininGoodStock)
+				}
+				return mininGoodStocks
+			}(),
 
 			CreatedAt: powerRental.CreatedAt,
 			UpdatedAt: powerRental.UpdatedAt,
@@ -145,6 +189,10 @@ func (h *Handler) GetPowerRental(ctx context.Context) (*npool.PowerRental, error
 		powerRentals: []*powerrentalmwpb.PowerRental{powerRental},
 	}
 	if err := handler.getCoins(ctx); err != nil {
+		return nil, err
+	}
+
+	if err := handler.getPoolGoodUsers(ctx); err != nil {
 		return nil, err
 	}
 
@@ -171,6 +219,10 @@ func (h *Handler) GetPowerRentals(ctx context.Context) ([]*npool.PowerRental, ui
 	}
 
 	if err := handler.getCoins(ctx); err != nil {
+		return nil, 0, err
+	}
+
+	if err := handler.getPoolGoodUsers(ctx); err != nil {
 		return nil, 0, err
 	}
 
