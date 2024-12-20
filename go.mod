@@ -3,15 +3,17 @@ module github.com/NpoolPlatform/good-gateway
 go 1.17
 
 require (
+	github.com/NpoolPlatform/account-middleware v0.0.0-20241220104902-158ae36312d3
 	github.com/NpoolPlatform/appuser-middleware v0.0.0-20240119021359-948c8504d662
 	github.com/NpoolPlatform/basal-middleware v0.0.0-20240228105108-f00107969a4f
 	github.com/NpoolPlatform/chain-middleware v0.0.0-20240711085642-93249f191575
 	github.com/NpoolPlatform/go-service-framework v0.0.0-20240510075442-89278cb5cf47
-	github.com/NpoolPlatform/good-middleware v0.0.0-20241106020322-e0263589a08c
+	github.com/NpoolPlatform/good-middleware v0.0.0-20241220105256-1456fb595d8b
 	github.com/NpoolPlatform/libent-cruder v0.0.0-20240323085036-7679b4818ce7
-	github.com/NpoolPlatform/message v0.0.0-20241104010148-4dc1b1efd9d1
+	github.com/NpoolPlatform/message v0.0.0-20241220104342-7f306495de57
 	github.com/NpoolPlatform/miningpool-middleware v0.0.0-20241106020300-03d147aeb913
 	github.com/NpoolPlatform/order-middleware v0.0.0-20241106020324-b91339b3d20e
+	github.com/NpoolPlatform/sphinx-proxy v0.0.0-20231020115438-bd66d3d334af
 	github.com/go-resty/resty/v2 v2.7.0
 	github.com/google/uuid v1.3.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.15.2
@@ -69,11 +71,8 @@ require (
 	github.com/magiconair/properties v1.8.6 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.16 // indirect
-	github.com/mattn/go-sqlite3 v1.14.16 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.4 // indirect
-	github.com/miekg/dns v1.1.48 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
-	github.com/mitchellh/go-testing-interface v1.14.1 // indirect
 	github.com/mitchellh/go-wordwrap v0.0.0-20150314170334-ad45545899c7 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/oklog/ulid v1.3.1 // indirect
@@ -108,7 +107,6 @@ require (
 	golang.org/x/net v0.8.0 // indirect
 	golang.org/x/sys v0.7.0 // indirect
 	golang.org/x/text v0.8.0 // indirect
-	golang.org/x/tools v0.7.0 // indirect
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect
 	google.golang.org/genproto v0.0.0-20230306155012-7f2fa6fef1f4 // indirect
 	gopkg.in/ini.v1 v1.66.4 // indirect

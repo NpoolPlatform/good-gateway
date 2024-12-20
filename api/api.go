@@ -22,6 +22,7 @@ import (
 	topmostgoodconstraint "github.com/NpoolPlatform/good-gateway/api/app/good/topmost/good/constraint"
 	topmostgoodposter "github.com/NpoolPlatform/good-gateway/api/app/good/topmost/good/poster"
 	topmostposter "github.com/NpoolPlatform/good-gateway/api/app/good/topmost/poster"
+	apppledge "github.com/NpoolPlatform/good-gateway/api/app/pledge"
 	apppowerrental "github.com/NpoolPlatform/good-gateway/api/app/powerrental"
 	apppowerrentalsimulate "github.com/NpoolPlatform/good-gateway/api/app/powerrental/simulate"
 	devicetype "github.com/NpoolPlatform/good-gateway/api/device"
@@ -33,6 +34,7 @@ import (
 	"github.com/NpoolPlatform/good-gateway/api/good/coin/reward/history"
 	malfunction "github.com/NpoolPlatform/good-gateway/api/good/malfunction"
 	"github.com/NpoolPlatform/good-gateway/api/good/required"
+	pledge "github.com/NpoolPlatform/good-gateway/api/pledge"
 	powerrental "github.com/NpoolPlatform/good-gateway/api/powerrental"
 	"github.com/NpoolPlatform/good-gateway/api/vender/brand"
 	"github.com/NpoolPlatform/good-gateway/api/vender/location"
@@ -81,6 +83,8 @@ func Register(server grpc.ServiceRegistrar) {
 	apppowerrental.Register(server)
 	goodcoin.Register(server)
 	malfunction.Register(server)
+	pledge.Register(server)
+	apppledge.Register(server)
 }
 
 //nolint:gocyclo,funlen
@@ -185,6 +189,12 @@ func RegisterGateway(mux *runtime.ServeMux, endpoint string, opts []grpc.DialOpt
 		return err
 	}
 	if err := malfunction.RegisterGateway(mux, endpoint, opts); err != nil {
+		return err
+	}
+	if err := pledge.RegisterGateway(mux, endpoint, opts); err != nil {
+		return err
+	}
+	if err := pledge.RegisterGateway(mux, endpoint, opts); err != nil {
 		return err
 	}
 	return nil
