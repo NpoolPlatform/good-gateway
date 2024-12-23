@@ -80,7 +80,7 @@ func (h *queryHandler) formalize() {
 			EntID:                     pledge.EntID,
 			GoodID:                    pledge.GoodID,
 			ContractDeploymentAddress: deploymentAddress,
-			ContractSettlementAddress: calculateAddress,
+			ContractCalculateAddress:  calculateAddress,
 
 			GoodType:             pledge.GoodType,
 			BenefitType:          pledge.BenefitType,
