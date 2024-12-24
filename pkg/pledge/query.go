@@ -97,8 +97,6 @@ func (h *queryHandler) formalize() {
 			ContractCodeBranch: pledge.ContractCodeBranch,
 			ContractState:      pledge.ContractState,
 
-			StockMode: pledge.StockMode,
-
 			RewardState:  pledge.RewardState,
 			LastRewardAt: pledge.LastRewardAt,
 			Rewards: func() (rewards []*goodcoinrewardgwpb.RewardInfo) {
