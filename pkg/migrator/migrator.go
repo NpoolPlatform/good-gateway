@@ -14,8 +14,6 @@ import (
 	servicename "github.com/NpoolPlatform/good-gateway/pkg/servicename"
 	"github.com/NpoolPlatform/good-middleware/pkg/db"
 	"github.com/NpoolPlatform/good-middleware/pkg/db/ent"
-	entgoodbase "github.com/NpoolPlatform/good-middleware/pkg/db/ent/goodbase"
-	goodtypes "github.com/NpoolPlatform/message/npool/basetypes/good/v1"
 
 	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 )
@@ -72,24 +70,6 @@ func open(hostname string) (conn *sql.DB, err error) {
 	return conn, nil
 }
 
-func migrateGoodBases(ctx context.Context, tx *ent.Tx) error {
-	logger.Sugar().Warnw("exec migrateGoodBases")
-	now := uint32(time.Now().Unix())
-
-	_, err := tx.GoodBase.
-		Update().
-		SetState(
-			goodtypes.GoodState_GoodStateReady.String(),
-		).
-		SetUpdatedAt(now).
-		Where(
-			entgoodbase.DeletedAt(0),
-			entgoodbase.BenefitType(goodtypes.BenefitType_BenefitTypePlatform.String()),
-		).
-		Save(ctx)
-	return err
-}
-
 func lockKey() string {
 	serviceID := config.GetStringValueWithNameSpace(servicename.ServiceDomain, keyServiceID)
 	return fmt.Sprintf("%v:%v", basetypes.Prefix_PrefixMigrate, serviceID)
@@ -120,9 +100,6 @@ func Migrate(ctx context.Context) error {
 	}()
 
 	return db.WithTx(ctx, func(_ctx context.Context, tx *ent.Tx) error {
-		if err := migrateGoodBases(ctx, tx); err != nil {
-			return wlog.WrapError(err)
-		}
 		return nil
 	})
 }
