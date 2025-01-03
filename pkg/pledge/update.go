@@ -29,7 +29,6 @@ func (h *Handler) UpdatePledge(ctx context.Context) (*npool.Pledge, error) {
 		Online:               h.Online,
 		ContractCodeURL:      h.ContractCodeURL,
 		ContractCodeBranch:   h.ContractCodeBranch,
-		ContractState:        h.ContractState,
 	}); err != nil {
 		return nil, wlog.WrapError(err)
 	}

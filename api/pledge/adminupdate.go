@@ -28,7 +28,6 @@ func (s *Server) AdminUpdatePledge(ctx context.Context, in *npool.AdminUpdatePle
 		pledge1.WithBenefitIntervalHours(in.BenefitIntervalHours, false),
 		pledge1.WithPurchasable(in.Purchasable, false),
 		pledge1.WithOnline(in.Online, false),
-		pledge1.WithState(in.State, false),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(

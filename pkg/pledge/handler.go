@@ -368,29 +368,6 @@ func WithOnline(b *bool, must bool) func(context.Context, *Handler) error {
 	}
 }
 
-func WithState(e *types.GoodState, must bool) func(context.Context, *Handler) error {
-	return func(ctx context.Context, h *Handler) error {
-		if e == nil {
-			if must {
-				return wlog.Errorf("invalid state")
-			}
-			return nil
-		}
-		switch *e {
-		case types.GoodState_GoodStatePreWait:
-		case types.GoodState_GoodStateWait:
-		case types.GoodState_GoodStateCreateGoodUser:
-		case types.GoodState_GoodStateCheckHashRate:
-		case types.GoodState_GoodStateReady:
-		case types.GoodState_GoodStateFail:
-		default:
-			return wlog.Errorf("invalid state")
-		}
-		h.State = e
-		return nil
-	}
-}
-
 func WithOffset(offset int32) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		h.Offset = offset
