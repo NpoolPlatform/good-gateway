@@ -21,7 +21,6 @@ func (s *Server) AdminUpdatePledge(ctx context.Context, in *npool.AdminUpdatePle
 
 		pledge1.WithContractCodeURL(in.ContractCodeURL, false),
 		pledge1.WithContractCodeBranch(in.ContractCodeBranch, false),
-		pledge1.WithGoodType(in.GoodType, false),
 		pledge1.WithName(in.Name, false),
 		pledge1.WithServiceStartAt(in.ServiceStartAt, false),
 		pledge1.WithStartMode(in.StartMode, false),

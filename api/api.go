@@ -194,7 +194,7 @@ func RegisterGateway(mux *runtime.ServeMux, endpoint string, opts []grpc.DialOpt
 	if err := pledge.RegisterGateway(mux, endpoint, opts); err != nil {
 		return err
 	}
-	if err := pledge.RegisterGateway(mux, endpoint, opts); err != nil {
+	if err := apppledge.RegisterGateway(mux, endpoint, opts); err != nil {
 		return err
 	}
 	return nil

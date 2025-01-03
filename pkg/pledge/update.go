@@ -20,7 +20,6 @@ func (h *Handler) UpdatePledge(ctx context.Context) (*npool.Pledge, error) {
 		ID:                   h.ID,
 		EntID:                h.EntID,
 		GoodID:               h.GoodID,
-		GoodType:             h.GoodType,
 		Name:                 h.Name,
 		ServiceStartAt:       h.ServiceStartAt,
 		StartMode:            h.StartMode,
