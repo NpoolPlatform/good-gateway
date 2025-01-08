@@ -4,10 +4,13 @@ import (
 	"context"
 	"fmt"
 
+	contractmwcli "github.com/NpoolPlatform/account-middleware/pkg/client/contract"
 	coinmwcli "github.com/NpoolPlatform/chain-middleware/pkg/client/coin"
 	wlog "github.com/NpoolPlatform/go-service-framework/pkg/wlog"
 	goodcoinmwcli "github.com/NpoolPlatform/good-middleware/pkg/client/good/coin"
 	pledgemwcli "github.com/NpoolPlatform/good-middleware/pkg/client/pledge"
+	contractmwpb "github.com/NpoolPlatform/message/npool/account/mw/v1/contract"
+	accounttypes "github.com/NpoolPlatform/message/npool/basetypes/account/v1"
 	npool "github.com/NpoolPlatform/message/npool/good/gw/v1/pledge"
 	goodcoinmwpb "github.com/NpoolPlatform/message/npool/good/mw/v1/good/coin"
 	pledgemwpb "github.com/NpoolPlatform/message/npool/good/mw/v1/pledge"
@@ -58,6 +61,16 @@ func (h *createHandler) createDevelopmentAddress(ctx context.Context) error {
 		return fmt.Errorf("fail create address")
 	}
 	h.contractDevelopmentAddress = &acc.Address
+	_, err = contractmwcli.CreateAccount(ctx, &contractmwpb.AccountReq{
+		GoodID:       h.GoodID,
+		PledgeID:     h.EntID,
+		ContractType: accounttypes.ContractType_ContractDeployment.Enum(),
+		CoinTypeID:   h.CoinTypeID,
+		Address:      h.contractDevelopmentAddress,
+	})
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -70,12 +83,25 @@ func (h *createHandler) createCalculateAddress(ctx context.Context) error {
 		return fmt.Errorf("fail create address")
 	}
 	h.contractCalculateAddress = &acc.Address
+	_, err = contractmwcli.CreateAccount(ctx, &contractmwpb.AccountReq{
+		GoodID:       h.GoodID,
+		PledgeID:     h.EntID,
+		ContractType: accounttypes.ContractType_ContractCalculate.Enum(),
+		CoinTypeID:   h.CoinTypeID,
+		Address:      h.contractDevelopmentAddress,
+	})
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
 func (h *Handler) CreatePledge(ctx context.Context) (*npool.Pledge, error) {
 	if h.GoodID == nil {
 		h.GoodID = func() *string { s := uuid.NewString(); return &s }()
+	}
+	if h.EntID == nil {
+		h.EntID = func() *string { s := uuid.NewString(); return &s }()
 	}
 	handler := &createHandler{
 		Handler: h,
@@ -90,6 +116,7 @@ func (h *Handler) CreatePledge(ctx context.Context) (*npool.Pledge, error) {
 		return nil, err
 	}
 	if err := pledgemwcli.CreatePledge(ctx, &pledgemwpb.PledgeReq{
+		EntID:                h.EntID,
 		GoodID:               h.GoodID,
 		GoodType:             h.GoodType,
 		Name:                 h.Name,
