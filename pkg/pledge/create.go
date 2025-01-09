@@ -90,7 +90,7 @@ func (h *createHandler) createCalculateAddress(ctx context.Context) error {
 		PledgeID:     h.EntID,
 		ContractType: accounttypes.ContractType_ContractCalculate.Enum(),
 		CoinTypeID:   h.CoinTypeID,
-		Address:      h.contractDevelopmentAddress,
+		Address:      h.contractCalculateAddress,
 	})
 	if err != nil {
 		return err
