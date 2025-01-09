@@ -52,6 +52,7 @@ func (h *createHandler) createGoodCoin(ctx context.Context) error {
 	return nil
 }
 
+//nolint:dupl
 func (h *createHandler) createDevelopmentAddress(ctx context.Context) error {
 	acc, err := sphinxproxycli.CreateAddress(ctx, *h.goodCoinName)
 	if err != nil {
@@ -74,6 +75,7 @@ func (h *createHandler) createDevelopmentAddress(ctx context.Context) error {
 	return nil
 }
 
+//nolint:dupl
 func (h *createHandler) createCalculateAddress(ctx context.Context) error {
 	acc, err := sphinxproxycli.CreateAddress(ctx, *h.goodCoinName)
 	if err != nil {
