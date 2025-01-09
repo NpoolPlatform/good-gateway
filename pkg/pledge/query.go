@@ -48,7 +48,7 @@ func (h *queryHandler) getPledgeAddress(ctx context.Context) (err error) {
 	}
 	accounts, _, err := contractmwcli.GetAccounts(ctx, &contractmwpb.Conds{
 		PledgeIDs: &basetypes.StringSliceVal{Op: cruder.IN, Value: pledgeIDs},
-	}, int32(0), int32(len(pledgeIDs)))
+	}, int32(0), int32(len(pledgeIDs)*2))
 	if accounts == nil {
 		return nil
 	}
