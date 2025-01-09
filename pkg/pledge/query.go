@@ -56,7 +56,7 @@ func (h *queryHandler) getPledgeAddress(ctx context.Context) (err error) {
 		if accont.ContractType == accounttypes.ContractType_ContractDeployment {
 			h.deploymentAddress[accont.PledgeID] = accont
 		}
-		if accont.ContractType == accounttypes.ContractType_ContractDeployment {
+		if accont.ContractType == accounttypes.ContractType_ContractCalculate {
 			h.calculateAddress[accont.PledgeID] = accont
 		}
 	}
