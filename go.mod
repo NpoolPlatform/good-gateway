@@ -3,14 +3,14 @@ module github.com/NpoolPlatform/good-gateway
 go 1.17
 
 require (
-	github.com/NpoolPlatform/account-middleware v0.0.0-20241220104902-158ae36312d3
+	github.com/NpoolPlatform/account-middleware v0.0.0-20250114083606-19a60147e4a5
 	github.com/NpoolPlatform/appuser-middleware v0.0.0-20240119021359-948c8504d662
 	github.com/NpoolPlatform/basal-middleware v0.0.0-20240228105108-f00107969a4f
 	github.com/NpoolPlatform/chain-middleware v0.0.0-20240711085642-93249f191575
 	github.com/NpoolPlatform/go-service-framework v0.0.0-20240510075442-89278cb5cf47
-	github.com/NpoolPlatform/good-middleware v0.0.0-20241226122633-bed3fc8e7749
+	github.com/NpoolPlatform/good-middleware v0.0.0-20250114082844-6665ba38fe5a
 	github.com/NpoolPlatform/libent-cruder v0.0.0-20240323085036-7679b4818ce7
-	github.com/NpoolPlatform/message v0.0.0-20250103065839-c2ed14e3750c
+	github.com/NpoolPlatform/message v0.0.0-20250114082501-6b4b1452f3c3
 	github.com/NpoolPlatform/miningpool-middleware v0.0.0-20241106020300-03d147aeb913
 	github.com/NpoolPlatform/order-middleware v0.0.0-20241106020324-b91339b3d20e
 	github.com/NpoolPlatform/sphinx-proxy v0.0.0-20231020115438-bd66d3d334af
