@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 
+	appdelegatedstaking "github.com/NpoolPlatform/good-gateway/api/app/delegatedstaking"
 	appfee "github.com/NpoolPlatform/good-gateway/api/app/fee"
 	appgood "github.com/NpoolPlatform/good-gateway/api/app/good"
 	"github.com/NpoolPlatform/good-gateway/api/app/good/comment"
@@ -24,6 +25,7 @@ import (
 	topmostposter "github.com/NpoolPlatform/good-gateway/api/app/good/topmost/poster"
 	apppowerrental "github.com/NpoolPlatform/good-gateway/api/app/powerrental"
 	apppowerrentalsimulate "github.com/NpoolPlatform/good-gateway/api/app/powerrental/simulate"
+	delegatedstaking "github.com/NpoolPlatform/good-gateway/api/delegatedstaking"
 	devicetype "github.com/NpoolPlatform/good-gateway/api/device"
 	manufacturer "github.com/NpoolPlatform/good-gateway/api/device/manufacturer"
 	deviceposter "github.com/NpoolPlatform/good-gateway/api/device/poster"
@@ -81,6 +83,8 @@ func Register(server grpc.ServiceRegistrar) {
 	apppowerrental.Register(server)
 	goodcoin.Register(server)
 	malfunction.Register(server)
+	delegatedstaking.Register(server)
+	appdelegatedstaking.Register(server)
 }
 
 //nolint:gocyclo,funlen
@@ -185,6 +189,12 @@ func RegisterGateway(mux *runtime.ServeMux, endpoint string, opts []grpc.DialOpt
 		return err
 	}
 	if err := malfunction.RegisterGateway(mux, endpoint, opts); err != nil {
+		return err
+	}
+	if err := delegatedstaking.RegisterGateway(mux, endpoint, opts); err != nil {
+		return err
+	}
+	if err := appdelegatedstaking.RegisterGateway(mux, endpoint, opts); err != nil {
 		return err
 	}
 	return nil
